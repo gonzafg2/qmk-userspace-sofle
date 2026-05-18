@@ -77,7 +77,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  */
 [_ADJUST] = LAYOUT(
   QK_BOOT,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                                    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
-  XXXXXXX,  GFG_SCRF,GFG_SCRA,GFG_SCRT,GFG_LOCK,GFG_FQUIT,                                  RGB_TOG, RGB_MOD, RGB_HUI, RGB_SAI, RGB_VAI, XXXXXXX,
+  XXXXXXX,  GFG_SCRF,GFG_SCRA,GFG_SCRT,GFG_LOCK,GFG_FQUIT,                                  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
   XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                                    TG(_MOUSE), KC_VOLD, KC_MUTE, KC_VOLU, XXXXXXX, XXXXXXX,
   XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______,                _______,   XXXXXXX, KC_MPRV, KC_MPLY, KC_MNXT, XXXXXXX, XXXXXXX,
                      _______, _______, _______, _______, _______,        _______, _______, _______, _______, _______
@@ -86,20 +86,20 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /* Mouse */
 [_MOUSE] = LAYOUT(
   XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                                    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
-  XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                                    XXXXXXX, KC_MS_L, KC_MS_D, KC_MS_U, KC_MS_R, XXXXXXX,
-  _______,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                                    XXXXXXX, KC_WH_L, KC_WH_D, KC_WH_U, KC_WH_R, XXXXXXX,
-  _______,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______,                _______,   XXXXXXX, KC_BTN1, KC_BTN3, KC_BTN2, XXXXXXX, TG(_MOUSE),
+  XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                                    XXXXXXX, MS_LEFT, MS_DOWN, MS_UP,   MS_RGHT, XXXXXXX,
+  _______,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                                    XXXXXXX, MS_WHLL, MS_WHLD, MS_WHLU, MS_WHLR, XXXXXXX,
+  _______,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______,                _______,   XXXXXXX, MS_BTN1, MS_BTN3, MS_BTN2, XXXXXXX, TG(_MOUSE),
                      _______, _______, _______, _______, _______,        _______, _______, _______, _______, _______
 ),
 };
 
 #ifdef ENCODER_MAP_ENABLE
 const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][NUM_DIRECTIONS] = {
-    [_BASE]   = { ENCODER_CCW_CW(KC_VOLD, KC_VOLU),         ENCODER_CCW_CW(KC_WH_D, KC_WH_U)         },
-    [_LOWER]  = { ENCODER_CCW_CW(KC_BRID, KC_BRIU),         ENCODER_CCW_CW(KC_WH_L, KC_WH_R)         },
+    [_BASE]   = { ENCODER_CCW_CW(KC_VOLD, KC_VOLU),             ENCODER_CCW_CW(MS_WHLD, MS_WHLU)            },
+    [_LOWER]  = { ENCODER_CCW_CW(KC_BRID, KC_BRIU),             ENCODER_CCW_CW(MS_WHLL, MS_WHLR)            },
     [_RAISE]  = { ENCODER_CCW_CW(LGUI(KC_LBRC), LGUI(KC_RBRC)), ENCODER_CCW_CW(LALT(KC_LEFT), LALT(KC_RIGHT)) },
-    [_ADJUST] = { ENCODER_CCW_CW(RGB_HUD, RGB_HUI),         ENCODER_CCW_CW(RGB_VAD, RGB_VAI)         },
-    [_MOUSE]  = { ENCODER_CCW_CW(KC_WH_D, KC_WH_U),         ENCODER_CCW_CW(KC_WH_L, KC_WH_R)         },
+    [_ADJUST] = { ENCODER_CCW_CW(KC_MPRV, KC_MNXT),             ENCODER_CCW_CW(KC_BRID, KC_BRIU)            },
+    [_MOUSE]  = { ENCODER_CCW_CW(MS_WHLD, MS_WHLU),             ENCODER_CCW_CW(MS_WHLL, MS_WHLR)            },
 };
 #endif
 
