@@ -1,0 +1,7 @@
+.build/
+*.uf2
+*.hex
+*.bin
+.DS_Store
+*.swp
+.vscode/
