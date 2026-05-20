@@ -5,3 +5,8 @@
 .DS_Store
 *.swp
 .vscode/
+
+# Override gitignore_global: en este repo SÍ queremos claudedocs/ versionado
+# (es el contexto persistente para retomar trabajo entre sesiones)
+!claudedocs/
+!claudedocs/**
