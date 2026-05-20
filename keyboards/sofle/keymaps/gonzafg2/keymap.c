@@ -9,18 +9,18 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
  * | TAB  |  Q   |  W   |  E   |  R   |  T   |                    |  Y   |  U   |  I   |  O   |  P   | BSDL |
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * | LSFT |  A   |  S   |  D   |  F   |  G   |-------.    ,-------|  H   |  J   |  K   |  L   |  Ñ   |  ´   |
- * |------+------+------+------+------+------| MUTE  |    | LOCK  |------+------+------+------+------+------|
- * | LCTL |  Z   |  X   |  C   |  V   |  B   |-------|    |-------|  N   |  M   |  ,   |  .   |  -   | ESCAD|
+ * | LSFT |  A   |  S   |  D   |  F   |  G   |-------.    ,-------|  H   |  J   |  K   |  L   |  N   |  ´   |
+ * |------+------+------+------+------+------| MUTM  |    | LOCK  |------+------+------+------+------+------|
+ * | LGUI |  Z   |  X   |  C   |  V   |  B   |-------|    |-------|  N   |  M   |  ,   |  .   |  -   | ESCAD|
  * `-----------------------------------------/       /     \      \-----------------------------------------'
- *           | LGUI | LALT | LWR  | LWRENT |LSFTMS|     | SPC | RSEENT| RSE  | RALT | RGUI |
+ *           | LCTL | LALT | --- | LWR | SPC |       | ENT | RSE | --- | RALT | RCTL |
  */
 [_BASE] = LAYOUT(
   KC_ESC,   KC_1,    KC_2,    KC_3,    KC_4,    KC_5,                                       KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_DEL,
   KC_TAB,   KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,                                       KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    GFG_BSDL,
   KC_LSFT,  KC_A,    KC_S,    KC_D,    KC_F,    KC_G,                                       KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_LBRC,
-  KC_LCTL,  KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_MUTE,                GFG_LOCK,  KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, GFG_ESCAD,
-                     KC_LGUI, KC_LALT, GFG_LWR, GFG_LWRENT, GFG_SFTMS,     KC_SPC, GFG_RSEENT, GFG_RSE, KC_RALT, KC_RGUI
+  KC_LGUI,  KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    GFG_MUTM,               GFG_LOCK,  KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, GFG_ESCAD,
+                     KC_LCTL, KC_LALT, XXXXXXX, GFG_LWR, KC_SPC,                  KC_ENT,   GFG_RSE, XXXXXXX, KC_RALT, KC_RCTL
 ),
 
 /* Lower (numpad + simbolos LATAM, fila numerica se mantiene de Base)
@@ -29,67 +29,81 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
  * | TAB  |  7   |  8   |  9   |  /   |  *   |                    |  (   |  )   |  \   |  !   |  ?   | BSDL |
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * | LSFT |  4   |  5   |  6   |  +   |  -   |-------.    ,-------|  {   |  }   |  ~   |  '   |  "   |  `   |
+ * | SFT  |  4   |  5   |  6   |  +   |  -   |-------.    ,-------|  {   |  }   |  ~   |  '   |  "   |  `   |
  * |------+------+------+------+------+------| BRDN  |    | BRUP  |------+------+------+------+------+------|
- * | LCTL |  1   |  2   |  3   |  .   |  0   |-------|    |-------|  [   |  ]   |  <   |  >   |  |   |  _   |
+ * | CMD  |  1   |  2   |  3   |  .   |  0   |-------|    |-------|  [   |  ]   |  <   |  >   |  |   |  _   |
  * `-----------------------------------------/       /     \      \-----------------------------------------'
- *           | LGUI | LALT |      | LWRENT | LSFT |      | SPC  | RSEENT| RSE  | RALT | RGUI |
+ *           | CTL | ALT | --- |  ▼  | SPC |        | ENT | RSE | --- | RALT | RCTL |
  */
 [_LOWER] = LAYOUT(
-  KC_ESC,   KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,                                      KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,
-  KC_TAB,   KC_7,    KC_8,    KC_9,    KC_PSLS, KC_PAST,                                    KC_LPRN, KC_RPRN, KC_BSLS, KC_EXLM, KC_QUES, GFG_BSDL,
-  KC_LSFT,  KC_4,    KC_5,    KC_6,    KC_PPLS, KC_PMNS,                                    KC_LCBR, KC_RCBR, KC_TILD, KC_QUOT, KC_DQUO, KC_GRV,
-  KC_LCTL,  KC_1,    KC_2,    KC_3,    KC_DOT,  KC_0,    KC_BRID,                KC_BRIU,   KC_LBRC, KC_RBRC, KC_LT,   KC_GT,   KC_PIPE, KC_UNDS,
-                     KC_LGUI, KC_LALT, _______, _______, KC_LSFT,        KC_SPC, _______, _______, KC_RALT, KC_RGUI
+  _______,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,                                      KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,
+  _______,  KC_7,    KC_8,    KC_9,    KC_PSLS, KC_PAST,                                    KC_LPRN, KC_RPRN, KC_BSLS, KC_EXLM, KC_QUES, _______,
+  _______,  KC_4,    KC_5,    KC_6,    KC_PPLS, KC_PMNS,                                    KC_LCBR, KC_RCBR, KC_TILD, KC_QUOT, KC_DQUO, KC_GRV,
+  _______,  KC_1,    KC_2,    KC_3,    KC_DOT,  KC_0,    KC_BRID,                KC_BRIU,   KC_LBRC, KC_RBRC, KC_LT,   KC_GT,   KC_PIPE, KC_UNDS,
+                     _______, _______, _______, _______, _______,                _______,   _______, _______, _______, _______
 ),
 
-/* Raise (operadores programacion + navegacion)
+/* Raise (operadores programacion + navegacion + F-keys)
  * ,-----------------------------------------.                    ,-----------------------------------------.
  * | ESC  | F12  |      |      |      |      |                    |      |      |      |      |      |      |
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
  * | TAB  |  !   |  @   |  #   |  $   |  %   |                    |      |QK_RPT|      |      | +=   | BSDL |
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * | LSFT |  ^   |      |  &   |  &&  |  ||  |-------.    ,-------| LEFT | DOWN |  UP  | RGHT | -=   |      |
- * |------+------+------+------+------+------| MUTE  |    | LOCK  |------+------+------+------+------+------|
- * | LCTL | =>   | ...  |  ==  | !==  | ===  |-------|    |-------| HOME | PGDN | PGUP | END  |      | ESCAD|
+ * | SFT  |  ^   |      |  &   |  &&  |  ||  |-------.    ,-------| LEFT | DOWN |  UP  | RGHT | -=   |      |
+ * |------+------+------+------+------+------| MUTM  |    | LOCK  |------+------+------+------+------+------|
+ * | CMD  | =>   | ...  |  ==  |  !== |  === |-------|    |-------| HOME | PGDN | PGUP | END  |      | ESCAD|
  * `-----------------------------------------/       /     \      \-----------------------------------------'
- *           | LGUI | LALT |      | LWRENT | LSFT |      | SPC  | RSEENT|      | RALT | RGUI |
+ *           | CTL | ALT | --- | LWR | SPC |        | ENT |  ▼  | --- | RALT | RCTL |
  */
 [_RAISE] = LAYOUT(
-  KC_ESC,   KC_F12,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                                    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
-  KC_TAB,   KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_PERC,                                    XXXXXXX, QK_REP,  XXXXXXX, XXXXXXX, GFG_PLEQ,GFG_BSDL,
-  KC_LSFT,  KC_CIRC, XXXXXXX, KC_AMPR, GFG_AND, GFG_OR,                                     KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, GFG_MIEQ,XXXXXXX,
-  KC_LCTL,  GFG_ARROW,GFG_SPREAD,GFG_EQEQ,GFG_NEQ,GFG_TEQ,KC_MUTE,                GFG_LOCK, KC_HOME, KC_PGDN, KC_PGUP, KC_END,  XXXXXXX, GFG_ESCAD,
-                     KC_LGUI, KC_LALT, _______, _______, KC_LSFT,        KC_SPC, _______, _______, KC_RALT, KC_RGUI
+  _______,  KC_F12,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                                    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+  _______,  KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_PERC,                                    XXXXXXX, QK_REP,  XXXXXXX, XXXXXXX, GFG_PLEQ,_______,
+  _______,  KC_CIRC, XXXXXXX, KC_AMPR, GFG_AND, GFG_OR,                                     KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, GFG_MIEQ,XXXXXXX,
+  _______,  GFG_ARROW,GFG_SPREAD,GFG_EQEQ,GFG_NEQ,GFG_TEQ,_______,                _______,  KC_HOME, KC_PGDN, KC_PGUP, KC_END,  XXXXXXX, _______,
+                     _______, _______, _______, _______, _______,                _______,   _______, _______, _______, _______
 ),
 
-/* Adjust (sistema, media, RGB)
+/* Adjust (sistema, media, macros mac, mouse toggle)
+ * Acceso: hold ambos LWR+RSE (tri-layer) | hold ESC pinky der | combo TAB+BSDL
  * ,-----------------------------------------.                    ,-----------------------------------------.
- * |QK_BT |      |      |      |      |      |                    |      |      |      |      |      |      |
+ * | BOOT |      |      |      |      |      |                    |      |      |      |      |      |      |
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * |      | SCRF | SCRA | SCRT | LOCK | FQUIT|                    | RGBTOG|RGBMOD|RGB_HUI|RGB_SAI|RGB_VAI|     |
+ * |      | SCRF | SCRA | SCRT | LOCK | FQT  |                    |TGMOU |      |      |      |      |      |
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * |      |      |      |      |      |      |-------.    ,-------| MOUSE|VOLDN | MUTE | VOLUP|      |      |
- * |------+------+------+------+------+------| MUTE  |    | LOCK  |------+------+------+------+------+------|
- * |      |      |      |      |      |      |-------|    |-------|      | PREV | PLAY | NEXT |      |      |
+ * |      |      |      |      |      |      |-------.    ,-------|      | VOLD | MUTE | VOLU |      |      |
+ * |------+------+------+------+------+------|       |    |       |------+------+------+------+------+------|
+ * |      |      |      |      |      |      |-------|    |-------|      | MPRV | MPLY | MNXT |      |      |
  * `-----------------------------------------/       /     \      \-----------------------------------------'
- *           |      |      |      |        |      |     |      |      |      |      |      |
+ *           |     |     | --- |     |     |        |     |     | --- |     |     |
  */
 [_ADJUST] = LAYOUT(
   QK_BOOT,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                                    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
-  XXXXXXX,  GFG_SCRF,GFG_SCRA,GFG_SCRT,GFG_LOCK,GFG_FQUIT,                                  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
-  XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                                    TG(_MOUSE), KC_VOLD, KC_MUTE, KC_VOLU, XXXXXXX, XXXXXXX,
+  XXXXXXX,  GFG_SCRF,GFG_SCRA,GFG_SCRT,GFG_LOCK,GFG_FQUIT,                                  TG(_MOUSE), XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+  XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                                    XXXXXXX, KC_VOLD, KC_MUTE, KC_VOLU, XXXXXXX, XXXXXXX,
   XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______,                _______,   XXXXXXX, KC_MPRV, KC_MPLY, KC_MNXT, XXXXXXX, XXXXXXX,
-                     _______, _______, _______, _______, _______,        _______, _______, _______, _______, _______
+                     _______, _______, _______, _______, _______,                _______,   _______, _______, _______, _______
 ),
 
-/* Mouse */
+/* Mouse (movimiento, scroll, clicks)
+ * Acceso: hold encoder push izq (momentaneo) | tap TG_MOUSE desde Adjust (persistente)
+ * Salir persistente: tap EXIT (esquina sup der o esquina inf der)
+ * ,-----------------------------------------.                    ,-----------------------------------------.
+ * |      |      |      |      |      |      |                    |      | BTN1 | BTN3 | BTN2 |      | EXIT |
+ * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
+ * |      |      |      |      |      |      |                    |      | M_LF | M_DN | M_UP | M_RT |      |
+ * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
+ * | SFT  |      |      |      |      |      |-------.    ,-------|      | S_LF | S_DN | S_UP | S_RT |      |
+ * |------+------+------+------+------+------|       |    |       |------+------+------+------+------+------|
+ * | CMD  |      |      |      |      |      |-------|    |-------|      |      |      |      |      | EXIT |
+ * `-----------------------------------------/       /     \      \-----------------------------------------'
+ *           | CTL | ALT | --- |     | SPC |        | ENT |     | --- | RALT | RCTL |
+ */
 [_MOUSE] = LAYOUT(
-  XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                                    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+  XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                                    XXXXXXX, MS_BTN1, MS_BTN3, MS_BTN2, XXXXXXX, TG(_MOUSE),
   XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                                    XXXXXXX, MS_LEFT, MS_DOWN, MS_UP,   MS_RGHT, XXXXXXX,
   _______,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                                    XXXXXXX, MS_WHLL, MS_WHLD, MS_WHLU, MS_WHLR, XXXXXXX,
-  _______,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______,                _______,   XXXXXXX, MS_BTN1, MS_BTN3, MS_BTN2, XXXXXXX, TG(_MOUSE),
-                     _______, _______, _______, _______, _______,        _______, _______, _______, _______, _______
+  _______,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______,                _______,   XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, TG(_MOUSE),
+                     _______, _______, _______, _______, _______,                _______,   _______, _______, _______, _______
 ),
 };
 
@@ -149,14 +163,6 @@ static void render_layer_state(void) {
     }
 }
 
-static void render_wpm(void) {
-    oled_set_cursor(0, 13);
-    oled_write_P(PSTR("WPM:\n"), false);
-    char wpm_str[5];
-    snprintf(wpm_str, sizeof(wpm_str), "%3d", get_current_wpm());
-    oled_write(wpm_str, false);
-}
-
 static void render_mod_status(void) {
     uint8_t mods = get_mods() | get_oneshot_mods();
     oled_set_cursor(0, 11);
@@ -170,7 +176,6 @@ bool oled_task_user(void) {
     if (is_keyboard_master()) {
         render_layer_state();
         render_mod_status();
-        render_wpm();
     } else {
         oled_set_cursor(0, 6);
         oled_write_P(PSTR("gonzafg2\n\n"), false);
