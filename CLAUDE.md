@@ -2,9 +2,20 @@
 
 Guía para Claude Code al trabajar con este repo.
 
+## Antes de empezar — leer `claudedocs/`
+
+Carpeta con el contexto persistente entre sesiones:
+
+- [`claudedocs/session-context.md`](./claudedocs/session-context.md) — contexto general, estado actual, qué se hizo y qué quedó pendiente
+- [`claudedocs/thumb-cluster-iteration.md`](./claudedocs/thumb-cluster-iteration.md) — discusión abierta sobre redundancia en el thumb cluster (doble Enter, LWR/RSE solos)
+- [`claudedocs/decisions-log.md`](./claudedocs/decisions-log.md) — decisiones tomadas con su justificación (por qué QMK, por qué RGB OFF, por qué quitamos split features, etc.)
+- [`claudedocs/hardware-notes.md`](./claudedocs/hardware-notes.md) — observaciones físicas del PCB (jumpers, pines, LEDs, controlador)
+
+Al retomar trabajo, leer primero esos archivos para entender estado y contexto antes de editar código.
+
 ## Qué es
 
-QMK Userspace para Sofle RGB ZK (Dane Evans, Pro Micro USB-C ATmega32U4, MX hotswap, 2 encoders, 2 OLEDs, RGB underglow SK6812). Hermano del repo `zmk-config-corne`.
+QMK Userspace para Sofle RGB ZK (Dane Evans, Pro Micro USB-C ATmega32U4, MX hotswap, 2 encoders, 2 OLEDs, RGB underglow SK6812 — actualmente OFF). Hermano del repo `zmk-config-corne`.
 
 ## Estructura
 
