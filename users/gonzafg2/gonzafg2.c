@@ -5,6 +5,24 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    if (keycode == GFG_BSDL) {
+        if (record->event.pressed) {
+            uint8_t mods = get_mods() | get_oneshot_mods();
+            if (mods & MOD_MASK_SHIFT) {
+                del_mods(MOD_MASK_SHIFT);
+                del_oneshot_mods(MOD_MASK_SHIFT);
+                register_code(KC_DEL);
+                set_mods(mods);
+            } else {
+                register_code(KC_BSPC);
+            }
+        } else {
+            unregister_code(KC_DEL);
+            unregister_code(KC_BSPC);
+        }
+        return false;
+    }
+
     if (!record->event.pressed) {
         return true;
     }
@@ -66,18 +84,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             tap_code16(LGUI(LALT(KC_ESC)));
             return false;
 
-        case GFG_BSDL: {
-            uint8_t mods = get_mods() | get_oneshot_mods();
-            if (mods & MOD_MASK_SHIFT) {
-                del_mods(MOD_MASK_SHIFT);
-                del_oneshot_mods(MOD_MASK_SHIFT);
-                tap_code(KC_DEL);
-                set_mods(mods);
-            } else {
-                tap_code(KC_BSPC);
-            }
-            return false;
-        }
     }
     return true;
 }

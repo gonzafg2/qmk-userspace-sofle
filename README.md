@@ -60,14 +60,14 @@ Salir de Mouse persistente: tap **EXIT** (esquina sup der o esquina inf der dent
 ├─────┼─────┼─────┼─────┼─────┼─────┤                              ├─────┼─────┼─────┼─────┼─────┼─────┤
 │ SFT │  A  │  S  │  D  │  F  │  G  │                              │  H  │  J  │  K  │  L  │  Ñ  │  ´  │
 ├─────┼─────┼─────┼─────┼─────┼─────┼─────┐                  ┌─────┼─────┼─────┼─────┼─────┼─────┼─────┤
-│ CMD │  Z  │  X  │  C  │  V  │  B  │MUTM │  ◉vol     scrl◉  │LOCK │  N  │  M  │  ,  │  .  │  -  │ESC/A│
+│ CMD │  Z  │  X  │  C  │  V  │  B  │MUTM │  ◉vol     scrl◉  │PLAY │  N  │  M  │  ,  │  .  │  -  │ESC/A│
 └─────┴─────┴─────┼─────┼─────┼─────┴─────┴─────┐        ┌───┴─────┴─────┼─────┼─────┼─────┴─────┴─────┘
                   │ CTL │ ALT │     │ LWR │ SPC │        │ ENT │ RSE │     │ALTGR│ CTL │
                   └─────┴─────┴─────┴─────┴─────┘        └─────┴─────┴─────┴─────┴─────┘
 ```
 
 `SFT` = Shift · `CMD` = Cmd (Mac) · `CTL` = Ctrl · `ALT` = Alt · `ALTGR` = AltGr (= RAlt en ISO LATAM)
-`MUTM` = Play/Pause al tap, hold = capa Mouse · `LOCK` = Cmd+Ctrl+Q (lock pantalla) · `ESC/A` = Esc al tap, hold = capa Adjust
+`MUTM` = Mute al tap, hold = capa Mouse · `PLAY` = Play/Pause · `ESC/A` = Esc al tap, hold = capa Adjust
 
 ### Lower — numpad + símbolos LATAM
 
@@ -166,11 +166,13 @@ Mano izq mantiene Shift y Cmd para combos: Shift+click (selección), Cmd+click (
 
 | Capa | Encoder izq (rotación / push) | Encoder der (rotación / push) |
 |---|---|---|
-| Base | Volumen ± / **Play-Pause (tap), Mouse (hold)** | Scroll vertical / Lock pantalla |
+| Base | Volumen ± / **Mute (tap), Mouse (hold)** | Scroll vertical / Play-Pause |
 | Lower | Brillo ± / Brillo down | Scroll horizontal / Brillo up |
-| Raise | Tab nav `⌘[` `⌘]` / — | Word nav `⌥←` `⌥→` / Lock |
+| Raise | Tab nav `⌘[` `⌘]` / — | Word nav `⌥←` `⌥→` / — |
 | Adjust | Track prev / next / — | Brillo ± / — |
 | Mouse | Scroll vertical / — | Scroll horizontal / — |
+
+`LOCK` pantalla (`⌘⌃Q`) sigue accesible desde la capa Adjust (segunda fila izq).
 
 ## Combos
 
@@ -199,8 +201,35 @@ Implementados con `tap_code` y `tap_code16` enviando keycodes nativos LATAM (no 
 
 ## OLED
 
-- **Mitad izquierda (master)**: logo `GFG` + capa actual (Base/Lwr/Rse/Adj/Mouse) + estado mods (CTRL/SHIFT)
-- **Mitad derecha (slave)**: logo + texto "typing with Sofle"
+Ambos OLEDs son **SSD1306 128×32 en orientación vertical** (rotación 270°), formato 5 chars × 16 líneas.
+
+### Mitad izquierda (master)
+
+```
+[logo GFG]    filas 0-3  — iniciales en Helvetica Neue Condensed Black
+  by          fila 5
+Sofle         fila 6
+ WPM          fila 8
+   42         fila 9     — palabras por minuto en tiempo real
+CTL           fila 13    — solo cuando hold Ctrl
+SFT           fila 14    — solo cuando hold Shift
+Lower         fila 15    — capa actual: Base/Lower/Raise/Conf/Mouse
+```
+
+### Mitad derecha (slave)
+
+```
+[logo GFG]    filas 0-3
+ Eres         fila 5
+  un          fila 7
+Crack         fila 9
+[Luna pet]    filas 12-15  — gato animado según WPM
+```
+
+**Luna pet** se mueve según tu velocidad de tipeo:
+- WPM < 10 → sentado (estático)
+- WPM 10-39 → caminando (alterna 2 frames cada 400 ms)
+- WPM ≥ 40 → corriendo (alterna 2 frames cada 200 ms)
 
 ## Setup macOS para LATAM
 
@@ -264,9 +293,11 @@ Haz push a `main` → GitHub Actions corre `qmk_userspace_build.yml` + `qmk_user
 
 ## VIA
 
-`VIA_ENABLE = yes` está activo. Sofle ya está soportado en [usevia.app](https://usevia.app). Los custom keycodes `GFG_*` (macros mac, operadores prog, BSDL) aparecen como `Any` (hex) en VIA — reasignables manualmente con el código hex correspondiente.
+**Deshabilitado** (`VIA_ENABLE = no` en `keymaps/gonzafg2/rules.mk`).
 
-Para tener los `GFG_*` con nombre legible, habría que generar un `vial.json` custom (no implementado todavía).
+VIA gasta ~2.5 KB de flash y ya estábamos al 97% del límite AVR del ATmega32U4 (28 KB). Lo sacamos para dejar espacio a los 5 frames del Luna pet en el OLED + `WPM_ENABLE`.
+
+**Para reactivarlo**: cambiar `VIA_ENABLE = yes` y quitar Luna pet (o algún otro feature pesado como `MOUSEKEY_ENABLE`).
 
 ## Diferencias vs Corne (ZMK)
 

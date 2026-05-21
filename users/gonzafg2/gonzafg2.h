@@ -31,4 +31,4 @@ enum gfg_keycodes {
 #define GFG_LWR     MO(_LOWER)
 #define GFG_RSE     MO(_RAISE)
 #define GFG_ESCAD   LT(_ADJUST, KC_ESC)
-#define GFG_MUTM    LT(_MOUSE, KC_MPLY)
+#define GFG_MUTM    LT(_MOUSE, KC_MUTE)

@@ -94,3 +94,18 @@ Del `keyboards/sofle/rev1/keyboard.json` de QMK mainline:
 - **ATmega32U4 = 28KB usables** después del bootloader Caterina (32KB - 4KB bootloader)
 - Build actual está cerca del límite — cada feature nueva requiere medir
 - LTO (`LTO_ENABLE = yes`) ya activo para máximo compactado
+
+## Defecto del Pro Micro USB-C clónico
+
+**Problema confirmado**: el Pro Micro USB-C del Sofle ZK **no se prende ni enumera** cuando se conecta con cable USB-C ↔ USB-C directo al Mac mini M4 Pro 2024. **Funciona solo con adaptador USB-A** (cable USB-A↔USB-C, con USB-A del lado del Mac).
+
+**Causa**: defecto conocido en clones chinos. Implementan el conector USB-C físicamente pero **omiten el resistor 5.1kΩ entre pines CC1/CC2 y GND**. Sin ese resistor, los Mac (Apple Silicon, spec USB-C estricta) no detectan al dispositivo y no entregan 5V por el puerto. Los puertos USB-A tradicionales siempre entregan 5V sin negociación CC, por eso el adaptador funciona como workaround.
+
+**Workaround usado**: cable USB-A↔USB-C + adaptador USB-A en el Mac. Es la solución actual.
+
+**Soluciones permanentes posibles** (para futuro, no necesarias ahora):
+1. Soldar resistor SMD 5.1kΩ entre CC1/CC2 y GND del Pro Micro (modificación HW pequeña)
+2. Reemplazar el Pro Micro por un controlador de marca confiable: Elite-C, SparkFun Pro Micro USB-C, KB2040, RP2040 Pro Micro
+3. Seguir usando el adaptador A↔C indefinidamente (es perfectamente válido y no causa problemas funcionales)
+
+**Implicación para flashear**: siempre conectar la mitad a flashear con adaptador USB-A → cable USB-A↔USB-C → teclado. No intentar cable C↔C directo, no funciona.
