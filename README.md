@@ -204,13 +204,26 @@ Implementados con `tap_code` y `tap_code16` enviando keycodes nativos LATAM (no 
 
 ## Setup macOS para LATAM
 
-Configura macOS como **ISO Spanish** para que los símbolos coincidan con los keycodes QMK:
+El teclado Sofle es **físicamente ANSI** (6 columnas por lado, 12 teclas por fila, sin la tecla extra del ISO). El firmware envía keycodes USB estándar que macOS interpreta según el layout configurado.
 
-```
-System Settings → Keyboard → Change Keyboard Type → ISO (European)
-```
+Para que los símbolos LATAM (ñ, ´, ¿, ¡, etc.) y los operadores prog (`<`, `>`, `=>`, `&&`, `||`) funcionen, configura **una** de estas opciones en `System Settings → Keyboard`:
 
-Verifica tipeando: `Ñ` y `´` deben funcionar; con AltGr (thumb der col 4) → `¿ ¡ @ # €`.
+| Opción | Input Source | Keyboard Type | Recomendado |
+|---|---|---|---|
+| **A** | `Spanish - ISO` | ANSI (default) | ✓ más simple |
+| B | `Spanish (Latin America)` | ISO European | alternativa |
+
+Ambas hacen que el keycode `KC_NUBS` se mapee a `<`/`>` (necesario para los operadores `=>`, `==`, etc.) y que `KC_SCLN` produzca `ñ`, `KC_LBRC` produzca `´`, etc.
+
+Si ya tenías un teclado mecánico con macOS configurado para español LATAM (por ejemplo, vienes de un Corne), **probablemente ya tienes esto configurado** y no necesitas tocar nada.
+
+### Verifica tipeando
+
+- Tecla a la derecha de `L` → `ñ`
+- Tecla a la derecha de `ñ` → `´` (acento muerto; presiona `a` después para `á`)
+- `AltGr + 2` (thumb der col 4 + número 2) → `@`
+- `AltGr + E` → `€`
+- En capa Lower: `<` y `>` desde el lado der (col 3-4 fila 3)
 
 ## Build
 
