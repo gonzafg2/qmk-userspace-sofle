@@ -38,7 +38,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 // Right side: keycodes posicionales para macOS layout Spanish LATAM (mismo enfoque que zmk-config-corne)
 [_LOWER] = LAYOUT(
   _______,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,                                      KC_F6,      KC_F7,      KC_F8,        KC_F9,      KC_F10,     KC_F11,
-  _______,  KC_7,    KC_8,    KC_9,    KC_PSLS, KC_PAST,                                    S(KC_8),    S(KC_9),    A(KC_MINS),   KC_EXLM,    S(KC_MINS), _______,
+  _______,  KC_7,    KC_8,    KC_9,    KC_PSLS, KC_PAST,                                    S(KC_8),    S(KC_9),    A(KC_7),      KC_EXLM,    S(KC_MINS), _______,
   _______,  KC_4,    KC_5,    KC_6,    KC_PPLS, KC_PMNS,                                    KC_QUOT,    KC_BSLS,    RALT(KC_RBRC),KC_MINS,    S(KC_2),    A(KC_BSLS),
   _______,  KC_1,    KC_2,    KC_3,    KC_DOT,  KC_0,    KC_BRID,                KC_BRIU,   S(KC_QUOT), S(KC_BSLS), KC_NUBS,      S(KC_NUBS), KC_GRV,     S(KC_SLSH),
                      _______, _______, _______, _______, _______,                _______,   _______, _______, _______, _______
