@@ -61,7 +61,7 @@ Salir de Mouse persistente: tap **EXIT** (esquina sup der o esquina inf der dent
 ├─────┼─────┼─────┼─────┼─────┼─────┼─────┐                  ┌─────┼─────┼─────┼─────┼─────┼─────┼─────┤
 │ CMD │  Z  │  X  │  C  │  V  │  B  │MUTM │  ◉vol     scrl◉  │PLAY │  N  │  M  │  ,  │  .  │  -  │ESC/A│
 └─────┴─────┴─────┼─────┼─────┼─────┴─────┴─────┐        ┌───┴─────┴─────┼─────┼─────┼─────┴─────┴─────┘
-                  │ CTL │ ALT │     │ LWR │ SPC │        │ ENT │ RSE │     │ALTGR│ CTL │
+                  │     │ ALT │ CTL │ LWR │ SPC │        │ ENT │ RSE │ALTGR│ CTL │     │
                   └─────┴─────┴─────┴─────┴─────┘        └─────┴─────┴─────┴─────┴─────┘
 ```
 
