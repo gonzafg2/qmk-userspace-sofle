@@ -236,13 +236,27 @@ Sofle         fila 6
 RGBv2         fila 7     — identificación del PCB
 rev2          fila 8     — revisión exacta
 [gata pet]    filas 9-12 — gata estática (sentada alerta, 32×32)
-CTL           fila 13    — solo cuando hold Ctrl
-SFT           fila 14    — solo cuando hold Shift
+              fila 13    — reservada (vacía por ahora)
+CAgSM         fila 14    — indicadores de modificadores activos (ver abajo)
 Lower / Star  fila 15    — capa actual O efecto RGB (ver abajo)
 ```
 
+**Fila 14 - indicadores de mods** (codificación posicional, 5 chars):
+
+| Pos | Char | Mod |
+|---|---|---|
+| 0 | `C` | Ctrl (LCTL o RCTL) |
+| 1 | `A` | Alt (LALT) |
+| 2 | `g` | AltGr (RALT) — minúscula para distinguir de Alt |
+| 3 | `S` | Shift (LSFT o RSFT) |
+| 4 | `M` | Meta/Cmd/Super (LGUI o RGUI) |
+
+Cada posición muestra su letra cuando el mod está held, o un espacio si no. Sin nada activo se ve vacío. Con todos: `CAgSM`. Con Cmd+Shift: `   SM`.
+
+> Nota: la fuente OLED es 6×8 px y el ancho útil es 32 px (rotación 270°) → máximo **5 chars por fila**. Distinguir LCTL vs RCTL y LSFT vs RSFT requeriría 2 filas (no implementado por ahora).
+
 **Fila 15 - comportamiento dinámico:**
-- Por default muestra la **capa actual**: `Base` / `Lower` / `Raise` / `Conf` / `Mouse`
+- Por default muestra la **capa actual** alineada a la izquierda: `Base ` / `Lower` / `Raise` / `Confi` / `Mouse` (5 chars; `Confi` es la abreviación de Adjust/Config dado que `Config` tiene 6 chars y no cabe)
 - Cuando cambias el efecto RGB con `RM_NEXT` / `RM_PREV` / `RM_TOGG`, **reemplaza** la capa por el efecto activo durante **2 segundos**, luego vuelve a la capa:
 
 | Label | Efecto |

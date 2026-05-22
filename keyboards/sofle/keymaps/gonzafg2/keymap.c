@@ -174,12 +174,12 @@ static void render_layer_state(void) {
         }
     } else {
         switch (get_highest_layer(layer_state)) {
-            case _BASE:   oled_write_P(PSTR(" Base"), false); break;
+            case _BASE:   oled_write_P(PSTR("Base "), false); break;
             case _LOWER:  oled_write_P(PSTR("Lower"), false); break;
             case _RAISE:  oled_write_P(PSTR("Raise"), false); break;
-            case _ADJUST: oled_write_P(PSTR(" Conf"), false); break;
+            case _ADJUST: oled_write_P(PSTR("Confi"), false); break;
             case _MOUSE:  oled_write_P(PSTR("Mouse"), false); break;
-            default:      oled_write_P(PSTR("  ?  "), false);
+            default:      oled_write_P(PSTR("?    "), false);
         }
     }
 }
@@ -207,9 +207,15 @@ static void render_gata(void) {
 static void render_mod_status(void) {
     uint8_t mods = get_mods() | get_oneshot_mods();
     oled_set_cursor(0, 13);
-    oled_write_P((mods & MOD_MASK_CTRL)  ? PSTR("CTL ") : PSTR("    "), false);
+    oled_write_P(PSTR("     "), false);
     oled_set_cursor(0, 14);
-    oled_write_P((mods & MOD_MASK_SHIFT) ? PSTR("SFT ") : PSTR("    "), false);
+    char buf[6] = "     ";
+    if (mods & MOD_MASK_CTRL)     buf[0] = 'C';
+    if (mods & MOD_BIT(KC_LALT))  buf[1] = 'A';
+    if (mods & MOD_BIT(KC_RALT))  buf[2] = 'g';
+    if (mods & MOD_MASK_SHIFT)    buf[3] = 'S';
+    if (mods & MOD_MASK_GUI)      buf[4] = 'M';
+    oled_write(buf, false);
 }
 
 
