@@ -6,24 +6,23 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     if (keycode == GFG_BSDL) {
-        static uint8_t bsdl_saved_shift = 0;
         if (record->event.pressed) {
-            uint8_t mods = get_mods() | get_oneshot_mods();
-            bsdl_saved_shift = mods & MOD_MASK_SHIFT;
-            if (bsdl_saved_shift) {
-                del_mods(MOD_MASK_SHIFT);
-                del_oneshot_mods(MOD_MASK_SHIFT);
-                register_code(KC_DEL);
+            uint8_t reg_shift = get_mods() & MOD_MASK_SHIFT;
+            uint8_t osm_shift = get_oneshot_mods() & MOD_MASK_SHIFT;
+            if (reg_shift || osm_shift) {
+                // Shift+BSDL = forward delete (tap unico, sin key repeat para
+                // evitar Shift latched durante el hold; restauramos regular y
+                // oneshot por separado para no promover oneshot a regular)
+                del_mods(reg_shift);
+                del_oneshot_mods(osm_shift);
+                tap_code(KC_DEL);
+                add_mods(reg_shift);
+                add_oneshot_mods(osm_shift);
             } else {
                 register_code(KC_BSPC);
             }
         } else {
-            unregister_code(KC_DEL);
             unregister_code(KC_BSPC);
-            if (bsdl_saved_shift) {
-                add_mods(bsdl_saved_shift);
-                bsdl_saved_shift = 0;
-            }
         }
         return false;
     }
