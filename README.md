@@ -233,26 +233,45 @@ Crack         fila 9
 
 ## Setup macOS para LATAM
 
-El teclado Sofle es **físicamente ANSI** (6 columnas por lado, 12 teclas por fila, sin la tecla extra del ISO). El firmware envía keycodes USB estándar que macOS interpreta según el layout configurado.
+El teclado Sofle es **físicamente ANSI** (6 columnas por lado, 12 teclas por fila, sin la tecla extra del ISO). El firmware envía keycodes USB estándar que macOS interpreta según **dos** factores independientes:
 
-Para que los símbolos LATAM (ñ, ´, ¿, ¡, etc.) y los operadores prog (`<`, `>`, `=>`, `&&`, `||`) funcionen, configura **una** de estas opciones en `System Settings → Keyboard`:
+1. **Input Source** activo (la bandera arriba a la derecha del menu bar)
+2. **Keyboard Type** asociado al teclado físico (ANSI / ISO / JIS)
 
-| Opción | Input Source | Keyboard Type | Recomendado |
-|---|---|---|---|
-| **A** | `Spanish - ISO` | ANSI (default) | ✓ más simple |
-| B | `Spanish (Latin America)` | ISO European | alternativa |
+### 1. Input Source
 
-Ambas hacen que el keycode `KC_NUBS` se mapee a `<`/`>` (necesario para los operadores `=>`, `==`, etc.) y que `KC_SCLN` produzca `ñ`, `KC_LBRC` produzca `´`, etc.
+`System Settings → Keyboard → Input Sources` → agregar **Latin American** (LA). Activarlo con la bandera del menu bar o `Cmd+Space → Switch Input Source`.
 
-Si ya tenías un teclado mecánico con macOS configurado para español LATAM (por ejemplo, vienes de un Corne), **probablemente ya tienes esto configurado** y no necesitas tocar nada.
+### 2. Keyboard Type — IMPORTANTE
+
+Por defecto macOS asume **ANSI** para teclados USB nuevos. Eso hace que `KC_NUBS` no produzca `<`/`>` y que `LALT(KC_MINS)` no produzca `\`. Hay que cambiarlo manualmente a **ISO**:
+
+1. Conectar solo el Sofle (desconectar otros teclados externos)
+2. Abrir Terminal y ejecutar:
+   ```bash
+   open "/System/Library/CoreServices/Keyboard Setup Assistant.app"
+   ```
+   (Si no existe en esa ruta, buscar "Keyboard Setup Assistant" en Spotlight)
+3. El wizard pide presionar la tecla a la derecha del Shift izquierdo y a la izquierda del Shift derecho
+4. Al final muestra 3 opciones: ANSI / JIS / **ISO (International)** → **elegir ISO**
+5. Click Done
+
+Una vez configurado como ISO, no hay que volver a hacerlo — macOS lo recuerda por el VID/PID del teclado.
 
 ### Verifica tipeando
 
 - Tecla a la derecha de `L` → `ñ`
 - Tecla a la derecha de `ñ` → `´` (acento muerto; presiona `a` después para `á`)
-- `AltGr + 2` (thumb der col 4 + número 2) → `@`
+- `AltGr + 2` → `@`
 - `AltGr + E` → `€`
-- En capa Lower: `<` y `>` desde el lado der (col 3-4 fila 3)
+- En capa Lower: `<`, `>`, `|`, `\` desde el lado der
+
+### Gotcha — Claude Desktop intercepta `\`
+
+La app Claude Desktop tiene un atajo global asignado a `\` (abre asistente de captura). Si la app está activa, el primer `\` que envíes abrirá ese asistente en vez de tipear el carácter. Workarounds:
+
+- Desactivar el atajo: Claude Desktop → Settings → Shortcuts
+- O cerrar el asistente cuando aparece: las pulsaciones siguientes de `\` ya van al campo activo
 
 ## Build
 
