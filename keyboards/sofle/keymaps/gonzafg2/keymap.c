@@ -67,12 +67,12 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /* Adjust (sistema, media, macros mac, mouse toggle, RGB)
  * Acceso: hold ambos LWR+RSE (tri-layer) | hold ESC pinky der
  * ,-----------------------------------------.                    ,-----------------------------------------.
- * | BOOT | TOG  | MOD  | HUI  | SAI  | VAI  |                    |      |      |      |      |      |      |
+ * | BOOT | TOG  | NXT  | HU+  | SA+  | VA+  |                    |      |      |      |      |      |      |
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * |      | SPD  | RMOD | HUD  | SAD  | VAD  |                    |TGMOU |      |      |      |      |      |
+ * |      | SP-  | PRV  | HU-  | SA-  | VA-  |                    |TGMOU |      |      |      |      |      |
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
  * |      | SCRF | SCRA | SCRT | LOCK | FQT  |-------.    ,-------|      | VOLD | MUTE | VOLU |      |      |
- * |------+------+------+------+------+------| SPI   |    |       |------+------+------+------+------+------|
+ * |------+------+------+------+------+------| SP+   |    |       |------+------+------+------+------+------|
  * |      |      |      |      |      |      |-------|    |-------|      | MPRV | MPLY | MNXT |      |      |
  * `-----------------------------------------/       /     \      \-----------------------------------------'
  *           |     |     | --- |     |     |        |     |     | --- |     |     |
@@ -265,6 +265,8 @@ static void render_luna(void) {
     if (timer_elapsed(luna_state_timer) > 6000) {
         luna_state = (luna_state + 1) % 3;
         luna_state_timer = timer_read();
+        luna_frame_timer = timer_read();
+        luna_flip = 0;
     }
 
     const char *frame;
