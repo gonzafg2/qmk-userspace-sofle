@@ -160,9 +160,7 @@ static void render_layer_state(void) {
     }
 
     oled_set_cursor(0, 5);
-    oled_write_P(PSTR("  by "), false);
-    oled_set_cursor(0, 6);
-    oled_write_P(PSTR("Sofle"), false);
+    oled_write_P(PSTR(" by  SofleRGBv2rev2 "), false);
 
     oled_set_cursor(0, 15);
     if (show_rgb) {
@@ -202,7 +200,7 @@ static const char PROGMEM gata_a[] = {
 };
 
 static void render_gata(void) {
-    oled_set_cursor(0, 8);
+    oled_set_cursor(0, 9);
     oled_write_raw_P(gata_a, 128);
 }
 

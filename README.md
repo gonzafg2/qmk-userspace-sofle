@@ -231,9 +231,11 @@ Ambos OLEDs son **SSD1306 128×32 en orientación vertical** (rotación 270°), 
 
 ```
 [logo GFG]    filas 0-3  — iniciales en Helvetica Neue Condensed Black
-  by          fila 5
+ by           fila 5
 Sofle         fila 6
-[gata pet]    filas 8-11 — gata estática (sentada alerta, 32×32)
+RGBv2         fila 7     — identificación del PCB
+rev2          fila 8     — revisión exacta
+[gata pet]    filas 9-12 — gata estática (sentada alerta, 32×32)
 CTL           fila 13    — solo cuando hold Ctrl
 SFT           fila 14    — solo cuando hold Shift
 Lower / Star  fila 15    — capa actual O efecto RGB (ver abajo)
