@@ -1,6 +1,6 @@
 # QMK Userspace · Sofle RGB ZK (gonzafg2)
 
-Configuración QMK para teclado **Sofle RGB** (ZoneKeyboards, PCB original de Dane Evans) con Pro Micro USB-C ATmega32U4, switches MX, 2 encoders rotatorios, 2 OLEDs y RGB underglow. Pensado para **macOS con layout Spanish ISO LATAM**.
+Configuración QMK para teclado **Sofle RGB V2 Rev2.1** (Josef Adamcik v2.1 con mod RGB de Dane Evans, fabricado por ZoneKeyboards) con Pro Micro USB-C ATmega32U4, switches MX, 2 encoders rotatorios, 2 OLEDs y 72 LEDs SK6812 MINI direccionables (per-key + underglow) controlados por `RGB_MATRIX`. Pensado para **macOS con layout Spanish ISO LATAM**.
 
 Sigue la estructura oficial **QMK Userspace** — keymap mantenido fuera del fork de `qmk_firmware`, build automatizado por GitHub Actions.
 
@@ -10,10 +10,10 @@ Hermano del repo [zmk-config-corne](https://github.com/gonzafg2/zmk-config-corne
 
 | Componente | Detalle |
 |---|---|
-| PCB | Sofle RGB by **Dane Evans** (fabricado por ZoneKeyboards Chile, ver "Power by Sofle RGB, Dane Evans" serigrafiado) |
+| PCB | **Sofle RGB V2 Rev2.1** — Josef Adamcik v2.1 base + mod RGB de Dane Evans. Fabricado por ZoneKeyboards Chile (serigrafía "Power by Sofle RGB, Dane Evans" + logo lagarto ZK) |
 | Controlador | Pro Micro clon **USB-C ATmega32U4 5V** |
 | Switches | MX hotswap (Gateron Blue + otros MX, vástago cruz estándar) |
-| LEDs | RGB SK6812 direccionables + LEDs blancos backlight tradicional (jumper `Light Sel` permite BL / UND / &BL) |
+| LEDs | **72 SK6812 MINI direccionables** (58 per-key + 14 underglow, 36 per side, pin data D3) + LEDs blancos backlight tradicional. Jumper `Light Sel` selecciona alimentación: BL / **UND** (actual) / BL&UND |
 | Encoders | 2× EC11 con push button (uno por mitad) |
 | OLED | 2× SSD1306 128×32 en orientación vertical |
 | Comunicación split | TRRS |
@@ -106,13 +106,13 @@ Casillas vacías = transparent (heredan de Base). Encoder izq cambia a brillo, e
 
 `RPT` = `QK_REP` (repite la última tecla pulsada). Encoder izq cambia a tab nav (`⌘[` / `⌘]`), encoder der a word nav (`⌥←` / `⌥→`).
 
-### Adjust — sistema, macros mac, media, RGB
+### Adjust — sistema, macros mac, media, **RGB**
 
 ```
 ┌─────┬─────┬─────┬─────┬─────┬─────┐                              ┌─────┬─────┬─────┬─────┬─────┬─────┐
-│BOOT │     │     │     │     │     │                              │     │     │     │     │     │     │
+│BOOT │ TOG │ NXT │ HU+ │ SA+ │ VA+ │                              │     │     │     │     │     │     │
 ├─────┼─────┼─────┼─────┼─────┼─────┤                              ├─────┼─────┼─────┼─────┼─────┼─────┤
-│     │     │     │     │     │     │                              │TGMOU│     │     │     │     │     │
+│ SP+ │ SP- │ PRV │ HU- │ SA- │ VA- │                              │TGMOU│     │     │     │     │     │
 ├─────┼─────┼─────┼─────┼─────┼─────┤                              ├─────┼─────┼─────┼─────┼─────┼─────┤
 │     │SCRF │SCRA │SCRT │LOCK │FQT  │                              │     │VOL- │MUTE │VOL+ │     │     │
 ├─────┼─────┼─────┼─────┼─────┼─────┼─────┐                  ┌─────┼─────┼─────┼─────┼─────┼─────┼─────┤
@@ -123,8 +123,32 @@ Casillas vacías = transparent (heredan de Base). Encoder izq cambia a brillo, e
                           ▲ hold ambos LWR+RSE | hold ESC
 ```
 
+**Sistema y macros mac:**
 `BOOT` = `QK_BOOT` (entra a bootloader para flashear) · `SCRF/A/T` = screenshots mac (`⌘⇧3`/`4`/`5`)
 `LOCK` = `⌘⌃Q` · `FQT` = Force Quit (`⌘⌥Esc`) · `TGMOU` = toggle capa Mouse persistente
+
+**Controles RGB (RGB_MATRIX, keycodes `RM_*`):**
+
+| Tecla en Adjust | Keycode QMK | Hace |
+|---|---|---|
+| `TOG` | `RM_TOGG` | Encender / apagar RGB |
+| `NXT` / `PRV` | `RM_NEXT` / `RM_PREV` | Siguiente / anterior efecto |
+| `HU+` / `HU-` | `RM_HUEU` / `RM_HUED` | Tono (matiz) +/- |
+| `SA+` / `SA-` | `RM_SATU` / `RM_SATD` | Saturación +/- (gris ↔ vivo) |
+| `VA+` / `VA-` | `RM_VALU` / `RM_VALD` | Brillo +/- (tope a 150 por límite USB) |
+| `SP+` / `SP-` | `RM_SPDU` / `RM_SPDD` | Velocidad animación +/- |
+
+**5 efectos habilitados** (ciclar con `NXT`):
+
+1. `RGB_MATRIX_GRADIENT_LEFT_RIGHT` *(default)* — gradient estático rojo→violeta de izq a der
+2. `RGB_MATRIX_STARLIGHT` — LEDs random titilan suavemente como estrellas (ambiental)
+3. `RGB_MATRIX_CYCLE_LEFT_RIGHT` — colores corren horizontalmente (ambiental)
+4. `RGB_MATRIX_TYPING_HEATMAP` — heat map del tecleo (reactivo)
+5. `RGB_MATRIX_SOLID_REACTIVE_SIMPLE` — LED individual se ilumina al pulsar tecla (reactivo)
+
+**Pre-requisito físico**: jumper `Light Sel` del PCB debe estar en `UND` o `BL&UND` para alimentar los SK6812.
+
+**Brillo limitado a 150/255 por hardware**: con 72 SK6812 al máximo del chip, el consumo excede el amperaje USB del Mac vía adaptador A↔C → undervolt → LEDs parpadean intermitentemente. No subir `RGB_MATRIX_MAXIMUM_BRIGHTNESS` sin una fuente USB con mejor amperaje.
 
 ### Mouse — movimiento + scroll + click
 
@@ -223,13 +247,18 @@ Lower         fila 15    — capa actual: Base/Lower/Raise/Conf/Mouse
  Eres         fila 5
   un          fila 7
 Crack         fila 9
-[Luna pet]    filas 12-15  — gato animado según WPM
+[Luna pet]    filas 12-15  — gato animado ciclando sit/walk/run
 ```
 
-**Luna pet** se mueve según tu velocidad de tipeo:
-- WPM < 10 → sentado (estático)
-- WPM 10-39 → caminando (alterna 2 frames cada 400 ms)
-- WPM ≥ 40 → corriendo (alterna 2 frames cada 200 ms)
+**Luna pet** cicla automáticamente entre 3 estados cada 6 segundos (ya no depende de WPM, que se deshabilitó para dejar espacio a RGB_MATRIX):
+
+| Segundos | Estado | Animación |
+|---|---|---|
+| 0-6 | `luna_sit` | Frame estático (sentada) |
+| 6-12 | `luna_walk_a` ↔ `luna_walk_b` | Camina alternando frames cada 400 ms |
+| 12-18 | `luna_run_a` ↔ `luna_run_b` | Corre alternando frames cada 200 ms |
+
+Cumplido el ciclo vuelve a `sit` y repite. Implementado con dos timers (`luna_state_timer` para el cambio de estado cada 6s + `luna_frame_timer` para el flip dentro de walk/run).
 
 ## Setup macOS para LATAM
 
@@ -328,13 +357,18 @@ Haz push a `main` → GitHub Actions corre `qmk_userspace_build.yml` + `qmk_user
 - **Los OLEDs se ven al revés**: revisa `OLED_ROTATION_270` en `keymap.c`. Si lo cambias, recompila y reflashea.
 - **Las dos mitades no se comunican (master tipea pero slave no manda nada)**: revisa el cable TRRS, que esté bien conectado en ambos lados.
 
-## VIA
+## Features deshabilitadas (trade-offs AVR)
 
-**Deshabilitado** (`VIA_ENABLE = no` en `keymaps/gonzafg2/rules.mk`).
+El ATmega32U4 tiene 28KB usables. Build actual está al **99% (28650/28672 bytes, 22 libres)**. Para llegar a este balance se sacrificó:
 
-VIA gasta ~2.5 KB de flash y ya estábamos al 97% del límite AVR del ATmega32U4 (28 KB). Lo sacamos para dejar espacio a los 5 frames del Luna pet en el OLED + `WPM_ENABLE`.
+| Feature | Estado | Por qué se quitó |
+|---|---|---|
+| `VIA_ENABLE` | `no` | ~2.5 KB para Luna pet (sesión 2026-05-21) |
+| `WPM_ENABLE` | `no` | ~500 B para meter `RGB_MATRIX_ENABLE` (sesión 2026-05-22). Luna ya no reacciona a velocidad de tipeo, cicla por timer fijo |
+| `SPLIT_LAYER_STATE_ENABLE` | `no` | ~130 B para meter STARLIGHT como 5to efecto RGB. Sin impacto visible (slave no muestra capa por OLED ni RGB indicators) |
+| `SPLIT_TRANSPORT_MIRROR`, `SPLIT_OLED_ENABLE`, `SPLIT_MODS_ENABLE`, `SPLIT_LED_STATE_ENABLE` | `no` | Build excedía 28KB en sesión inicial |
 
-**Para reactivarlo**: cambiar `VIA_ENABLE = yes` y quitar Luna pet (o algún otro feature pesado como `MOUSEKEY_ENABLE`).
+**Para revertir algún sacrificio**: hay que liberar el equivalente quitando otra feature. Las opciones más pesadas que aún siguen activas son `MOUSEKEY_ENABLE` (~700 B) y `RGB_MATRIX_ENABLE` (~3 KB).
 
 ## Diferencias vs Corne (ZMK)
 
