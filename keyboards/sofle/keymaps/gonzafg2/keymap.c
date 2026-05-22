@@ -118,11 +118,6 @@ const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][NUM_DIRECTIONS] = {
 };
 #endif
 
-const uint16_t PROGMEM combo_caps_word[] = { KC_F, KC_J, COMBO_END };
-
-combo_t key_combos[] = {
-    COMBO(combo_caps_word, CW_TOGG),
-};
 
 #ifdef OLED_ENABLE
 oled_rotation_t oled_init_user(oled_rotation_t rotation) {

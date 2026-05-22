@@ -25,7 +25,7 @@ qmk-userspace-sofle/
 ├── .github/workflows/build_binaries.yml              # CI oficial QMK userspace
 ├── users/gonzafg2/                                   # código compartido
 │   ├── gonzafg2.{c,h}                                # custom keycodes, macros
-│   ├── config.h                                      # tapping term, combos
+│   ├── config.h                                      # tapping term, defines varios
 │   └── rules.mk                                      # features comunes
 └── keyboards/sofle/keymaps/gonzafg2/                 # keymap específico
     ├── keymap.c                                      # capas + encoder map + OLED
