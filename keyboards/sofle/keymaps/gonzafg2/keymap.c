@@ -25,7 +25,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 /* Lower (numpad + simbolos LATAM, fila numerica se mantiene de Base)
  * ,-----------------------------------------.                    ,-----------------------------------------.
- * | ESC  |  F1  |  F2  |  F3  |  F4  |  F5  |                    |  F6  |  F7  |  F8  |  F9  | F10  | F11  |
+ * | F12  |  F1  |  F2  |  F3  |  F4  |  F5  |                    |  F6  |  F7  |  F8  |  F9  | F10  | F11  |
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
  * | TAB  |  7   |  8   |  9   |  /   |  *   |                    |  (   |  )   |  \   |  !   |  ?   | BSDL |
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
@@ -37,29 +37,29 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  */
 // Right side: keycodes posicionales para macOS layout Spanish LATAM (mismo enfoque que zmk-config-corne)
 [_LOWER] = LAYOUT(
-  _______,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,                                      KC_F6,      KC_F7,      KC_F8,        KC_F9,      KC_F10,     KC_F11,
+  KC_F12,   KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,                                      KC_F6,      KC_F7,      KC_F8,        KC_F9,      KC_F10,     KC_F11,
   _______,  KC_7,    KC_8,    KC_9,    KC_PSLS, KC_PAST,                                    S(KC_8),    S(KC_9),    A(KC_MINS),   KC_EXLM,    S(KC_MINS), _______,
   _______,  KC_4,    KC_5,    KC_6,    KC_PPLS, KC_PMNS,                                    KC_QUOT,    KC_BSLS,    RALT(KC_RBRC),KC_MINS,    S(KC_2),    A(KC_BSLS),
   _______,  KC_1,    KC_2,    KC_3,    KC_DOT,  KC_0,    KC_BRID,                KC_BRIU,   S(KC_QUOT), S(KC_BSLS), KC_NUBS,      S(KC_NUBS), KC_GRV,     S(KC_SLSH),
                      _______, _______, _______, _______, _______,                _______,   _______, _______, _______, _______
 ),
 
-/* Raise (operadores programacion + navegacion + F-keys)
+/* Raise (operadores programacion + navegacion)
  * ,-----------------------------------------.                    ,-----------------------------------------.
- * | ESC  | F12  |      |      |      |      |                    |      |      |      |      |      |      |
+ * | ESC  |      |      |      |      |      |                    |      |      |      |      |      |      |
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * | TAB  |  !   |  @   |  #   |  $   |  %   |                    |      |QK_RPT|      |      | +=   | BSDL |
+ * | TAB  |  !   |  @   |  #   |  $   |  %   |                    |      |QK_RPT|      |      |      | BSDL |
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * | SFT  |  ^   |      |  &   |  &&  |  ||  |-------.    ,-------| LEFT | DOWN |  UP  | RGHT | -=   |      |
+ * | SFT  |  ^   |  +=  |  &   |  &&  |  ||  |-------.    ,-------| LEFT | DOWN |  UP  | RGHT | -=   |      |
  * |------+------+------+------+------+------| MUTM  |    | PLAY  |------+------+------+------+------+------|
  * | CMD  | =>   | ...  |  ==  |  !== |  === |-------|    |-------| HOME | PGDN | PGUP | END  |      | ESCAD|
  * `-----------------------------------------/       /     \      \-----------------------------------------'
  *           | CTL | ALT | --- | LWR | SPC |        | ENT |  ▼  | --- | RALT | RCTL |
  */
 [_RAISE] = LAYOUT(
-  _______,  KC_F12,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                                    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
-  _______,  KC_EXLM,    RALT(KC_Q),KC_HASH, KC_DLR,  KC_PERC,                                XXXXXXX, QK_REP,  XXXXXXX, XXXXXXX, GFG_PLEQ,_______,
-  _______,  A(KC_QUOT), XXXXXXX,   S(KC_6), GFG_AND, GFG_OR,                                 KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, GFG_MIEQ,XXXXXXX,
+  _______,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                                    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+  _______,  KC_EXLM,    RALT(KC_Q),KC_HASH, KC_DLR,  KC_PERC,                                XXXXXXX, QK_REP,  XXXXXXX, XXXXXXX, XXXXXXX, _______,
+  _______,  A(KC_QUOT), GFG_PLEQ,  S(KC_6), GFG_AND, GFG_OR,                                 KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, GFG_MIEQ,XXXXXXX,
   _______,  GFG_ARROW,GFG_SPREAD,GFG_EQEQ,GFG_NEQ,GFG_TEQ,_______,                _______,  KC_HOME, KC_PGDN, KC_PGUP, KC_END,  XXXXXXX, _______,
                      _______, _______, _______, _______, _______,                _______,   _______, _______, _______, _______
 ),
@@ -69,9 +69,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * ,-----------------------------------------.                    ,-----------------------------------------.
  * | BOOT |      |      |      |      |      |                    |      |      |      |      |      |      |
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * |      | SCRF | SCRA | SCRT | LOCK | FQT  |                    |TGMOU |      |      |      |      |      |
+ * |      |      |      |      |      |      |                    |TGMOU |      |      |      |      |      |
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * |      |      |      |      |      |      |-------.    ,-------|      | VOLD | MUTE | VOLU |      |      |
+ * |      | SCRF | SCRA | SCRT | LOCK | FQT  |-------.    ,-------|      | VOLD | MUTE | VOLU |      |      |
  * |------+------+------+------+------+------|       |    |       |------+------+------+------+------+------|
  * |      |      |      |      |      |      |-------|    |-------|      | MPRV | MPLY | MNXT |      |      |
  * `-----------------------------------------/       /     \      \-----------------------------------------'
@@ -79,8 +79,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  */
 [_ADJUST] = LAYOUT(
   QK_BOOT,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                                    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
-  XXXXXXX,  GFG_SCRF,GFG_SCRA,GFG_SCRT,GFG_LOCK,GFG_FQUIT,                                  TG(_MOUSE), XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
-  XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                                    XXXXXXX, KC_VOLD, KC_MUTE, KC_VOLU, XXXXXXX, XXXXXXX,
+  XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                                    TG(_MOUSE), XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+  XXXXXXX,  GFG_SCRF,GFG_SCRA,GFG_SCRT,GFG_LOCK,GFG_FQUIT,                                  XXXXXXX, KC_VOLD, KC_MUTE, KC_VOLU, XXXXXXX, XXXXXXX,
   XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______,                _______,   XXXXXXX, KC_MPRV, KC_MPLY, KC_MNXT, XXXXXXX, XXXXXXX,
                      _______, _______, _______, _______, _______,                _______,   _______, _______, _______, _______
 ),
@@ -89,20 +89,20 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * Acceso: hold encoder push izq (momentaneo) | tap TG_MOUSE desde Adjust (persistente)
  * Salir persistente: tap EXIT (esquina sup der o esquina inf der)
  * ,-----------------------------------------.                    ,-----------------------------------------.
- * |      |      |      |      |      |      |                    |      | BTN1 | BTN3 | BTN2 |      | EXIT |
+ * |      |      |      |      |      |      |                    | BTN1 | BTN3 | BTN2 |      |      | EXIT |
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * |      |      |      |      |      |      |                    |      | M_LF | M_DN | M_UP | M_RT |      |
+ * |      |      |      |      |      |      |                    | M_LF | M_DN | M_UP | M_RT |      |      |
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * | SFT  |      |      |      |      |      |-------.    ,-------|      | S_LF | S_DN | S_UP | S_RT |      |
+ * | SFT  |      |      |      |      |      |-------.    ,-------| S_LF | S_DN | S_UP | S_RT |      |      |
  * |------+------+------+------+------+------|       |    |       |------+------+------+------+------+------|
  * | CMD  |      |      |      |      |      |-------|    |-------|      |      |      |      |      | EXIT |
  * `-----------------------------------------/       /     \      \-----------------------------------------'
  *           | CTL | ALT | --- |     | SPC |        | ENT |     | --- | RALT | RCTL |
  */
 [_MOUSE] = LAYOUT(
-  XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                                    XXXXXXX, MS_BTN1, MS_BTN3, MS_BTN2, XXXXXXX, TG(_MOUSE),
-  XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                                    XXXXXXX, MS_LEFT, MS_DOWN, MS_UP,   MS_RGHT, XXXXXXX,
-  _______,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                                    XXXXXXX, MS_WHLL, MS_WHLD, MS_WHLU, MS_WHLR, XXXXXXX,
+  XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                                    MS_BTN1, MS_BTN3, MS_BTN2, XXXXXXX, XXXXXXX, TG(_MOUSE),
+  XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                                    MS_LEFT, MS_DOWN, MS_UP,   MS_RGHT, XXXXXXX, XXXXXXX,
+  _______,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                                    MS_WHLL, MS_WHLD, MS_WHLU, MS_WHLR, XXXXXXX, XXXXXXX,
   _______,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______,                _______,   XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, TG(_MOUSE),
                      _______, _______, _______, _______, _______,                _______,   _______, _______, _______, _______
 ),
