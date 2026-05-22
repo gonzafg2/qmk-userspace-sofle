@@ -69,19 +69,19 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * ,-----------------------------------------.                    ,-----------------------------------------.
  * | BOOT | TOG  | NXT  | HU+  | SA+  | VA+  |                    |      |      |      |      |      |      |
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * |      | SP-  | PRV  | HU-  | SA-  | VA-  |                    |TGMOU |      |      |      |      |      |
+ * | SP+  | SP-  | PRV  | HU-  | SA-  | VA-  |                    |TGMOU |      |      |      |      |      |
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
  * |      | SCRF | SCRA | SCRT | LOCK | FQT  |-------.    ,-------|      | VOLD | MUTE | VOLU |      |      |
- * |------+------+------+------+------+------| SP+   |    |       |------+------+------+------+------+------|
+ * |------+------+------+------+------+------|       |    |       |------+------+------+------+------+------|
  * |      |      |      |      |      |      |-------|    |-------|      | MPRV | MPLY | MNXT |      |      |
  * `-----------------------------------------/       /     \      \-----------------------------------------'
  *           |     |     | --- |     |     |        |     |     | --- |     |     |
  */
 [_ADJUST] = LAYOUT(
   QK_BOOT,  RM_TOGG, RM_NEXT, RM_HUEU, RM_SATU, RM_VALU,                                    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
-  XXXXXXX,  RM_SPDD, RM_PREV, RM_HUED, RM_SATD, RM_VALD,                                    TG(_MOUSE), XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+  RM_SPDU,  RM_SPDD, RM_PREV, RM_HUED, RM_SATD, RM_VALD,                                    TG(_MOUSE), XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
   XXXXXXX,  GFG_SCRF,GFG_SCRA,GFG_SCRT,GFG_LOCK,GFG_FQUIT,                                  XXXXXXX, KC_VOLD, KC_MUTE, KC_VOLU, XXXXXXX, XXXXXXX,
-  XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, RM_SPDU,                _______,   XXXXXXX, KC_MPRV, KC_MPLY, KC_MNXT, XXXXXXX, XXXXXXX,
+  XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                _______,   XXXXXXX, KC_MPRV, KC_MPLY, KC_MNXT, XXXXXXX, XXXXXXX,
                      _______, _______, _______, _______, _______,                _______,   _______, _______, _______, _______
 ),
 
