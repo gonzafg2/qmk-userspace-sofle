@@ -1,7 +1,20 @@
 #include "gonzafg2.h"
 
+// Tri-layer manual: solo activa/desactiva _ADJUST cuando se entra/sale del
+// estado LOWER+RAISE. NO toca _ADJUST si esta activa por otra via (LT en
+// ESC/A o combo TAB+BSDL). Usa un flag para saber si fue el tri-layer
+// quien la prendio.
 layer_state_t layer_state_set_user(layer_state_t state) {
-    return update_tri_layer_state(state, _LOWER, _RAISE, _ADJUST);
+    static bool tri_adjust_on = false;
+    bool both = (state & ((1UL << _LOWER) | (1UL << _RAISE))) == ((1UL << _LOWER) | (1UL << _RAISE));
+    if (both && !tri_adjust_on) {
+        tri_adjust_on = true;
+        state |= (1UL << _ADJUST);
+    } else if (!both && tri_adjust_on) {
+        tri_adjust_on = false;
+        state &= ~(1UL << _ADJUST);
+    }
+    return state;
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
