@@ -20,6 +20,11 @@ enum gfg_keycodes {
     GFG_OR,
     GFG_PLEQ,
     GFG_MIEQ,
+    GFG_GTEQ,
+    GFG_LTEQ,
+    GFG_NULC,
+    GFG_OPTC,
+    GFG_POW,
     GFG_SCRF,
     GFG_SCRA,
     GFG_SCRT,
@@ -31,4 +36,4 @@ enum gfg_keycodes {
 #define GFG_LWR     MO(_LOWER)
 #define GFG_RSE     MO(_RAISE)
 #define GFG_ESCAD   LT(_ADJUST, KC_ESC)
-#define GFG_MUTM    LT(_MOUSE, KC_MPLY)
+#define GFG_MUTM    LT(_MOUSE, KC_MUTE)

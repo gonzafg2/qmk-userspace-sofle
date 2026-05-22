@@ -30,9 +30,27 @@ Misma filosofía que el repo del Corne (config separado del firmware, CI build),
 - ✅ Repo creado y pushed: https://github.com/gonzafg2/qmk-userspace-sofle
 - ✅ CI verde — release `latest` con `sofle_rev1_gonzafg2.hex` listo para flashear
 - ✅ README documentado y con diagramas limpios
+- ✅ **Flasheado al menos una vez** (sesión 2026-05-21, OLED master verificado en fotos)
+- ✅ Símbolos LATAM correctos en LOWER + RAISE
+- ✅ OLED master rediseñado: logo GFG real + WPM + capa abajo
+- ✅ OLED slave: "Eres / un / Crack" + Luna pet animado
+- ✅ Encoder push Base: Mute izq, Play der
 - ⏳ Discusión abierta sobre thumb cluster — ver [thumb-cluster-iteration.md](./thumb-cluster-iteration.md)
+- ⏳ Luna pet sin verificar físicamente — riesgo de que la posición o estética falle
 - ❌ RGB underglow deshabilitado (decisión documentada en [decisions-log.md](./decisions-log.md))
-- ❌ Sin probar físicamente — el usuario aún no flasheó
+- ❌ VIA deshabilitado (intercambiado por espacio para Luna pet)
+
+## Sesión 2026-05-21 — qué se hizo
+
+1. **Fix símbolos LATAM Mac en LOWER right side** (`keymap.c:38-45`): porté el mismo enfoque de keycodes posicionales que usa `zmk-config-corne` (línea 147-149). 17 keycodes mapeados, ver tabla en [decisions-log.md](./decisions-log.md).
+2. **Fix RAISE** (`keymap.c:61-62`): 3 keycodes (`KC_AT`, `KC_CIRC`, `KC_AMPR`) que asumían US.
+3. **OLED master reorganizado** (`keymap.c:152-174`): logo + by/Sofle + WPM + mods + capa abajo. Capa renombrada en OLED: Lwr→Lower, Rse→Raise, Adj→Conf.
+4. **OLED slave reescrito** (`keymap.c:184-198`): "Eres / un / Crack" arriba + Luna pet 32×32 animado abajo.
+5. **Logo cambiado** (`keymap.c:138-148`): de mark abstracto a "GFG" iniciales reales (Helvetica Neue Condensed Black 20px).
+6. **WPM_ENABLE = yes** + **VIA_ENABLE = no** (trade-off explicado en decisions-log).
+7. **Encoder push Base** (`keymap.c:22`, `gonzafg2.h:34`): `GFG_MUTM` Play→Mute, slot der `GFG_LOCK`→`KC_MPLY`. LOCK sigue accesible en Adjust.
+
+Firmware final: **26044/28672 bytes (90%, 2628 libres)**.
 
 ## Trade-offs aceptados
 

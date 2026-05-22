@@ -37,7 +37,6 @@ Hermano del repo [zmk-config-corne](https://github.com/gonzafg2/zmk-config-corne
     │  (1)  │    │  (2)  │    │  (3)  │    │  (4)  │    │  (4)  │
     └───────┘    └───────┘    └───────┘    └───────┘    └───────┘
                                   ▲ tambien: hold ESC pinky der
-                                            o combo TAB+BSDL
 ```
 
 | Capa | # | Activación | Tipo |
@@ -45,7 +44,7 @@ Hermano del repo [zmk-config-corne](https://github.com/gonzafg2/zmk-config-corne
 | Base | 0 | default | — |
 | Lower | 1 | hold thumb izq col 4 | momentary |
 | Raise | 2 | hold thumb der col 2 | momentary |
-| Adjust | 3 | hold AMBOS Lower+Raise (tri-layer) **o** hold ESC pinky der **o** combo TAB+BSDL | momentary |
+| Adjust | 3 | hold AMBOS Lower+Raise (tri-layer) **o** hold ESC pinky der | momentary |
 | Mouse | 4 | hold encoder push izq (momentary) **o** tap TG_MOUSE en Adjust (persistente) | mixto |
 
 Salir de Mouse persistente: tap **EXIT** (esquina sup der o esquina inf der dentro de Mouse).
@@ -60,20 +59,20 @@ Salir de Mouse persistente: tap **EXIT** (esquina sup der o esquina inf der dent
 ├─────┼─────┼─────┼─────┼─────┼─────┤                              ├─────┼─────┼─────┼─────┼─────┼─────┤
 │ SFT │  A  │  S  │  D  │  F  │  G  │                              │  H  │  J  │  K  │  L  │  Ñ  │  ´  │
 ├─────┼─────┼─────┼─────┼─────┼─────┼─────┐                  ┌─────┼─────┼─────┼─────┼─────┼─────┼─────┤
-│ CMD │  Z  │  X  │  C  │  V  │  B  │MUTM │  ◉vol     scrl◉  │LOCK │  N  │  M  │  ,  │  .  │  -  │ESC/A│
+│ CMD │  Z  │  X  │  C  │  V  │  B  │MUTM │  ◉vol     scrl◉  │PLAY │  N  │  M  │  ,  │  .  │  -  │ESC/A│
 └─────┴─────┴─────┼─────┼─────┼─────┴─────┴─────┐        ┌───┴─────┴─────┼─────┼─────┼─────┴─────┴─────┘
                   │ CTL │ ALT │     │ LWR │ SPC │        │ ENT │ RSE │     │ALTGR│ CTL │
                   └─────┴─────┴─────┴─────┴─────┘        └─────┴─────┴─────┴─────┴─────┘
 ```
 
 `SFT` = Shift · `CMD` = Cmd (Mac) · `CTL` = Ctrl · `ALT` = Alt · `ALTGR` = AltGr (= RAlt en ISO LATAM)
-`MUTM` = Play/Pause al tap, hold = capa Mouse · `LOCK` = Cmd+Ctrl+Q (lock pantalla) · `ESC/A` = Esc al tap, hold = capa Adjust
+`MUTM` = Mute al tap, hold = capa Mouse · `PLAY` = Play/Pause · `ESC/A` = Esc al tap, hold = capa Adjust
 
 ### Lower — numpad + símbolos LATAM
 
 ```
 ┌─────┬─────┬─────┬─────┬─────┬─────┐                              ┌─────┬─────┬─────┬─────┬─────┬─────┐
-│     │ F1  │ F2  │ F3  │ F4  │ F5  │                              │ F6  │ F7  │ F8  │ F9  │ F10 │ F11 │
+│ F12 │ F1  │ F2  │ F3  │ F4  │ F5  │                              │ F6  │ F7  │ F8  │ F9  │ F10 │ F11 │
 ├─────┼─────┼─────┼─────┼─────┼─────┤                              ├─────┼─────┼─────┼─────┼─────┼─────┤
 │     │  7  │  8  │  9  │  /  │  *  │                              │  (  │  )  │  \  │  !  │  ?  │     │
 ├─────┼─────┼─────┼─────┼─────┼─────┤                              ├─────┼─────┼─────┼─────┼─────┼─────┤
@@ -92,11 +91,11 @@ Casillas vacías = transparent (heredan de Base). Encoder izq cambia a brillo, e
 
 ```
 ┌─────┬─────┬─────┬─────┬─────┬─────┐                              ┌─────┬─────┬─────┬─────┬─────┬─────┐
-│     │ F12 │     │     │     │     │                              │     │     │     │     │     │     │
+│  =  │ >=  │ <=  │ ??  │ ?.  │ **  │                              │     │     │     │     │     │     │
 ├─────┼─────┼─────┼─────┼─────┼─────┤                              ├─────┼─────┼─────┼─────┼─────┼─────┤
-│     │  !  │  @  │  #  │  $  │  %  │                              │     │ RPT │     │     │ +=  │     │
+│     │  !  │  @  │  #  │  $  │  %  │                              │     │ RPT │     │     │     │     │
 ├─────┼─────┼─────┼─────┼─────┼─────┤                              ├─────┼─────┼─────┼─────┼─────┼─────┤
-│     │  ^  │     │  &  │ &&  │ ||  │                              │  ←  │  ↓  │  ↑  │  →  │ -=  │     │
+│     │  ^  │ +=  │  &  │ &&  │ ||  │                              │  ←  │  ↓  │  ↑  │  →  │ -=  │     │
 ├─────┼─────┼─────┼─────┼─────┼─────┼─────┐                  ┌─────┼─────┼─────┼─────┼─────┼─────┼─────┤
 │     │ =>  │ ... │ ==  │ !== │ === │     │ ◉tab     word◉   │     │HOME │PGDN │PGUP │ END │     │     │
 └─────┴─────┴─────┼─────┼─────┼─────┴─────┴─────┐        ┌───┴─────┴─────┼─────┼─────┼─────┴─────┴─────┘
@@ -113,15 +112,15 @@ Casillas vacías = transparent (heredan de Base). Encoder izq cambia a brillo, e
 ┌─────┬─────┬─────┬─────┬─────┬─────┐                              ┌─────┬─────┬─────┬─────┬─────┬─────┐
 │BOOT │     │     │     │     │     │                              │     │     │     │     │     │     │
 ├─────┼─────┼─────┼─────┼─────┼─────┤                              ├─────┼─────┼─────┼─────┼─────┼─────┤
-│     │SCRF │SCRA │SCRT │LOCK │FQT  │                              │TGMOU│     │     │     │     │     │
+│     │     │     │     │     │     │                              │TGMOU│     │     │     │     │     │
 ├─────┼─────┼─────┼─────┼─────┼─────┤                              ├─────┼─────┼─────┼─────┼─────┼─────┤
-│     │     │     │     │     │     │                              │     │VOL- │MUTE │VOL+ │     │     │
+│     │SCRF │SCRA │SCRT │LOCK │FQT  │                              │     │VOL- │MUTE │VOL+ │     │     │
 ├─────┼─────┼─────┼─────┼─────┼─────┼─────┐                  ┌─────┼─────┼─────┼─────┼─────┼─────┼─────┤
 │     │     │     │     │     │     │     │ ◉track  brillo◉  │     │     │PREV │PLAY │NEXT │     │     │
 └─────┴─────┴─────┼─────┼─────┼─────┴─────┴─────┐        ┌───┴─────┴─────┼─────┼─────┼─────┴─────┴─────┘
                   │     │     │     │  ▼  │     │        │     │  ▼  │     │     │     │
                   └─────┴─────┴─────┴─────┴─────┘        └─────┴─────┴─────┴─────┴─────┘
-                          ▲ hold ambos LWR+RSE | hold ESC | combo TAB+BSDL
+                          ▲ hold ambos LWR+RSE | hold ESC
 ```
 
 `BOOT` = `QK_BOOT` (entra a bootloader para flashear) · `SCRF/A/T` = screenshots mac (`⌘⇧3`/`4`/`5`)
@@ -131,11 +130,11 @@ Casillas vacías = transparent (heredan de Base). Encoder izq cambia a brillo, e
 
 ```
 ┌─────┬─────┬─────┬─────┬─────┬─────┐                              ┌─────┬─────┬─────┬─────┬─────┬─────┐
-│     │     │     │     │     │     │                              │     │BTN1 │BTN3 │BTN2 │     │EXIT │
+│     │     │     │     │     │     │                              │BTN1 │BTN3 │BTN2 │     │     │EXIT │
 ├─────┼─────┼─────┼─────┼─────┼─────┤                              ├─────┼─────┼─────┼─────┼─────┼─────┤
-│     │     │     │     │     │     │                              │     │ ←M  │ ↓M  │ ↑M  │ →M  │     │
+│     │     │     │     │     │     │                              │ ←M  │ ↓M  │ ↑M  │ →M  │     │     │
 ├─────┼─────┼─────┼─────┼─────┼─────┤                              ├─────┼─────┼─────┼─────┼─────┼─────┤
-│ SFT │     │     │     │     │     │                              │     │ ←S  │ ↓S  │ ↑S  │ →S  │     │
+│ SFT │     │     │     │     │     │                              │ ←S  │ ↓S  │ ↑S  │ →S  │     │     │
 ├─────┼─────┼─────┼─────┼─────┼─────┼─────┐                  ┌─────┼─────┼─────┼─────┼─────┼─────┼─────┤
 │ CMD │     │     │     │     │     │     │  ◉scrV    scrH◉  │     │     │     │     │     │     │EXIT │
 └─────┴─────┴─────┼─────┼─────┼─────┴─────┴─────┐        ┌───┴─────┴─────┼─────┼─────┼─────┴─────┴─────┘
@@ -166,18 +165,21 @@ Mano izq mantiene Shift y Cmd para combos: Shift+click (selección), Cmd+click (
 
 | Capa | Encoder izq (rotación / push) | Encoder der (rotación / push) |
 |---|---|---|
-| Base | Volumen ± / **Play-Pause (tap), Mouse (hold)** | Scroll vertical / Lock pantalla |
+| Base | Volumen ± / **Mute (tap), Mouse (hold)** | Scroll vertical / Play-Pause |
 | Lower | Brillo ± / Brillo down | Scroll horizontal / Brillo up |
-| Raise | Tab nav `⌘[` `⌘]` / — | Word nav `⌥←` `⌥→` / Lock |
+| Raise | Tab nav `⌘[` `⌘]` / — | Word nav `⌥←` `⌥→` / — |
 | Adjust | Track prev / next / — | Brillo ± / — |
 | Mouse | Scroll vertical / — | Scroll horizontal / — |
 
-## Combos
+`LOCK` pantalla (`⌘⌃Q`) sigue accesible desde la capa Adjust (segunda fila izq).
 
-| Combo | Acción |
-|---|---|
-| `F` + `J` (home row) | **Caps Word** — mayúsculas hasta espacio/enter |
-| `TAB` + `BSDL` (esquinas sup.) | Acceso momentáneo a **Adjust** |
+> **⚠️ Hardware conocido**: en la unidad actual los **push de los encoders no registran señal eléctrica** (cold joint diagnosticado, no es bug de firmware). La rotación funciona correctamente. Los keycodes de tap/hold están asignados correctamente y funcionarán una vez resoldados los pines del switch del EC11. Detalle del diagnóstico en [`claudedocs/hardware-notes.md`](./claudedocs/hardware-notes.md).
+
+## Caps Word
+
+Doble tap rápido de **Shift** (LSFT) activa Caps Word — mayúsculas temporales hasta que pulses espacio, enter, tab o pase un timeout. Útil para escribir constantes (`MAX_RETRIES`) o acrónimos sin mantener Shift.
+
+Activado vía `DOUBLE_TAP_SHIFT_TURNS_ON_CAPS_WORD` (built-in de QMK, sin overhead de `COMBO_ENABLE`).
 
 ## Macros macOS (Adjust)
 
@@ -193,37 +195,83 @@ Implementadas con `tap_code16` LATAM-aware en `users/gonzafg2/gonzafg2.c`:
 
 ## Operadores de programación (Raise)
 
-`=>` · `...` · `==` · `!==` · `===` · `&&` · `||` · `+=` · `-=`
+`=>` · `...` · `==` · `!==` · `===` · `&&` · `||` · `+=` · `-=` · `>=` · `<=` · `??` · `?.` · `**`
 
 Implementados con `tap_code` y `tap_code16` enviando keycodes nativos LATAM (no `SEND_STRING` ASCII). Esto garantiza que `&&`, `||`, `=>`, etc. salgan correctos en macOS con teclado físico **ISO Spanish LATAM**.
 
 ## OLED
 
-- **Mitad izquierda (master)**: logo `GFG` + capa actual (Base/Lwr/Rse/Adj/Mouse) + estado mods (CTRL/SHIFT)
-- **Mitad derecha (slave)**: logo + texto "typing with Sofle"
+Ambos OLEDs son **SSD1306 128×32 en orientación vertical** (rotación 270°), formato 5 chars × 16 líneas.
+
+### Mitad izquierda (master)
+
+```
+[logo GFG]    filas 0-3  — iniciales en Helvetica Neue Condensed Black
+  by          fila 5
+Sofle         fila 6
+ WPM          fila 8
+   42         fila 9     — palabras por minuto en tiempo real
+CTL           fila 13    — solo cuando hold Ctrl
+SFT           fila 14    — solo cuando hold Shift
+Lower         fila 15    — capa actual: Base/Lower/Raise/Conf/Mouse
+```
+
+### Mitad derecha (slave)
+
+```
+[logo GFG]    filas 0-3
+ Eres         fila 5
+  un          fila 7
+Crack         fila 9
+[Luna pet]    filas 12-15  — gato animado según WPM
+```
+
+**Luna pet** se mueve según tu velocidad de tipeo:
+- WPM < 10 → sentado (estático)
+- WPM 10-39 → caminando (alterna 2 frames cada 400 ms)
+- WPM ≥ 40 → corriendo (alterna 2 frames cada 200 ms)
 
 ## Setup macOS para LATAM
 
-El teclado Sofle es **físicamente ANSI** (6 columnas por lado, 12 teclas por fila, sin la tecla extra del ISO). El firmware envía keycodes USB estándar que macOS interpreta según el layout configurado.
+El teclado Sofle es **físicamente ANSI** (6 columnas por lado, 12 teclas por fila, sin la tecla extra del ISO). El firmware envía keycodes USB estándar que macOS interpreta según **dos** factores independientes:
 
-Para que los símbolos LATAM (ñ, ´, ¿, ¡, etc.) y los operadores prog (`<`, `>`, `=>`, `&&`, `||`) funcionen, configura **una** de estas opciones en `System Settings → Keyboard`:
+1. **Input Source** activo (la bandera arriba a la derecha del menu bar)
+2. **Keyboard Type** asociado al teclado físico (ANSI / ISO / JIS)
 
-| Opción | Input Source | Keyboard Type | Recomendado |
-|---|---|---|---|
-| **A** | `Spanish - ISO` | ANSI (default) | ✓ más simple |
-| B | `Spanish (Latin America)` | ISO European | alternativa |
+### 1. Input Source
 
-Ambas hacen que el keycode `KC_NUBS` se mapee a `<`/`>` (necesario para los operadores `=>`, `==`, etc.) y que `KC_SCLN` produzca `ñ`, `KC_LBRC` produzca `´`, etc.
+`System Settings → Keyboard → Input Sources` → agregar **Latin American** (LA). Activarlo con la bandera del menu bar o `Cmd+Space → Switch Input Source`.
 
-Si ya tenías un teclado mecánico con macOS configurado para español LATAM (por ejemplo, vienes de un Corne), **probablemente ya tienes esto configurado** y no necesitas tocar nada.
+### 2. Keyboard Type — IMPORTANTE
+
+Por defecto macOS asume **ANSI** para teclados USB nuevos. Eso hace que `KC_NUBS` no produzca `<`/`>` y que `LALT(KC_MINS)` no produzca `\`. Hay que cambiarlo manualmente a **ISO**:
+
+1. Conectar solo el Sofle (desconectar otros teclados externos)
+2. Abrir Terminal y ejecutar:
+   ```bash
+   open "/System/Library/CoreServices/Keyboard Setup Assistant.app"
+   ```
+   (Si no existe en esa ruta, buscar "Keyboard Setup Assistant" en Spotlight)
+3. El wizard pide presionar la tecla a la derecha del Shift izquierdo y a la izquierda del Shift derecho
+4. Al final muestra 3 opciones: ANSI / JIS / **ISO (International)** → **elegir ISO**
+5. Click Done
+
+Una vez configurado como ISO, no hay que volver a hacerlo — macOS lo recuerda por el VID/PID del teclado.
 
 ### Verifica tipeando
 
 - Tecla a la derecha de `L` → `ñ`
 - Tecla a la derecha de `ñ` → `´` (acento muerto; presiona `a` después para `á`)
-- `AltGr + 2` (thumb der col 4 + número 2) → `@`
+- `AltGr + 2` → `@`
 - `AltGr + E` → `€`
-- En capa Lower: `<` y `>` desde el lado der (col 3-4 fila 3)
+- En capa Lower: `<`, `>`, `|`, `\` desde el lado der
+
+### Gotcha — Claude Desktop intercepta `\`
+
+La app Claude Desktop tiene un atajo global asignado a `\` (abre asistente de captura). Si la app está activa, el primer `\` que envíes abrirá ese asistente en vez de tipear el carácter. Workarounds:
+
+- Desactivar el atajo: Claude Desktop → Settings → Shortcuts
+- O cerrar el asistente cuando aparece: las pulsaciones siguientes de `\` ya van al campo activo
 
 ## Build
 
@@ -264,9 +312,11 @@ Haz push a `main` → GitHub Actions corre `qmk_userspace_build.yml` + `qmk_user
 
 ## VIA
 
-`VIA_ENABLE = yes` está activo. Sofle ya está soportado en [usevia.app](https://usevia.app). Los custom keycodes `GFG_*` (macros mac, operadores prog, BSDL) aparecen como `Any` (hex) en VIA — reasignables manualmente con el código hex correspondiente.
+**Deshabilitado** (`VIA_ENABLE = no` en `keymaps/gonzafg2/rules.mk`).
 
-Para tener los `GFG_*` con nombre legible, habría que generar un `vial.json` custom (no implementado todavía).
+VIA gasta ~2.5 KB de flash y ya estábamos al 97% del límite AVR del ATmega32U4 (28 KB). Lo sacamos para dejar espacio a los 5 frames del Luna pet en el OLED + `WPM_ENABLE`.
+
+**Para reactivarlo**: cambiar `VIA_ENABLE = yes` y quitar Luna pet (o algún otro feature pesado como `MOUSEKEY_ENABLE`).
 
 ## Diferencias vs Corne (ZMK)
 
@@ -277,7 +327,7 @@ Para tener los `GFG_*` con nombre legible, habría que generar un `vial.json` cu
 | Macros `=>`, `&&`, etc. | `behavior-macro` con keycodes LATAM | `tap_code16` con keycodes LATAM (mismo principio) |
 | Mod-morph BSPC/DEL | `behavior-mod-morph` | handler en `process_record_user` |
 | Combos | `combos` node | `combo_t key_combos[]` |
-| Capa Adjust | conditional layers tienen bug, se accede via hold ESC o combo TAB+BSDL | `update_tri_layer_state` (funciona en QMK) + hold ESC + combo |
+| Capa Adjust | conditional layers tienen bug, se accede via hold ESC o combo TAB+BSDL | tri-layer manual con flag (preserva LT) + hold ESC |
 | Mouse layer | `tog 4` desde Adjust (solo persistente) | hold encoder izq (momentary) + tap TG desde Adjust (persistente) |
 | Editor runtime | ZMK Studio | VIA web |
 | Fila numérica | Solo en Lower (42 keys) | **En Base** (58 keys) |

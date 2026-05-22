@@ -25,7 +25,7 @@ qmk-userspace-sofle/
 ├── .github/workflows/build_binaries.yml              # CI oficial QMK userspace
 ├── users/gonzafg2/                                   # código compartido
 │   ├── gonzafg2.{c,h}                                # custom keycodes, macros
-│   ├── config.h                                      # tapping term, combos
+│   ├── config.h                                      # tapping term, defines varios
 │   └── rules.mk                                      # features comunes
 └── keyboards/sofle/keymaps/gonzafg2/                 # keymap específico
     ├── keymap.c                                      # capas + encoder map + OLED
@@ -52,7 +52,7 @@ qmk flash -kb sofle/rev1 -km gonzafg2
 | 0 | `_BASE` | siempre | QWERTY LATAM + fila numérica |
 | 1 | `_LOWER` | hold thumb izq | numpad, F-keys, símbolos |
 | 2 | `_RAISE` | hold thumb der | operadores prog, navegación |
-| 3 | `_ADJUST` | hold ESC ó combo TAB+BSDL | sistema, media, RGB, mouse toggle |
+| 3 | `_ADJUST` | hold ESC ó tri-layer LWR+RSE | sistema, media, RGB, mouse toggle |
 | 4 | `_MOUSE` | hold LSFT ó toggle Adjust | mouse + scroll |
 
 ## Custom keycodes (definidos en `users/gonzafg2/gonzafg2.h`)

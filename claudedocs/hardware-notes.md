@@ -94,3 +94,39 @@ Del `keyboards/sofle/rev1/keyboard.json` de QMK mainline:
 - **ATmega32U4 = 28KB usables** después del bootloader Caterina (32KB - 4KB bootloader)
 - Build actual está cerca del límite — cada feature nueva requiere medir
 - LTO (`LTO_ENABLE = yes`) ya activo para máximo compactado
+
+## Defecto del Pro Micro USB-C clónico
+
+**Problema confirmado**: el Pro Micro USB-C del Sofle ZK **no se prende ni enumera** cuando se conecta con cable USB-C ↔ USB-C directo al Mac mini M4 Pro 2024. **Funciona solo con adaptador USB-A** (cable USB-A↔USB-C, con USB-A del lado del Mac).
+
+**Causa**: defecto conocido en clones chinos. Implementan el conector USB-C físicamente pero **omiten el resistor 5.1kΩ entre pines CC1/CC2 y GND**. Sin ese resistor, los Mac (Apple Silicon, spec USB-C estricta) no detectan al dispositivo y no entregan 5V por el puerto. Los puertos USB-A tradicionales siempre entregan 5V sin negociación CC, por eso el adaptador funciona como workaround.
+
+**Workaround usado**: cable USB-A↔USB-C + adaptador USB-A en el Mac. Es la solución actual.
+
+**Soluciones permanentes posibles** (para futuro, no necesarias ahora):
+1. Soldar resistor SMD 5.1kΩ entre CC1/CC2 y GND del Pro Micro (modificación HW pequeña)
+2. Reemplazar el Pro Micro por un controlador de marca confiable: Elite-C, SparkFun Pro Micro USB-C, KB2040, RP2040 Pro Micro
+3. Seguir usando el adaptador A↔C indefinidamente (es perfectamente válido y no causa problemas funcionales)
+
+**Implicación para flashear**: siempre conectar la mitad a flashear con adaptador USB-A → cable USB-A↔USB-C → teclado. No intentar cable C↔C directo, no funciona.
+
+## Encoder push buttons no funcionan (cold joint diagnosticado)
+
+**Síntoma confirmado** (sesión 2026-05-21): rotación de ambos encoders funciona OK en todas las capas; **el tap/hold del push button del encoder NO registra evento de matriz en ninguna capa**.
+
+**Cómo se diagnosticó**: temporalmente se habilitó debug en master OLED que mostraba el último matrix event (`row,col` + hex del keycode) en filas 11-12. Resultados:
+- `SPC` (thumb izq col 4) → `4,4` y `0x002C` ✓ (matrix [4,4] funciona)
+- `,` (der) → `8,3` y `0x0036` ✓ (matrix [8,3] funciona)
+- **Encoder push izq** (matrix [4,5]) → **OLED no se actualiza** (ningún evento)
+- **Encoder push der** (matrix [9,5]) → **OLED no se actualiza** (ningún evento)
+
+Como row 4 y row 9 funcionan (thumbs OK) y col 5 funciona (DEL, BSDL, LBRC, ESCAD OK), la intersección row 4×col 5 y row 9×col 5 (que son exactamente los encoder push) deberían funcionar — pero no llega señal eléctrica al pin del Pro Micro.
+
+**Diagnóstico**: **cold joint** en los pines del switch del encoder. El switch interno EC11 funciona mecánicamente (se siente el click táctil) y los 5 puntos de soldadura están visibles, pero al menos uno de los dos pines del switch no hace contacto eléctrico con su pad del PCB.
+
+**Soluciones por probabilidad**:
+1. **Resoldar los 5 pines del encoder** con flux + estaño nuevo — resuelve cold joints invisibles
+2. **Verificar con multímetro** (modo continuidad) entre los pads del switch presionando el encoder; si no hay continuidad eléctrica, switch defectuoso → reemplazar EC11
+3. **Reemplazar el encoder completo** si los puntos anteriores no resuelven
+
+**Estado firmware**: correcto. Los keycodes `GFG_MUTM` (Mute + Mouse layer hold) y `KC_MPLY` (Play/Pause) están asignados correctamente a las matrix positions [4,5] y [9,5]. Cuando se arregle el hardware, funcionarán sin necesidad de tocar firmware.

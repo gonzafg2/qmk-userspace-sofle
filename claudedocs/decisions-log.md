@@ -90,9 +90,88 @@ Decisiones tomadas durante el desarrollo, con su justificación. Útil para ente
 
 **Cómo mejorar**: generar `vial.json` con los GFG_* nombrados explícitamente (futuro, no necesario ahora).
 
+## 2026-05-21 · Símbolos LATAM Mac: keycodes posicionales en LOWER + RAISE
+
+**Decisión**: reemplazar aliases US-centric (`KC_LPRN`, `KC_LCBR`, `KC_TILD`, `KC_AT`, `KC_CIRC`, `KC_AMPR`, etc.) por keycodes posicionales que produzcan el símbolo correcto en macOS con layout Spanish LATAM.
+
+**Por qué**: el Mac re-interpreta los scancodes USB según el layout activo. `KC_LPRN = LSFT(KC_9)` en US = `(`, pero en LATAM Mac = `)`. Mismo problema que resolvimos en el Corne (ZMK) — porteado a QMK con la tabla de mapeo equivalente.
+
+**Mapeo verificado** (todos en LOWER right side y RAISE columnas afectadas):
+- `(` = `S(KC_8)` · `)` = `S(KC_9)` · `\` = `A(KC_MINS)` · `?` = `S(KC_MINS)` · `_` = `S(KC_SLSH)`
+- `{` = `KC_QUOT` · `}` = `KC_BSLS` · `~` = `RALT(KC_RBRC)` · `'` = `KC_MINS` · `"` = `S(KC_2)` · `` ` `` = `A(KC_BSLS)`
+- `[` = `S(KC_QUOT)` · `]` = `S(KC_BSLS)` · `<` = `KC_NUBS` · `>` = `S(KC_NUBS)` · `|` = `KC_GRV`
+- `@` = `RALT(KC_Q)` · `^` = `A(KC_QUOT)` · `&` = `S(KC_6)`
+
+**Macros `GFG_*` en `users/gonzafg2/gonzafg2.c`** ya estaban correctas (usan `LSFT(KC_0)` para `=`, `KC_RBRC` para `+`, `KC_SLSH` para `-`, etc.) — no requirieron cambios.
+
+**Gotcha QMK**: solo existen aliases cortos para mods izquierdos (`S()`, `A()`, `C()`, `G()`). Para mods derechos hay que usar la forma completa `RALT()` / `RCTL()` etc. `RA(...)` no existe y falla con `implicit declaration`.
+
+## 2026-05-21 · OLED master: layout reorganizado con capa abajo + WPM
+
+**Decisión**: reescribir el contenido del master OLED:
+- Logo `GFG` arriba (filas 0-3)
+- "by / Sofle" (filas 5-6)
+- WPM en tiempo real (filas 8-9)
+- CTL/SFT mods condicionales (filas 13-14)
+- **Capa actual en la parte inferior** (fila 15), nombres completos: Base / Lower / Raise / Conf / Mouse
+
+**Por qué**: el layout previo mostraba "Sofle / by ZK / LAYER / [capa]" pero "LAYER" (5 chars) hacía wrap incorrecto y se veía como una "R" colgada. El nuevo layout es más legible, más informativo (WPM), y la capa queda donde la vista cae naturalmente.
+
+**Costo flash**: `WPM_ENABLE = yes` agregó ~880 bytes. Llegamos al 97% (28KB AVR).
+
+## 2026-05-21 · Logo: cambio de mark abstracto a iniciales "GFG"
+
+**Decisión**: reemplazar el bitmap del logo (un símbolo abstracto con dos triángulos opuestos, comentado como "GFG mark" pero que no decía GFG) por las **iniciales reales "GFG"** en Helvetica Neue Condensed Black 20px, centradas en 32×32.
+
+**Por qué**: el comentario del código decía "GFG mark" pero el bitmap dibujaba un símbolo de "sync/swap" (⇅), no las iniciales. El usuario pidió que dijera GFG de verdad.
+
+**Cómo se generó**: script Python con PIL + Helvetica Neue Condensed Black (en `/System/Library/Fonts/HelveticaNeue.ttc` index 9), size 20, output empaquetado a formato SSD1306 vertical LSB-first (128 bytes = 4 páginas × 32 cols).
+
+## 2026-05-21 · VIA deshabilitado para hacer espacio para Luna pet
+
+**Decisión**: `VIA_ENABLE = no` en `keymaps/gonzafg2/rules.mk`. Reemplaza la decisión previa del 2026-05-18.
+
+**Por qué**: VIA gastaba ~2.5 KB de flash. Después de habilitar `WPM_ENABLE` (~880 B) llegamos al 97% (844 bytes libres). Para meter Luna pet (5 frames × 128 bytes = 640 B + ~150 B de lógica) sin reventar el AVR, había que liberar espacio. VIA era el más pesado y prescindible.
+
+**Impacto**: el usuario pierde el editor VIA. Para remapear teclas hay que editar `keymap.c` y recompilar/reflashear.
+
+**Reversible**: sí, si en algún momento prioriza VIA sobre Luna pet o si se cambia el controlador a uno con más flash (Elite-C, KB2040, etc).
+
+## 2026-05-21 · Luna pet animado en slave OLED
+
+**Decisión**: agregar gato Luna animado en la parte inferior del slave OLED (filas 12-15), debajo del texto "Eres / un / Crack".
+
+**Por qué**: el usuario lo pidió ("Veamos como se ve el gato"). Da feedback visual del WPM en tiempo real.
+
+**Implementación**:
+- 5 frames 32×32 (sit / walk_a / walk_b / run_a / run_b)
+- Sprites generados con Python + PIL usando primitivas (elipses, triángulos, rectángulos), NO son el Luna canónico de HellSingCoder
+- Estado según WPM: `< 10` = sit estático, `< 40` = walk alterna cada 400 ms, `>= 40` = run alterna cada 200 ms
+- Posicionado con `oled_set_cursor(0, 12)` + `oled_write_raw_P(frame, 128)`
+
+**Trade-off**: los sprites son simples y pueden verse "blob-y" en el OLED real. Si no convencen, regenerar con sprites más detallados o copiar Luna canónico.
+
+## 2026-05-21 · Encoder push en Base: Mute izq, Play der
+
+**Decisión**:
+- Izq: `GFG_MUTM` cambia de `LT(_MOUSE, KC_MPLY)` a `LT(_MOUSE, KC_MUTE)` (en `gonzafg2.h`). Tap = Mute, hold = capa Mouse. El nombre "MUTM" ahora cuadra con lo que hace (Mute + Mouse).
+- Der: el slot pasa de `GFG_LOCK` a `KC_MPLY` directo. Tap = Play/Pause, sin hold.
+
+**Por qué**: el usuario reportó que los encoder push "no funcionaban" en Base. Análisis:
+1. `GFG_MUTM` con tap = Play era poco perceptible (si no hay app de media activa, no pasa nada visible).
+2. `GFG_LOCK` con tap = lock screen es destructivo — un tap accidental te bloquea la sesión.
+3. El nombre del izq decía "MUTM" pero hacía Play, inconsistente.
+
+Mute + Play es más coherente con la rotación del encoder (que ya controla volumen izq + scroll der) y elimina el riesgo del lock accidental. `GFG_LOCK` sigue accesible desde la capa Adjust.
+
 ## Decisiones pendientes (sin resolver)
 
 Ver [thumb-cluster-iteration.md](./thumb-cluster-iteration.md):
 - ¿Mantener doble Enter o consolidar a uno solo?
 - ¿Reemplazar `LWR` y `RSE` solos por TAB/BSPC dedicados?
 - ¿Otra alternativa que el usuario proponga?
+
+Pendiente verificar en físico (esta sesión):
+- Posición real del Luna pet en el OLED (¿queda en parte inferior como esperado o en otra zona por la rotación 270°?)
+- Estética de los sprites del gato en el OLED real
+- Que el encoder push izq registre tap = Mute (puede ser problema de tapping_term del LT)
