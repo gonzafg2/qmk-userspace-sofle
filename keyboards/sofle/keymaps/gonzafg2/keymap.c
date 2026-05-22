@@ -160,7 +160,7 @@ static void render_layer_state(void) {
     }
 
     oled_set_cursor(0, 5);
-    oled_write_P(PSTR(" by  SofleRGBv2rev2 "), false);
+    oled_write_P(PSTR(" by  SofleRGBv2     "), false);
 
     oled_set_cursor(0, 15);
     if (show_rgb) {

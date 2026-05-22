@@ -234,7 +234,7 @@ Ambos OLEDs son **SSD1306 128×32 en orientación vertical** (rotación 270°), 
  by           fila 5
 Sofle         fila 6
 RGBv2         fila 7     — identificación del PCB
-rev2          fila 8     — revisión exacta
+              fila 8     — separador
 [gata pet]    filas 9-12 — gata estática (sentada alerta, 32×32)
 CC AA         fila 13    — Ctrl izq/der + Alt/AltGr (ver abajo)
 SS MM         fila 14    — Shift izq/der + Cmd izq/der (ver abajo)
