@@ -404,7 +404,7 @@ Haz push a `main` → GitHub Actions corre `qmk_userspace_build.yml` + `qmk_user
 
 ## Features deshabilitadas (trade-offs AVR)
 
-El ATmega32U4 tiene 28KB usables. Build actual está al **99% (28650/28672 bytes, 22 libres)**. Para llegar a este balance se sacrificó:
+El ATmega32U4 tiene 28KB usables. Build actual está al **~99%** (muy cerca del límite — el número exacto cambia con cada feature y aparece en el output de `qmk compile`). Para llegar a este balance se sacrificó:
 
 | Feature | Estado | Por qué se quitó |
 |---|---|---|

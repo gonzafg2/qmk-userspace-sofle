@@ -64,7 +64,20 @@ Firmware final: **26044/28672 bytes (90%, 2628 libres)**.
 5. **Iteraciones de Luna**: primero a walk loop fijo (post-WPM), después **Luna ciclando** entre sit→walk→run cada 6s (los 5 sprites originales mantenidos, frijol-y-nieblita stay).
 6. **Set final de 5 efectos RGB**: `GRADIENT_LEFT_RIGHT` (default), `STARLIGHT` (ambiental "estrellas"), `CYCLE_LEFT_RIGHT`, `TYPING_HEATMAP` (reactivo), `SOLID_REACTIVE_SIMPLE` (reactivo).
 7. **Verificado físicamente**: gradient rojo→violeta enciende al boot. **Titileo en brillo alto confirmó undervolt** — no subir `RGB_MATRIX_MAXIMUM_BRIGHTNESS` arriba de 150 sin cambiar fuente USB.
-8. **Firmware final**: **28634/28672 bytes (99%, 38 libres)**. Muy apretado pero estable.
+8. **Firmware tras activar RGB_MATRIX**: ~99% del AVR (cerca del límite, varias decenas de bytes libres). Estable pero apretado.
+
+### Iteraciones post-PR (OLED enriquecido)
+
+Después del primer build de RGB_MATRIX, varias features adicionales sumaron al PR:
+
+- **Indicador efímero del efecto RGB** en fila 15 del master OLED (2s al cambiar `RM_NEXT`/`RM_PREV`/`RM_TOGG`)
+- **Gata del master estática** (sin respiración) para hacer espacio para el indicador anterior
+- **`RGBv2` + `rev2`** agregados al master OLED (filas 7-8) — identificación del PCB
+- **Mods en 2 filas** (13-14) con codificación posicional fija que distingue LCTL/RCTL/LSFT/RSFT/LGUI/RGUI
+- **Capa alineada a la izquierda** (`Base `, `Lower`, `Raise`, `Conf.`, `Mouse`)
+- **Truco recurrente para caber**: un solo buffer + un solo `oled_write*` aprovechando autowrap del cursor del OLED, en vez de múltiples `set_cursor` + `write_P` separados.
+
+**Tamaño final del PR**: ~99% (10 bytes libres en el último compile). Para nuevas features se requiere sacrificar algo existente.
 
 ## Trade-offs aceptados
 

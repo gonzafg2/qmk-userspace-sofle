@@ -178,12 +178,19 @@ Mute + Play es más coherente con la rotación del encoder (que ya controla volu
 #define ENABLE_RGB_MATRIX_SOLID_REACTIVE_SIMPLE
 ```
 
-**Keycodes en `_ADJUST`** (mano izquierda): se usan los nombres modernos `RM_*`, NO los legacy `RGB_*` (esos son solo para `RGBLIGHT_ENABLE`):
+**Keycodes en `_ADJUST`** (mano izquierda): se usan los nombres modernos `RM_*`, NO los legacy `RGB_*` (esos son solo para `RGBLIGHT_ENABLE`).
+
+Layout inicial al activar RGB_MATRIX (después corregido — ver iteraciones):
 - Row 0 cols 1-5: `RM_TOGG, RM_NEXT, RM_HUEU, RM_SATU, RM_VALU`
 - Row 1 cols 1-5: `RM_SPDD, RM_PREV, RM_HUED, RM_SATD, RM_VALD`
-- Thumb col 6 izq: `RM_SPDU`
+- Thumb col 6 izq: `RM_SPDU` ⚠️ se descubrió que ese slot es el encoder push izquierdo (matrix [4,5]) con cold joint — no registra eventos. Corregido en iteración posterior moviendo `RM_SPDU` a row 1 col 0.
 
-**Tamaño final**: 28634/28672 bytes (99%, 38 libres). Muy apretado pero estable.
+**Layout final correcto**:
+- Row 0 cols 1-5: `RM_TOGG, RM_NEXT, RM_HUEU, RM_SATU, RM_VALU`
+- Row 1 col 0-5: `RM_SPDU, RM_SPDD, RM_PREV, RM_HUED, RM_SATD, RM_VALD` (RM_SPDU agregado al inicio)
+- Thumb col 6 izq: `XXXXXXX` (encoder push roto, no se asigna nada útil)
+
+**Tamaño tras activar RGB_MATRIX** (antes de iteraciones de OLED): muy cerca del límite del AVR (~99%).
 
 ### Indicador del efecto RGB en master OLED (post-PR)
 
@@ -195,7 +202,19 @@ Mute + Play es más coherente con la rotación del encoder (que ya controla volu
 
 **Labels usados**: `Grad`, `Star`, `Cycl`, `Heat`, `Reac` (4 chars, consistentes con el ancho del OLED en orientación vertical).
 
-**Tamaño final tras este cambio**: 28640/28672 bytes (99%, 32 libres).
+### Iteraciones de OLED post-PR original
+
+Tras los fixes de Copilot y nuevas features pedidas por el usuario, el OLED master quedó así:
+
+- **Filas 7-8**: agregado texto `RGBv2` y `rev2` para identificación del PCB. Optimización: las 4 strings (` by  `, `Sofle`, `RGBv2`, `rev2 `) se escriben con UN solo `oled_write_P` concatenado (` by  SofleRGBv2rev2 `) aprovechando autowrap del cursor. Esto ahorró ~52 bytes vs llamadas separadas.
+- **Gata pet**: movida de filas 8-11 a 9-12 para hacer espacio.
+- **Filas 13-14**: indicador completo de los 8 mods (LCTL/RCTL/LALT/RALT/LSFT/RSFT/LGUI/RGUI) con codificación posicional en 2 filas:
+  - Fila 13: `[LCTL][RCTL][ ][LALT][RALT]` → chars `C C   A A`
+  - Fila 14: `[LSFT][RSFT][ ][LGUI][RGUI]` → chars `S S   M M`
+  - Mismo truco de un solo buffer + un solo write con autowrap.
+- **Fila 15**: capa **alineada a la izquierda** (`Base `, `Lower`, `Raise`, `Conf.`, `Mouse`). `Conf.` con punto final indica abreviación (Config no cabe en 5 chars).
+
+**Tamaño tras todas las iteraciones**: ~99% del AVR (~10-30 bytes libres dependiendo del momento exacto; el número exacto se ve en el último `qmk compile` output, no en estos docs que se desactualizan rápido).
 
 ### Iteraciones de la misma sesión
 
