@@ -39,7 +39,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 [_LOWER] = LAYOUT(
   KC_F12,   KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,                                      KC_F6,      KC_F7,      KC_F8,        KC_F9,      KC_F10,     KC_F11,
   _______,  KC_7,    KC_8,    KC_9,    KC_PSLS, KC_PAST,                                    S(KC_8),    S(KC_9),    A(KC_MINS),   KC_EXLM,    S(KC_MINS), _______,
-  _______,  KC_4,    KC_5,    KC_6,    KC_PPLS, KC_PMNS,                                    KC_QUOT,    KC_BSLS,    RALT(KC_RBRC),KC_MINS,    S(KC_2),    A(KC_BSLS),
+  _______,  KC_4,    KC_5,    KC_6,    KC_PPLS, KC_PMNS,                                    KC_QUOT,    KC_BSLS,    A(KC_RBRC),   KC_MINS,    S(KC_2),    A(KC_BSLS),
   _______,  KC_1,    KC_2,    KC_3,    KC_DOT,  KC_0,    KC_BRID,                KC_BRIU,   S(KC_QUOT), S(KC_BSLS), KC_NUBS,      S(KC_NUBS), KC_GRV,     S(KC_SLSH),
                      _______, _______, _______, _______, _______,                _______,   _______, _______, _______, _______
 ),
@@ -58,7 +58,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  */
 [_RAISE] = LAYOUT(
   S(KC_0),  GFG_GTEQ,GFG_LTEQ,GFG_NULC,GFG_OPTC,GFG_POW,                                    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
-  _______,  KC_EXLM,    RALT(KC_Q),KC_HASH, KC_DLR,  KC_PERC,                                XXXXXXX, QK_REP,  XXXXXXX, XXXXXXX, XXXXXXX, _______,
+  _______,  KC_EXLM,    A(KC_Q),   KC_HASH, KC_DLR,  KC_PERC,                                XXXXXXX, QK_REP,  XXXXXXX, XXXXXXX, XXXXXXX, _______,
   _______,  A(KC_QUOT), GFG_PLEQ,  S(KC_6), GFG_AND, GFG_OR,                                 KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, GFG_MIEQ,XXXXXXX,
   _______,  GFG_ARROW,GFG_SPREAD,GFG_EQEQ,GFG_NEQ,GFG_TEQ,_______,                _______,  KC_HOME, KC_PGDN, KC_PGUP, KC_END,  XXXXXXX, _______,
                      _______, _______, _______, _______, _______,                _______,   _______, _______, _______, _______

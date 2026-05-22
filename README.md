@@ -266,6 +266,24 @@ Una vez configurado como ISO, no hay que volver a hacerlo — macOS lo recuerda 
 - `AltGr + E` → `€`
 - En capa Lower: `<`, `>`, `|`, `\` desde el lado der
 
+### Gotcha — Ghostty + zellij/neovim + dead keys (`, \, ^, ~, @)
+
+En LATAM Mac ISO, los caracteres `` ` `` `\` `^` `~` `@` se producen con Option+tecla y muchos son **dead keys** (acentos muertos). macOS los procesa correctamente en Firefox, TextEdit, VS Code, etc. — pero Ghostty por default los traga.
+
+El conflicto: el firmware del teclado tiene **KC_RALT en el thumb derecho** para que zellij/neovim reciban Alt como modificador (M-x). Si configuras Ghostty con `macos-option-as-alt = false`, los dead keys funcionan pero pierdes Alt. Si pones `true`, ganas Alt pero pierdes los dead keys.
+
+**Solución**: usar `macos-option-as-alt = right` en `~/.config/ghostty/config`:
+
+```
+macos-option-as-alt = right
+```
+
+Eso le dice a Ghostty:
+- **LEFT Option** (lo que envía el firmware al hacer `\`, `^`, `~`, `@`, `` ` ``) → pasa a macOS → dead keys procesados normalmente
+- **RIGHT Option** (el `KC_RALT` físico del thumb derecho) → intercepta como Alt → zellij/neovim lo reciben
+
+Para que esto funcione, **todos los macros del firmware usan `LALT()` consistentemente** para los caracteres LATAM Option. El thumb `KC_RALT` queda exclusivamente para Alt de terminal.
+
 ### Gotcha — Claude Desktop intercepta `\`
 
 La app Claude Desktop tiene un atajo global asignado a `\` (abre asistente de captura). Si la app está activa, el primer `\` que envíes abrirá ese asistente en vez de tipear el carácter. Workarounds:
