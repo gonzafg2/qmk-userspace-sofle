@@ -174,6 +174,8 @@ Mano izq mantiene Shift y Cmd para combos: Shift+click (selección), Cmd+click (
 
 `LOCK` pantalla (`⌘⌃Q`) sigue accesible desde la capa Adjust (segunda fila izq).
 
+> **⚠️ Hardware conocido**: en la unidad actual los **push de los encoders no registran señal eléctrica** (cold joint diagnosticado, no es bug de firmware). La rotación funciona correctamente. Los keycodes de tap/hold están asignados correctamente y funcionarán una vez resoldados los pines del switch del EC11. Detalle del diagnóstico en [`claudedocs/hardware-notes.md`](./claudedocs/hardware-notes.md).
+
 ## Combos
 
 | Combo | Acción |
