@@ -91,7 +91,7 @@ Casillas vacías = transparent (heredan de Base). Encoder izq cambia a brillo, e
 
 ```
 ┌─────┬─────┬─────┬─────┬─────┬─────┐                              ┌─────┬─────┬─────┬─────┬─────┬─────┐
-│     │     │     │     │     │     │                              │     │     │     │     │     │     │
+│     │ >=  │ <=  │ ??  │ ?.  │ **  │                              │     │     │     │     │     │     │
 ├─────┼─────┼─────┼─────┼─────┼─────┤                              ├─────┼─────┼─────┼─────┼─────┼─────┤
 │     │  !  │  @  │  #  │  $  │  %  │                              │     │ RPT │     │     │     │     │
 ├─────┼─────┼─────┼─────┼─────┼─────┤                              ├─────┼─────┼─────┼─────┼─────┼─────┤
@@ -195,7 +195,7 @@ Implementadas con `tap_code16` LATAM-aware en `users/gonzafg2/gonzafg2.c`:
 
 ## Operadores de programación (Raise)
 
-`=>` · `...` · `==` · `!==` · `===` · `&&` · `||` · `+=` · `-=`
+`=>` · `...` · `==` · `!==` · `===` · `&&` · `||` · `+=` · `-=` · `>=` · `<=` · `??` · `?.` · `**`
 
 Implementados con `tap_code` y `tap_code16` enviando keycodes nativos LATAM (no `SEND_STRING` ASCII). Esto garantiza que `&&`, `||`, `=>`, etc. salgan correctos en macOS con teclado físico **ISO Spanish LATAM**.
 

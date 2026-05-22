@@ -83,6 +83,26 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             tap_code(KC_SLSH);
             tap_code16(LSFT(KC_0));
             return false;
+        case GFG_GTEQ:
+            tap_code16(LSFT(KC_NUBS));
+            tap_code16(LSFT(KC_0));
+            return false;
+        case GFG_LTEQ:
+            tap_code(KC_NUBS);
+            tap_code16(LSFT(KC_0));
+            return false;
+        case GFG_NULC:
+            tap_code16(LSFT(KC_MINS));
+            tap_code16(LSFT(KC_MINS));
+            return false;
+        case GFG_OPTC:
+            tap_code16(LSFT(KC_MINS));
+            tap_code(KC_DOT);
+            return false;
+        case GFG_POW:
+            tap_code(KC_PAST);
+            tap_code(KC_PAST);
+            return false;
 
         case GFG_SCRF:
             tap_code16(LGUI(LSFT(KC_3)));
