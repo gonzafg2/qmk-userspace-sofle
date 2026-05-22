@@ -65,7 +65,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 ),
 
 /* Adjust (sistema, media, macros mac, mouse toggle)
- * Acceso: hold ambos LWR+RSE (tri-layer) | hold ESC pinky der | combo TAB+BSDL
+ * Acceso: hold ambos LWR+RSE (tri-layer) | hold ESC pinky der
  * ,-----------------------------------------.                    ,-----------------------------------------.
  * | BOOT |      |      |      |      |      |                    |      |      |      |      |      |      |
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
@@ -119,11 +119,9 @@ const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][NUM_DIRECTIONS] = {
 #endif
 
 const uint16_t PROGMEM combo_caps_word[] = { KC_F, KC_J, COMBO_END };
-const uint16_t PROGMEM combo_adjust[]    = { KC_TAB, GFG_BSDL, COMBO_END };
 
 combo_t key_combos[] = {
     COMBO(combo_caps_word, CW_TOGG),
-    COMBO(combo_adjust,    MO(_ADJUST)),
 };
 
 #ifdef OLED_ENABLE

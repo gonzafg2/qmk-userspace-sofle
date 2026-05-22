@@ -37,7 +37,6 @@ Hermano del repo [zmk-config-corne](https://github.com/gonzafg2/zmk-config-corne
     │  (1)  │    │  (2)  │    │  (3)  │    │  (4)  │    │  (4)  │
     └───────┘    └───────┘    └───────┘    └───────┘    └───────┘
                                   ▲ tambien: hold ESC pinky der
-                                            o combo TAB+BSDL
 ```
 
 | Capa | # | Activación | Tipo |
@@ -45,7 +44,7 @@ Hermano del repo [zmk-config-corne](https://github.com/gonzafg2/zmk-config-corne
 | Base | 0 | default | — |
 | Lower | 1 | hold thumb izq col 4 | momentary |
 | Raise | 2 | hold thumb der col 2 | momentary |
-| Adjust | 3 | hold AMBOS Lower+Raise (tri-layer) **o** hold ESC pinky der **o** combo TAB+BSDL | momentary |
+| Adjust | 3 | hold AMBOS Lower+Raise (tri-layer) **o** hold ESC pinky der | momentary |
 | Mouse | 4 | hold encoder push izq (momentary) **o** tap TG_MOUSE en Adjust (persistente) | mixto |
 
 Salir de Mouse persistente: tap **EXIT** (esquina sup der o esquina inf der dentro de Mouse).
@@ -121,7 +120,7 @@ Casillas vacías = transparent (heredan de Base). Encoder izq cambia a brillo, e
 └─────┴─────┴─────┼─────┼─────┼─────┴─────┴─────┐        ┌───┴─────┴─────┼─────┼─────┼─────┴─────┴─────┘
                   │     │     │     │  ▼  │     │        │     │  ▼  │     │     │     │
                   └─────┴─────┴─────┴─────┴─────┘        └─────┴─────┴─────┴─────┴─────┘
-                          ▲ hold ambos LWR+RSE | hold ESC | combo TAB+BSDL
+                          ▲ hold ambos LWR+RSE | hold ESC
 ```
 
 `BOOT` = `QK_BOOT` (entra a bootloader para flashear) · `SCRF/A/T` = screenshots mac (`⌘⇧3`/`4`/`5`)
@@ -329,7 +328,7 @@ VIA gasta ~2.5 KB de flash y ya estábamos al 97% del límite AVR del ATmega32U4
 | Macros `=>`, `&&`, etc. | `behavior-macro` con keycodes LATAM | `tap_code16` con keycodes LATAM (mismo principio) |
 | Mod-morph BSPC/DEL | `behavior-mod-morph` | handler en `process_record_user` |
 | Combos | `combos` node | `combo_t key_combos[]` |
-| Capa Adjust | conditional layers tienen bug, se accede via hold ESC o combo TAB+BSDL | `update_tri_layer_state` (funciona en QMK) + hold ESC + combo |
+| Capa Adjust | conditional layers tienen bug, se accede via hold ESC o combo TAB+BSDL | tri-layer manual con flag (preserva LT) + hold ESC |
 | Mouse layer | `tog 4` desde Adjust (solo persistente) | hold encoder izq (momentary) + tap TG desde Adjust (persistente) |
 | Editor runtime | ZMK Studio | VIA web |
 | Fila numérica | Solo en Lower (42 keys) | **En Base** (58 keys) |
