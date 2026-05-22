@@ -10,6 +10,9 @@ enum gfg_layers {
     _MOUSE,
 };
 
+extern uint16_t gfg_last_kc;
+extern uint8_t  gfg_last_pos;
+
 enum gfg_keycodes {
     GFG_ARROW = QK_USER,
     GFG_SPREAD,

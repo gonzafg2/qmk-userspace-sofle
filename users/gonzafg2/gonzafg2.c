@@ -1,10 +1,18 @@
 #include "gonzafg2.h"
 
+uint16_t gfg_last_kc = 0;
+uint8_t  gfg_last_pos = 0;
+
 layer_state_t layer_state_set_user(layer_state_t state) {
     return update_tri_layer_state(state, _LOWER, _RAISE, _ADJUST);
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    if (record->event.pressed) {
+        gfg_last_kc = keycode;
+        gfg_last_pos = (record->event.key.row << 4) | (record->event.key.col & 0x0F);
+    }
+
     if (keycode == GFG_BSDL) {
         if (record->event.pressed) {
             uint8_t mods = get_mods() | get_oneshot_mods();

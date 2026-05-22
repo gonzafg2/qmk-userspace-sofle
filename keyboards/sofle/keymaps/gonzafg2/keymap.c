@@ -181,6 +181,23 @@ static void render_mod_status(void) {
     oled_write_P((mods & MOD_MASK_SHIFT) ? PSTR("SFT ") : PSTR("    "), false);
 }
 
+// DEBUG TEMPORAL: muestra ultimo matrix event en filas 11-12
+static void render_debug_lastkey(void) {
+    static const char hex[] PROGMEM = "0123456789ABCDEF";
+    oled_set_cursor(0, 11);
+    oled_write_char('0' + ((gfg_last_pos >> 4) & 0x0F), false);
+    oled_write_char(',', false);
+    oled_write_char('0' + (gfg_last_pos & 0x0F), false);
+    oled_write_char(' ', false);
+    oled_write_char(' ', false);
+    oled_set_cursor(0, 12);
+    oled_write_char(pgm_read_byte(&hex[(gfg_last_kc >> 12) & 0x0F]), false);
+    oled_write_char(pgm_read_byte(&hex[(gfg_last_kc >> 8)  & 0x0F]), false);
+    oled_write_char(pgm_read_byte(&hex[(gfg_last_kc >> 4)  & 0x0F]), false);
+    oled_write_char(pgm_read_byte(&hex[ gfg_last_kc        & 0x0F]), false);
+    oled_write_char(' ', false);
+}
+
 // Luna pet: 5 frames 32x32 — sit / walk_a / walk_b / run_a / run_b
 static const char PROGMEM luna_sit[] = {
     0x00,0x00,0x00,0x00,0xC0,0x80,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
@@ -264,6 +281,7 @@ bool oled_task_user(void) {
     if (is_keyboard_master()) {
         render_layer_state();
         render_mod_status();
+        render_debug_lastkey();
     } else {
         oled_set_cursor(0, 5);
         oled_write_P(PSTR("Eres "), false);
