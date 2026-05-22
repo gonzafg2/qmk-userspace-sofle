@@ -177,7 +177,7 @@ static void render_layer_state(void) {
             case _BASE:   oled_write_P(PSTR("Base "), false); break;
             case _LOWER:  oled_write_P(PSTR("Lower"), false); break;
             case _RAISE:  oled_write_P(PSTR("Raise"), false); break;
-            case _ADJUST: oled_write_P(PSTR("Confi"), false); break;
+            case _ADJUST: oled_write_P(PSTR("Conf."), false); break;
             case _MOUSE:  oled_write_P(PSTR("Mouse"), false); break;
             default:      oled_write_P(PSTR("?    "), false);
         }
@@ -206,15 +206,16 @@ static void render_gata(void) {
 
 static void render_mod_status(void) {
     uint8_t mods = get_mods() | get_oneshot_mods();
+    char buf[11] = "          ";
+    if (mods & MOD_BIT(KC_LCTL)) buf[0] = 'C';
+    if (mods & MOD_BIT(KC_RCTL)) buf[1] = 'C';
+    if (mods & MOD_BIT(KC_LALT)) buf[3] = 'A';
+    if (mods & MOD_BIT(KC_RALT)) buf[4] = 'A';
+    if (mods & MOD_BIT(KC_LSFT)) buf[5] = 'S';
+    if (mods & MOD_BIT(KC_RSFT)) buf[6] = 'S';
+    if (mods & MOD_BIT(KC_LGUI)) buf[8] = 'M';
+    if (mods & MOD_BIT(KC_RGUI)) buf[9] = 'M';
     oled_set_cursor(0, 13);
-    oled_write_P(PSTR("     "), false);
-    oled_set_cursor(0, 14);
-    char buf[6] = "     ";
-    if (mods & MOD_MASK_CTRL)     buf[0] = 'C';
-    if (mods & MOD_BIT(KC_LALT))  buf[1] = 'A';
-    if (mods & MOD_BIT(KC_RALT))  buf[2] = 'g';
-    if (mods & MOD_MASK_SHIFT)    buf[3] = 'S';
-    if (mods & MOD_MASK_GUI)      buf[4] = 'M';
     oled_write(buf, false);
 }
 
