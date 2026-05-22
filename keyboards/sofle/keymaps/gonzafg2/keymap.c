@@ -238,7 +238,7 @@ static void render_luna(void) {
     static uint16_t luna_timer = 0;
     static uint8_t luna_flip = 0;
     uint8_t wpm = get_current_wpm();
-    const char *frame;
+    const char *frame;  // apunta a PROGMEM, leido via oled_write_raw_P (no se puede tipar PROGMEM* en avr-gcc para parametros/locales)
     uint16_t period;
 
     if (wpm < 10) {
