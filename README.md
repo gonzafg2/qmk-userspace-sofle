@@ -233,12 +233,25 @@ Ambos OLEDs son **SSD1306 128×32 en orientación vertical** (rotación 270°), 
 [logo GFG]    filas 0-3  — iniciales en Helvetica Neue Condensed Black
   by          fila 5
 Sofle         fila 6
- WPM          fila 8
-   42         fila 9     — palabras por minuto en tiempo real
+[gata pet]    filas 8-11 — gata estática (sentada alerta, 32×32)
 CTL           fila 13    — solo cuando hold Ctrl
 SFT           fila 14    — solo cuando hold Shift
-Lower         fila 15    — capa actual: Base/Lower/Raise/Conf/Mouse
+Lower / Star  fila 15    — capa actual O efecto RGB (ver abajo)
 ```
+
+**Fila 15 - comportamiento dinámico:**
+- Por default muestra la **capa actual**: `Base` / `Lower` / `Raise` / `Conf` / `Mouse`
+- Cuando cambias el efecto RGB con `RM_NEXT` / `RM_PREV` / `RM_TOGG`, **reemplaza** la capa por el efecto activo durante **2 segundos**, luego vuelve a la capa:
+
+| Label | Efecto |
+|---|---|
+| `Grad` | `RGB_MATRIX_GRADIENT_LEFT_RIGHT` |
+| `Star` | `RGB_MATRIX_STARLIGHT` |
+| `Cycl` | `RGB_MATRIX_CYCLE_LEFT_RIGHT` |
+| `Heat` | `RGB_MATRIX_TYPING_HEATMAP` |
+| `Reac` | `RGB_MATRIX_SOLID_REACTIVE_SIMPLE` |
+
+Detección autocontenida en `render_layer_state()` — compara `rgb_matrix_get_mode()` con el último modo conocido, dispara el indicador en cambios. No requiere hooks en `process_record_user`.
 
 ### Mitad derecha (slave)
 

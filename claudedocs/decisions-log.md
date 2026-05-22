@@ -185,6 +185,18 @@ Mute + Play es más coherente con la rotación del encoder (que ya controla volu
 
 **Tamaño final**: 28634/28672 bytes (99%, 38 libres). Muy apretado pero estable.
 
+### Indicador del efecto RGB en master OLED (post-PR)
+
+**Decisión**: la fila 15 del master OLED (que normalmente muestra la capa actual) **reemplaza temporalmente la capa por el nombre del efecto RGB** durante 2 segundos cuando el modo cambia. Implementado en `render_layer_state()` comparando `rgb_matrix_get_mode()` con un `last_rgb_mode` static cada frame.
+
+**Por qué**: el usuario quería saber qué efecto tiene activo al ciclar con `RM_NEXT`/`RM_PREV`. La idea original era un indicador fijo en fila 12 (~120 B), pero el usuario propuso "reemplazar la capa por unos segundos" como alternativa más elegante (no requiere fila adicional, solo se ve cuando lo necesitas).
+
+**Trade-off para meterlo en AVR**: convertí la **gata pet del master** de animada (2 frames con respiración cada 1500ms) a **estática** (solo `gata_a`). Liberó ~140 B; el indicador costó ~110 B; quedaron **+30 B netos** de margen. La gata del slave (Luna ciclando) NO fue tocada — sigue con sus 5 frames y 3 estados.
+
+**Labels usados**: `Grad`, `Star`, `Cycl`, `Heat`, `Reac` (4 chars, consistentes con el ancho del OLED en orientación vertical).
+
+**Tamaño final tras este cambio**: 28640/28672 bytes (99%, 32 libres).
+
 ### Iteraciones de la misma sesión
 
 1. **Luna ciclando entre sit/walk/run** (`keymap.c:render_luna`): después de quitar WPM, en vez de dejar Luna en walk loop fijo, se agregó un segundo timer (`luna_state_timer`) que cambia el estado cada 6 segundos (`sit → walk → run → sit`). Reincorpora los frames `luna_sit/luna_run_a/luna_run_b` que el linker había descartado por falta de referencias. Costo: ~150 bytes (+ los 384 B de los 3 frames PROGMEM que vuelven al binario).

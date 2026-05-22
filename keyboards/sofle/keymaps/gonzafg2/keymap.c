@@ -143,25 +143,53 @@ static void render_logo(void) {
 }
 
 static void render_layer_state(void) {
+    static uint8_t last_rgb_mode = 0xFF;
+    static uint16_t rgb_mode_timer = 0;
+    static bool show_rgb = false;
+
+    uint8_t current_mode = rgb_matrix_get_mode();
+    if (current_mode != last_rgb_mode) {
+        if (last_rgb_mode != 0xFF) {
+            rgb_mode_timer = timer_read();
+            show_rgb = true;
+        }
+        last_rgb_mode = current_mode;
+    }
+    if (show_rgb && timer_elapsed(rgb_mode_timer) > 2000) {
+        show_rgb = false;
+    }
+
     oled_set_cursor(0, 5);
     oled_write_P(PSTR("  by "), false);
     oled_set_cursor(0, 6);
     oled_write_P(PSTR("Sofle"), false);
 
     oled_set_cursor(0, 15);
-    switch (get_highest_layer(layer_state)) {
-        case _BASE:   oled_write_P(PSTR(" Base"), false); break;
-        case _LOWER:  oled_write_P(PSTR("Lower"), false); break;
-        case _RAISE:  oled_write_P(PSTR("Raise"), false); break;
-        case _ADJUST: oled_write_P(PSTR(" Conf"), false); break;
-        case _MOUSE:  oled_write_P(PSTR("Mouse"), false); break;
-        default:      oled_write_P(PSTR("  ?  "), false);
+    if (show_rgb) {
+        switch (current_mode) {
+            case RGB_MATRIX_GRADIENT_LEFT_RIGHT:    oled_write_P(PSTR("Grad "), false); break;
+            case RGB_MATRIX_STARLIGHT:              oled_write_P(PSTR("Star "), false); break;
+            case RGB_MATRIX_CYCLE_LEFT_RIGHT:       oled_write_P(PSTR("Cycl "), false); break;
+            case RGB_MATRIX_TYPING_HEATMAP:         oled_write_P(PSTR("Heat "), false); break;
+            case RGB_MATRIX_SOLID_REACTIVE_SIMPLE:  oled_write_P(PSTR("Reac "), false); break;
+            default:                                oled_write_P(PSTR("RGB? "), false);
+        }
+    } else {
+        switch (get_highest_layer(layer_state)) {
+            case _BASE:   oled_write_P(PSTR(" Base"), false); break;
+            case _LOWER:  oled_write_P(PSTR("Lower"), false); break;
+            case _RAISE:  oled_write_P(PSTR("Raise"), false); break;
+            case _ADJUST: oled_write_P(PSTR(" Conf"), false); break;
+            case _MOUSE:  oled_write_P(PSTR("Mouse"), false); break;
+            default:      oled_write_P(PSTR("  ?  "), false);
+        }
     }
 }
 
-// Gata pet (master OLED): 2 frames 32x32 - sentada alerta con cabeza separada
+// Gata pet (master OLED): frame estatico 32x32 - sentada alerta con cabeza separada
 // Cabeza arriba con sombra de cuello, cuerpo redondo abajo, cola enroscada
-// Cara estilo gato slave: 2 ojos vertical + nariz + boca recta
+// (antes ten\xC3\xADa 2 frames con "respiraci\xC3\xB3n"; simplificado para liberar flash
+// que ocupa el indicador del modo RGB en render_layer_state)
 static const char PROGMEM gata_a[] = {
     0x00,0x00,0x00,0x00,0x00,0xE0,0xF8,0xFE,0xFC,0xF0,0xF0,0xF0,0xF0,0xF0,0xFC,0xFE,
     0xF8,0xC0,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
@@ -172,27 +200,10 @@ static const char PROGMEM gata_a[] = {
     0x00,0x00,0x00,0x00,0x01,0x03,0x07,0x0F,0x1F,0x1F,0x7B,0x7F,0x7B,0x7F,0x7F,0x7F,
     0x7F,0x7F,0x7F,0x7F,0x7B,0x7F,0x7B,0x1F,0x1F,0x0F,0x07,0x03,0x03,0x05,0x00,0x00,
 };
-static const char PROGMEM gata_b[] = {
-    0x00,0x00,0x00,0x00,0x00,0xE0,0xF8,0xFE,0xFC,0xF0,0xF0,0xF0,0xF0,0xF0,0xFC,0xFE,
-    0xF8,0xC0,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-    0x00,0x00,0x00,0x00,0x0F,0x1F,0x3F,0x7F,0x79,0xDF,0xCF,0xCF,0xDF,0xFF,0x79,0x7F,
-    0xBF,0xDF,0xEF,0xE0,0xC0,0xC0,0xC0,0x80,0x80,0x60,0x60,0xC0,0xC0,0x80,0x00,0x00,
-    0x00,0x00,0x00,0x00,0xF0,0xFC,0xFE,0xFF,0xFF,0xFE,0xFE,0xFE,0xFE,0xFE,0xFF,0xFF,
-    0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFE,0xFC,0xF1,0xFF,0x7E,0x00,
-    0x00,0x00,0x00,0x00,0x00,0x03,0x07,0x0F,0x1F,0x1F,0x7B,0x7F,0x7B,0x7F,0x7F,0x7F,
-    0x7F,0x7F,0x7F,0x7F,0x7B,0x7F,0x7B,0x1F,0x1F,0x0F,0x07,0x03,0x03,0x05,0x00,0x00,
-};
 
 static void render_gata(void) {
-    static uint16_t breath_timer = 0;
-    static uint8_t breath_state = 0;
-    // Respiracion lenta: 1500 ms por fase
-    if (timer_elapsed(breath_timer) > 1500) {
-        breath_state ^= 1;
-        breath_timer = timer_read();
-    }
     oled_set_cursor(0, 8);
-    oled_write_raw_P(breath_state ? gata_b : gata_a, 128);
+    oled_write_raw_P(gata_a, 128);
 }
 
 static void render_mod_status(void) {
