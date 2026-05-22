@@ -8,8 +8,9 @@ Carpeta con el contexto persistente entre sesiones:
 
 - [`claudedocs/session-context.md`](./claudedocs/session-context.md) — contexto general, estado actual, qué se hizo y qué quedó pendiente
 - [`claudedocs/thumb-cluster-iteration.md`](./claudedocs/thumb-cluster-iteration.md) — discusión abierta sobre redundancia en el thumb cluster (doble Enter, LWR/RSE solos)
-- [`claudedocs/decisions-log.md`](./claudedocs/decisions-log.md) — decisiones tomadas con su justificación (por qué QMK, por qué RGB OFF, por qué quitamos split features, etc.)
+- [`claudedocs/decisions-log.md`](./claudedocs/decisions-log.md) — decisiones tomadas con su justificación (por qué QMK, por qué activar RGB, por qué quitamos WPM y split features, etc.)
 - [`claudedocs/hardware-notes.md`](./claudedocs/hardware-notes.md) — observaciones físicas del PCB (jumpers, pines, LEDs, controlador)
+- [`claudedocs/feature-weights.md`](./claudedocs/feature-weights.md) — base de conocimiento del costo en flash de cada feature (medido en esta config). Consultar **antes de** activar/desactivar features para anticipar si cabe en AVR
 
 Al retomar trabajo, leer primero esos archivos para entender estado y contexto antes de editar código.
 

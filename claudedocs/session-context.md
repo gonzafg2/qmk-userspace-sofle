@@ -104,5 +104,6 @@ Lee primero:
 2. [thumb-cluster-iteration.md](./thumb-cluster-iteration.md) — debate abierto sin resolver
 3. [decisions-log.md](./decisions-log.md) — qué se decidió y por qué
 4. [hardware-notes.md](./hardware-notes.md) — observaciones del PCB
-5. El `README.md` raíz — para ver el keymap actual documentado
-6. `keyboards/sofle/keymaps/gonzafg2/keymap.c` — código fuente del keymap
+5. [feature-weights.md](./feature-weights.md) — costos en flash medidos por feature (consultar **antes de** togglar features)
+6. El `README.md` raíz — para ver el keymap actual documentado
+7. `keyboards/sofle/keymaps/gonzafg2/keymap.c` — código fuente del keymap
