@@ -165,12 +165,12 @@ static void render_layer_state(void) {
     oled_set_cursor(0, 15);
     if (show_rgb) {
         switch (current_mode) {
-            case RGB_MATRIX_GRADIENT_LEFT_RIGHT:    oled_write_P(PSTR("Grad "), false); break;
-            case RGB_MATRIX_STARLIGHT:              oled_write_P(PSTR("Star "), false); break;
-            case RGB_MATRIX_CYCLE_LEFT_RIGHT:       oled_write_P(PSTR("Cycl "), false); break;
-            case RGB_MATRIX_TYPING_HEATMAP:         oled_write_P(PSTR("Heat "), false); break;
-            case RGB_MATRIX_SOLID_REACTIVE_SIMPLE:  oled_write_P(PSTR("Reac "), false); break;
-            default:                                oled_write_P(PSTR("RGB? "), false);
+            case RGB_MATRIX_GRADIENT_LEFT_RIGHT:        oled_write_P(PSTR("Grad "), false); break;
+            case RGB_MATRIX_STARLIGHT:                  oled_write_P(PSTR("Star "), false); break;
+            case RGB_MATRIX_CYCLE_LEFT_RIGHT:           oled_write_P(PSTR("Cycl "), false); break;
+            case RGB_MATRIX_SOLID_MULTISPLASH:          oled_write_P(PSTR("Wave "), false); break;
+            case RGB_MATRIX_SOLID_REACTIVE_MULTICROSS:  oled_write_P(PSTR("Cros "), false); break;
+            default:                                    oled_write_P(PSTR("RGB? "), false);
         }
     } else {
         switch (get_highest_layer(layer_state)) {

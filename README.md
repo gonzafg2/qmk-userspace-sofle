@@ -143,8 +143,8 @@ Casillas vacías = transparent (heredan de Base). Encoder izq cambia a brillo, e
 1. `RGB_MATRIX_GRADIENT_LEFT_RIGHT` *(default)* — gradient estático rojo→violeta de izq a der
 2. `RGB_MATRIX_STARLIGHT` — LEDs random titilan suavemente como estrellas (ambiental)
 3. `RGB_MATRIX_CYCLE_LEFT_RIGHT` — colores corren horizontalmente (ambiental)
-4. `RGB_MATRIX_TYPING_HEATMAP` — heat map del tecleo (reactivo)
-5. `RGB_MATRIX_SOLID_REACTIVE_SIMPLE` — LED individual se ilumina al pulsar tecla (reactivo)
+4. `RGB_MATRIX_SOLID_MULTISPLASH` — ondas circulares se expanden desde cada tecla pulsada (reactivo, múltiples ondas simultáneas)
+5. `RGB_MATRIX_SOLID_REACTIVE_MULTICROSS` — al pulsar, fila + columna se iluminan en cruz (reactivo, múltiples cruces simultáneas)
 
 **Pre-requisito físico**: jumper `Light Sel` del PCB debe estar en `UND` o `BL&UND` para alimentar los SK6812.
 
@@ -280,8 +280,8 @@ Cada posición tiene una letra fija que aparece sólo cuando ese mod específico
 | `Grad` | `RGB_MATRIX_GRADIENT_LEFT_RIGHT` |
 | `Star` | `RGB_MATRIX_STARLIGHT` |
 | `Cycl` | `RGB_MATRIX_CYCLE_LEFT_RIGHT` |
-| `Heat` | `RGB_MATRIX_TYPING_HEATMAP` |
-| `Reac` | `RGB_MATRIX_SOLID_REACTIVE_SIMPLE` |
+| `Wave` | `RGB_MATRIX_SOLID_MULTISPLASH` (ondas expansivas) |
+| `Cros` | `RGB_MATRIX_SOLID_REACTIVE_MULTICROSS` (cruz fila+columna) |
 
 Detección autocontenida en `render_layer_state()` — compara `rgb_matrix_get_mode()` con el último modo conocido, dispara el indicador en cambios. No requiere hooks en `process_record_user`.
 
