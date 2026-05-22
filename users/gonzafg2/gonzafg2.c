@@ -1,8 +1,14 @@
 #include "gonzafg2.h"
 
+// Flag global: track si GFG_ESCAD (LT _ADJUST KC_ESC) esta presionado
+// fisicamente. Usado por layer_state_set_user para no apagar _ADJUST si
+// el LT la sigue solicitando aunque el tri-layer ya no la quiera.
+static bool gfg_escad_held = false;
+
 // Tri-layer manual: solo activa/desactiva _ADJUST cuando se entra/sale del
 // estado LOWER+RAISE. NO toca _ADJUST si esta activa por otra via (LT en
-// ESC/A). Usa un flag para saber si fue el tri-layer quien la prendio.
+// ESC/A). Usa flags para saber si fue el tri-layer quien la prendio y si
+// el LT(ESCAD) sigue solicitando _ADJUST.
 layer_state_t layer_state_set_user(layer_state_t state) {
     static bool tri_adjust_on = false;
     bool both = (state & ((1UL << _LOWER) | (1UL << _RAISE))) == ((1UL << _LOWER) | (1UL << _RAISE));
@@ -11,13 +17,23 @@ layer_state_t layer_state_set_user(layer_state_t state) {
         state |= (1UL << _ADJUST);
     } else if (!both && tri_adjust_on) {
         tri_adjust_on = false;
-        state &= ~(1UL << _ADJUST);
+        if (!gfg_escad_held) {
+            state &= ~(1UL << _ADJUST);
+        }
     }
     return state;
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    // Track LT(_ADJUST, KC_ESC) hold state para que tri-layer no apague
+    // _ADJUST cuando el LT aun la mantiene. Solo trackear, QMK procesa LT.
+    if (keycode == GFG_ESCAD) {
+        gfg_escad_held = record->event.pressed;
+        return true;
+    }
+
     if (keycode == GFG_BSDL) {
+        static bool bspc_registered = false;
         if (record->event.pressed) {
             uint8_t reg_shift = get_mods() & MOD_MASK_SHIFT;
             uint8_t osm_shift = get_oneshot_mods() & MOD_MASK_SHIFT;
@@ -32,9 +48,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 add_oneshot_mods(osm_shift);
             } else {
                 register_code(KC_BSPC);
+                bspc_registered = true;
             }
-        } else {
+        } else if (bspc_registered) {
             unregister_code(KC_BSPC);
+            bspc_registered = false;
         }
         return false;
     }
