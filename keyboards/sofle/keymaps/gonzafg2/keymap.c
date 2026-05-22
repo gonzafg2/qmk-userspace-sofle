@@ -64,24 +64,24 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                      _______, _______, _______, _______, _______,                _______,   _______, _______, _______, _______
 ),
 
-/* Adjust (sistema, media, macros mac, mouse toggle)
+/* Adjust (sistema, media, macros mac, mouse toggle, RGB)
  * Acceso: hold ambos LWR+RSE (tri-layer) | hold ESC pinky der
  * ,-----------------------------------------.                    ,-----------------------------------------.
- * | BOOT |      |      |      |      |      |                    |      |      |      |      |      |      |
+ * | BOOT | TOG  | MOD  | HUI  | SAI  | VAI  |                    |      |      |      |      |      |      |
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * |      |      |      |      |      |      |                    |TGMOU |      |      |      |      |      |
+ * |      | SPD  | RMOD | HUD  | SAD  | VAD  |                    |TGMOU |      |      |      |      |      |
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
  * |      | SCRF | SCRA | SCRT | LOCK | FQT  |-------.    ,-------|      | VOLD | MUTE | VOLU |      |      |
- * |------+------+------+------+------+------|       |    |       |------+------+------+------+------+------|
+ * |------+------+------+------+------+------| SPI   |    |       |------+------+------+------+------+------|
  * |      |      |      |      |      |      |-------|    |-------|      | MPRV | MPLY | MNXT |      |      |
  * `-----------------------------------------/       /     \      \-----------------------------------------'
  *           |     |     | --- |     |     |        |     |     | --- |     |     |
  */
 [_ADJUST] = LAYOUT(
-  QK_BOOT,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                                    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
-  XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                                    TG(_MOUSE), XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+  QK_BOOT,  RM_TOGG, RM_NEXT, RM_HUEU, RM_SATU, RM_VALU,                                    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+  XXXXXXX,  RM_SPDD, RM_PREV, RM_HUED, RM_SATD, RM_VALD,                                    TG(_MOUSE), XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
   XXXXXXX,  GFG_SCRF,GFG_SCRA,GFG_SCRT,GFG_LOCK,GFG_FQUIT,                                  XXXXXXX, KC_VOLD, KC_MUTE, KC_VOLU, XXXXXXX, XXXXXXX,
-  XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______,                _______,   XXXXXXX, KC_MPRV, KC_MPLY, KC_MNXT, XXXXXXX, XXXXXXX,
+  XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, RM_SPDU,                _______,   XXXXXXX, KC_MPRV, KC_MPLY, KC_MNXT, XXXXXXX, XXXXXXX,
                      _______, _______, _______, _______, _______,                _______,   _______, _______, _______, _______
 ),
 
@@ -257,25 +257,32 @@ static const char PROGMEM luna_run_b[] = {
 };
 
 static void render_luna(void) {
-    static uint16_t luna_timer = 0;
+    static uint16_t luna_frame_timer = 0;
+    static uint16_t luna_state_timer = 0;
     static uint8_t luna_flip = 0;
-    uint8_t wpm = get_current_wpm();
-    const char *frame;  // apunta a PROGMEM, leido via oled_write_raw_P (no se puede tipar PROGMEM* en avr-gcc para parametros/locales)
-    uint16_t period;
+    static uint8_t luna_state = 0; // 0=sit, 1=walk, 2=run
 
-    if (wpm < 10) {
+    if (timer_elapsed(luna_state_timer) > 6000) {
+        luna_state = (luna_state + 1) % 3;
+        luna_state_timer = timer_read();
+    }
+
+    const char *frame;
+    uint16_t period;
+    if (luna_state == 0) {
         frame = luna_sit;
         period = 0;
-    } else if (wpm < 40) {
-        period = 400;
+    } else if (luna_state == 1) {
         frame = luna_flip ? luna_walk_a : luna_walk_b;
+        period = 400;
     } else {
-        period = 200;
         frame = luna_flip ? luna_run_a : luna_run_b;
+        period = 200;
     }
-    if (period > 0 && timer_elapsed(luna_timer) > period) {
+
+    if (period > 0 && timer_elapsed(luna_frame_timer) > period) {
         luna_flip ^= 1;
-        luna_timer = timer_read();
+        luna_frame_timer = timer_read();
     }
 
     oled_set_cursor(0, 12);

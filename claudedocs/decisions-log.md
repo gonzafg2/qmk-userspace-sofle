@@ -49,22 +49,13 @@ Decisiones tomadas durante el desarrollo, con su justificación. Útil para ente
 - Adjust: media (prev/next) / brillo
 - Mouse: scroll-V / scroll-H
 
-## 2026-05-18 · RGB underglow deshabilitado
+## ~~2026-05-18 · RGB underglow deshabilitado~~ (ANULADA — ver 2026-05-22)
 
-**Decisión**: `RGBLIGHT_ENABLE = no` por ahora.
+**Decisión original**: `RGBLIGHT_ENABLE = no`.
 
-**Por qué**: `keyboards/sofle/rev1` mainline NO trae configuración RGB out-of-box (no define `WS2812_DI_PIN` ni `RGBLED_NUM`). Activarlo provocaba error de compilación con todos los `RGB_*` keycodes "undeclared".
+**Por qué (al momento)**: se asumió que `keyboards/sofle/rev1` mainline no traía configuración RGB out-of-box. Esto resultó ser **falso** al verificar en 2026-05-22: mainline `keyboards/sofle/info.json` sí define `ws2812.pin=D3`, 72 LEDs (split 36/36), driver ws2812 y el layout RGB matrix completo. La decisión original se tomó sin verificar `info.json` (solo se miró `keyboard.json` de `rev1/`).
 
-**Cómo activarlo después**:
-1. Mirar el PCB del usuario para identificar el pin del data line RGB (probable D3)
-2. Contar LEDs SK6812 por mitad (probable ~35)
-3. Agregar a `keymaps/gonzafg2/config.h`:
-   ```c
-   #define WS2812_DI_PIN D3
-   #define RGBLED_NUM 70
-   ```
-4. Cambiar `RGBLIGHT_ENABLE = yes` en rules.mk
-5. Verificar que no exceda 28KB de AVR (RGB suma ~3KB)
+**Reemplazada por**: la entrada del 2026-05-22 más abajo.
 
 ## 2026-05-18 · SPLIT features quitadas para caber en AVR
 
@@ -163,6 +154,55 @@ Decisiones tomadas durante el desarrollo, con su justificación. Útil para ente
 3. El nombre del izq decía "MUTM" pero hacía Play, inconsistente.
 
 Mute + Play es más coherente con la rotación del encoder (que ya controla volumen izq + scroll der) y elimina el riesgo del lock accidental. `GFG_LOCK` sigue accesible desde la capa Adjust.
+
+## 2026-05-22 · RGB_MATRIX activado (reemplaza decisión del 2026-05-18)
+
+**Decisión**: `RGB_MATRIX_ENABLE = yes` con driver `ws2812`. Set acotado de 5 efectos. Brillo máx 150. Modo default `RGB_MATRIX_GRADIENT_LEFT_RIGHT`.
+
+**Por qué**: el usuario lo pidió ("este Sofle es un RGB"). El PCB es **Sofle RGB V2 Rev2.1** (Josef Adamcik + mod RGB de Dane Evans) con 72 LEDs SK6812 MINI (58 per-key + 14 underglow, 36 per side).
+
+**Hallazgo importante**: mainline `keyboards/sofle/info.json` ya configura `ws2812.pin=D3`, `rgb_matrix.split_count=[36,36]`, layout completo, y driver. **No** se necesita override en `config.h` de esos valores — solo defines estéticos.
+
+**Trade-off para caber en AVR**: el framework RGB_MATRIX cuesta ~3KB y excedió por 498 bytes. Sacrificio elegido: **`WPM_ENABLE = no`** + simplificar `render_luna()` a walk loop fijo (sin reactividad a velocidad de tecleo). Luna sigue animándose, solo pierde el cambio sit/walk/run según WPM.
+
+**Configuración final** (`keyboards/sofle/keymaps/gonzafg2/config.h`):
+```c
+#define RGB_MATRIX_MAXIMUM_BRIGHTNESS 150
+#define RGB_MATRIX_DEFAULT_VAL 100
+#define RGB_MATRIX_DEFAULT_MODE RGB_MATRIX_GRADIENT_LEFT_RIGHT
+
+#define ENABLE_RGB_MATRIX_GRADIENT_LEFT_RIGHT
+#define ENABLE_RGB_MATRIX_STARLIGHT
+#define ENABLE_RGB_MATRIX_CYCLE_LEFT_RIGHT
+#define ENABLE_RGB_MATRIX_TYPING_HEATMAP
+#define ENABLE_RGB_MATRIX_SOLID_REACTIVE_SIMPLE
+```
+
+**Keycodes en `_ADJUST`** (mano izquierda): se usan los nombres modernos `RM_*`, NO los legacy `RGB_*` (esos son solo para `RGBLIGHT_ENABLE`):
+- Row 0 cols 1-5: `RM_TOGG, RM_NEXT, RM_HUEU, RM_SATU, RM_VALU`
+- Row 1 cols 1-5: `RM_SPDD, RM_PREV, RM_HUED, RM_SATD, RM_VALD`
+- Thumb col 6 izq: `RM_SPDU`
+
+**Tamaño final**: 28634/28672 bytes (99%, 38 libres). Muy apretado pero estable.
+
+### Iteraciones de la misma sesión
+
+1. **Luna ciclando entre sit/walk/run** (`keymap.c:render_luna`): después de quitar WPM, en vez de dejar Luna en walk loop fijo, se agregó un segundo timer (`luna_state_timer`) que cambia el estado cada 6 segundos (`sit → walk → run → sit`). Reincorpora los frames `luna_sit/luna_run_a/luna_run_b` que el linker había descartado por falta de referencias. Costo: ~150 bytes (+ los 384 B de los 3 frames PROGMEM que vuelven al binario).
+
+2. **BREATHING → STARLIGHT**: el usuario pidió un efecto "ambiente nocturno". Reemplazo no fue flash-neutral (STARLIGHT pesa más); para meterlo se quitó adicionalmente `SPLIT_LAYER_STATE_ENABLE` (~130 B).
+
+3. **`SPLIT_LAYER_STATE_ENABLE` removido** del `config.h` del keymap. Impacto práctico nulo en este setup porque:
+   - El slave OLED nunca mostraba la capa (eso requería `SPLIT_OLED_ENABLE`, quitado desde el inicio por espacio AVR — ver decisión 2026-05-18 SPLIT features)
+   - No tenemos indicadores RGB per-capa en el slave
+   - Mod-tap / LT sigue funcionando porque cada lado evalúa su propia matriz
+
+   **Cuándo volver a habilitarlo**: si en el futuro se agregan indicadores RGB de capa en el lado derecho (LEDs del slave cambian color según capa activa). Sin él, el slave no sabría qué capa está activa.
+
+4. **`RGB_MATRIX_MAXIMUM_BRIGHTNESS 150`**: límite eléctrico, no arbitrario. Con 72 SK6812 a brillo absoluto del chip (255) el consumo teórico supera 4A — el USB del Mac (especialmente vía adaptador A↔C por el defecto del Pro Micro) no entrega esa corriente. **Confirmado en sesión**: al subir el brillo al máximo del tope configurado (150), el usuario reportó **titileo intermitente** de los LEDs. Es el síntoma clásico de **undervolt** del controlador → timing del data line a los SK6812 se corrompe. Mantener brillo ≤ 130 evita el problema. NO subir el define más allá de 150 sin cambiar a fuente USB con mejor amperaje.
+
+**Pre-requisito físico**: jumper `Light Sel` del PCB debe estar en `UND` o `BL&UND`. Si está en `BL`, los SK6812 no reciben energía aunque el firmware esté perfecto.
+
+**Reversible**: sí. Si en el futuro se prefiere recuperar WPM reactivo, volver a `WPM_ENABLE = yes`, restaurar `render_luna()` original y deshabilitar `RGB_MATRIX_ENABLE` (o cambiar a `RGBLIGHT_ENABLE` que es más liviano y permite mantener WPM).
 
 ## Decisiones pendientes (sin resolver)
 

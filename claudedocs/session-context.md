@@ -37,7 +37,8 @@ Misma filosofía que el repo del Corne (config separado del firmware, CI build),
 - ✅ Encoder push Base: Mute izq, Play der
 - ⏳ Discusión abierta sobre thumb cluster — ver [thumb-cluster-iteration.md](./thumb-cluster-iteration.md)
 - ⏳ Luna pet sin verificar físicamente — riesgo de que la posición o estética falle
-- ❌ RGB underglow deshabilitado (decisión documentada en [decisions-log.md](./decisions-log.md))
+- ✅ **RGB Matrix activo** desde 2026-05-22 (72 LEDs SK6812 MINI, 5 efectos, control en `_ADJUST`)
+- ❌ WPM deshabilitado (sacrificado en 2026-05-22 para que RGB_MATRIX entrara en AVR; Luna animada pero no reactiva al tecleo)
 - ❌ VIA deshabilitado (intercambiado por espacio para Luna pet)
 
 ## Sesión 2026-05-21 — qué se hizo
@@ -52,12 +53,28 @@ Misma filosofía que el repo del Corne (config separado del firmware, CI build),
 
 Firmware final: **26044/28672 bytes (90%, 2628 libres)**.
 
+## Sesión 2026-05-22 — qué se hizo
+
+1. **Identificación correcta del PCB**: el usuario confirmó nombre comercial **Sofle RGB V2 Rev2.1** — Josef Adamcik v2.1 con mod RGB de Dane Evans. Coincide con `keyboards/sofle/rev1` mainline.
+2. **Corrección de decisión obsoleta**: la nota del 2026-05-18 sobre "RGB no compila out-of-box" estaba equivocada. Mainline `keyboards/sofle/info.json` ya define todo lo necesario (`ws2812.pin=D3`, 72 LEDs, split [36,36], driver, layout). Sin necesidad de overrides.
+3. **RGB_MATRIX activado** (`rules.mk` + `config.h` + `keymap.c`): brillo máx 150, modo default gradient L→R. Keycodes `RM_*` (no `RGB_*`) en `_ADJUST` mano izquierda.
+4. **Sacrificios para caber en AVR**:
+   - `WPM_ENABLE = yes → no` (liberó ~500 B)
+   - `SPLIT_LAYER_STATE_ENABLE` removido (~130 B; sin impacto visible)
+5. **Iteraciones de Luna**: primero a walk loop fijo (post-WPM), después **Luna ciclando** entre sit→walk→run cada 6s (los 5 sprites originales mantenidos, frijol-y-nieblita stay).
+6. **Set final de 5 efectos RGB**: `GRADIENT_LEFT_RIGHT` (default), `STARLIGHT` (ambiental "estrellas"), `CYCLE_LEFT_RIGHT`, `TYPING_HEATMAP` (reactivo), `SOLID_REACTIVE_SIMPLE` (reactivo).
+7. **Verificado físicamente**: gradient rojo→violeta enciende al boot. **Titileo en brillo alto confirmó undervolt** — no subir `RGB_MATRIX_MAXIMUM_BRIGHTNESS` arriba de 150 sin cambiar fuente USB.
+8. **Firmware final**: **28634/28672 bytes (99%, 38 libres)**. Muy apretado pero estable.
+
 ## Trade-offs aceptados
 
 | Decisión | Por qué | Reversible |
 |---|---|---|
-| RGB underglow OFF | sofle/rev1 mainline no trae config RGB out-of-box; agregarlo requiere override del keyboard con `WS2812_DI_PIN` y `RGBLED_NUM` | Sí, agregando defines |
-| SPLIT_* features quitadas | Firmware excedía 28KB de ATmega32U4 | Sí, si liberamos espacio |
+| RGB_MATRIX activo (vs RGBLIGHT) | El usuario lo pidió. Efectos reactivos al tecleo (heatmap, solid reactive) | Sí, cambiando a `RGBLIGHT_ENABLE = yes` (más liviano) |
+| Brillo RGB tope 150/255 | Undervolt confirmado en sesión al subir más allá | Sí, si se cambia a fuente USB con mejor amperaje |
+| WPM OFF + Luna ciclando (no reactiva al WPM) | RGB_MATRIX cuesta ~3KB; WPM era el sacrificio menos disruptivo. Luna mantiene los 5 frames ciclando por timer | Sí, deshabilitando RGB_MATRIX o quitando MOUSEKEY |
+| SPLIT_LAYER_STATE_ENABLE removido | Para meter STARLIGHT como 5to efecto. Slave no necesita saber capa porque no muestra OLED de capa ni RGB indicators per-capa | Sí, si se agregan indicadores RGB de capa en el slave |
+| SPLIT_* otras features quitadas | Firmware excedía 28KB de ATmega32U4 | Sí, si liberamos espacio |
 | VIA con custom keycodes hex | VIA mainline no conoce los `GFG_*` | Sí, generando vial.json |
 
 ## Convenciones de pulgar (importante para próximas iteraciones)
