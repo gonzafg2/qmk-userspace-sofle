@@ -47,6 +47,7 @@ Cada `ENABLE_RGB_MATRIX_*` agrega ~50-500 B según la complejidad del efecto. Co
 | `TYPING_HEATMAP` | **~500 B** | 🟢 | El más pesado encontrado. Usa difusión térmica + paleta runtime + decay por LED. Quitarlo liberó ~500 B en esta sesión. |
 | `SOLID_REACTIVE_MULTICROSS` | ~150 B | 🟡 | Activado actualmente (label `Cros`). |
 | `SOLID_MULTISPLASH` | ~130 B | 🟡 | Activado actualmente (label `Wave`). |
+| `MULTISPLASH` | **~88 B** | 🟢 | Medido al agregarlo. Activado actualmente (label `Rain`). Variante full-gradient de SOLID_MULTISPLASH. |
 | `STARLIGHT` | ~130 B | 🟢 | Medido vs BREATHING al hacer el swap. |
 | `BREATHING` | ~50 B | 🟢 | Comparado con STARLIGHT en la sesión. |
 | `CYCLE_LEFT_RIGHT` | ~50 B | 🟡 | Activado actualmente. |

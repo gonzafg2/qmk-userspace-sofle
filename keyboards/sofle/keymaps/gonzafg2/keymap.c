@@ -170,6 +170,7 @@ static void render_layer_state(void) {
             case RGB_MATRIX_CYCLE_LEFT_RIGHT:           oled_write_P(PSTR("Cycl "), false); break;
             case RGB_MATRIX_SOLID_MULTISPLASH:          oled_write_P(PSTR("Wave "), false); break;
             case RGB_MATRIX_SOLID_REACTIVE_MULTICROSS:  oled_write_P(PSTR("Cros "), false); break;
+            case RGB_MATRIX_MULTISPLASH:                oled_write_P(PSTR("Rain "), false); break;
             default:                                    oled_write_P(PSTR("RGB? "), false);
         }
     } else {
