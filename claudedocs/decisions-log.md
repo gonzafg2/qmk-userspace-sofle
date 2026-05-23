@@ -252,7 +252,7 @@ Tras los fixes de Copilot y nuevas features pedidas por el usuario, el OLED mast
 - Verificado que NO había chatter (la tecla siempre registra cuando se prueba aislada)
 - Causa raíz: **race condition entre las dos mitades del split + modo HID 6KRO de QMK**. La ´ está en la mitad derecha (slave), las vocales en la izquierda (master). El evento de ´ viaja por serial (~1-3 ms de lag) y, al escribir rápido, llega al master tan cerca del evento de la vocal que ambos se reportan en la misma ventana de polling USB (1 ms). En 6KRO el reporte HID es un array de 6 slots con orden ambiguo. macOS no puede saber qué tecla vino primero y la dead key del layout LATAM no combina.
 
-**Por qué NKRO lo arregla**: cambia el reporte HID a un bitmap individual por tecla. Cada cambio se manda como evento atómico ordenado. Ya no hay ambigüedad de orden dentro de un mismo reporte.
+**Por qué NKRO lo arregla**: cambia el formato HID de array de 6 slots compartidos (6KRO) a un bitmap con un bit por tecla (NKRO). Los reportes HID en ambos modos son **snapshots de estado** (no eventos ordenados — esto aplica a 6KRO y NKRO por igual), pero NKRO elimina la ambigüedad de slots: en 6KRO los 6 slots se llenan en orden no estrictamente definido por la spec, lo que combinado con eventos solapados puede llevar a que macOS interprete teclas en el orden "incorrecto". Empíricamente activar NKRO resolvió el bug, aunque la causa exacta probablemente involucra también diferencias de timing/batching de reportes entre los dos modos en QMK, no solo el formato HID puro.
 
 **Por qué `DEBOUNCE 8` (no es la causa principal pero ayuda)**: subir de 5 a 8 ms agrega margen anti-chatter sin latencia perceptible al humano (8 ms < 1 frame a 60 fps). Costo en flash = 0 (es un define numérico).
 

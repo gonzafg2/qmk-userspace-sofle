@@ -456,7 +456,7 @@ Si al escribir muy rápido en LATAM notabas que **´+vocal no producía la tilde
 
 **Fix aplicado** (sesión 2026-05-23, ver [decisions-log.md](./claudedocs/decisions-log.md)):
 
-- `NKRO_ENABLE = yes` + `FORCE_NKRO` → cambia el reporte HID de array 6KRO (6 slots, orden ambiguo) a bitmap NKRO (cada cambio = evento atómico ordenado). Costo: **368 B medidos**.
+- `NKRO_ENABLE = yes` + `FORCE_NKRO` → cambia el formato HID de array de 6 slots compartidos (6KRO) a bitmap con un bit por tecla (NKRO). Los reportes HID en ambos modos son **snapshots de estado** (no eventos ordenados), pero al no compartir slots, NKRO elimina la ambigüedad sobre qué tecla ocupa qué slot del array. Empíricamente esto resolvió el bug — la causa exacta probablemente combina la eliminación de esa ambigüedad con diferencias de timing/batching de reportes entre los dos modos en QMK. Costo: **368 B medidos**.
 - `DEBOUNCE 8` (default QMK = 5) → margen extra anti-chatter. Costo: 0 B (es un define numérico).
 
 El firmware arranca siempre en NKRO sin necesidad de hotkey de toggle. Si por alguna razón necesitas volver a 6KRO en una máquina con BIOS antiguo o KVM problemático, hay que recompilar quitando `FORCE_NKRO`.
