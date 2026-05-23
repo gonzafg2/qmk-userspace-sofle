@@ -148,7 +148,7 @@ Casillas vacías = transparent (heredan de Base). Encoder izq cambia a brillo, e
 6. **`MY_WAVE` (custom)** — ondas un solo color + **fondo idle pulsando (respiración)** del HUE actual
 7. **`MY_RAIN` (custom)** — ondas arcoíris + **fondo idle pulsando (respiración)** del HUE actual
 
-Los efectos custom están implementados en [`rgb_matrix_user.inc`](./keyboards/sofle/keymaps/gonzafg2/rgb_matrix_user.inc). El BG idle ahora **pulsa suavemente** entre `BG_MIN = 15` (~6%) y `BG_MAX = 70` (~28%) con ciclo sinusoidal de ~2 segundos (`g_rgb_timer >> 3`). El brillo del pulso queda modulado por el VAL global.
+Los efectos custom están implementados en [`rgb_matrix_user.inc`](./keyboards/sofle/keymaps/gonzafg2/rgb_matrix_user.inc). El BG idle **late tipo corazón** (lub-dub + pausa) usando una lookup table piecewise de 32 frames × ~32ms = ciclo ~1 segundo (~60 BPM). Pico del lub: 88 (~35%); pico del dub: 70 (~28%); reposo: ~15-20 (~6-8%). El brillo total queda modulado por el VAL global.
 
 **Pre-requisito físico**: jumper `Light Sel` del PCB debe estar en `UND` o `BL&UND` para alimentar los SK6812.
 

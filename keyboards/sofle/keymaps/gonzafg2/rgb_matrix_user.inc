@@ -12,18 +12,35 @@ RGB_MATRIX_EFFECT(MY_RAIN)
 
 #ifdef RGB_MATRIX_CUSTOM_EFFECT_IMPLS
 
-// El BG idle "respira": pulsa suave entre BG_MIN y BG_MAX usando sin8.
-// Patrón sinusoidal continuo, no heartbeat biologico (eso requeriria
-// lookup table piecewise y no cabe en flash actual).
+// El BG idle "late" tipo corazón: patrón lub-dub-pausa con lookup table
+// piecewise. Más visceral que un sinusoidal puro.
 //
-// Notas de optimizacion para AVR:
-// - g_rgb_timer es uint32_t. (uint8_t)(g_rgb_timer >> 3) = /8 con mod 256
-//   gratis al castear, sin division 32-bit.
-// - Macro en vez de funcion: evita el RCALL/RET (~15 B) y permite que
-//   GCC haga constant folding con BG_MAX - BG_MIN.
-#    define BG_MIN 15 // valle del pulso (poco brillo)
-#    define BG_MAX 70 // pico del pulso (mas brillo, ~28%)
-#    define BG_PULSE() (BG_MIN + scale8(BG_MAX - BG_MIN, sin8((uint8_t)(g_rgb_timer >> 3))))
+// Estructura del latido (32 frames, ~32ms cada uno = ciclo ~1s = ~60 BPM):
+//   Frames 0-7  : Lub (sistole), pulso rapido alto. Pico ~88 (~35%).
+//   Frames 8-11 : Pausa corta a reposo.
+//   Frames 12-19: Dub (diastole), pulso secundario menor. Pico ~70.
+//   Frames 20-31: Pausa larga (~400ms de quietud antes del proximo latido).
+//
+// Pico del Lub a 88 (vs 70 del sinusoidal anterior) = ~10% mas brillo
+// absoluto, mas notorio.
+//
+// Optimizaciones AVR:
+// - PROGMEM: tabla en flash, no RAM (32 bytes).
+// - (uint8_t)(g_rgb_timer >> 5) & 0x1F: shift /32 ms + cast a uint8_t
+//   + AND mod 32 = indice 0-31 sin division 32-bit.
+// - Macro inline en el runner: evita RCALL/RET.
+static const uint8_t PROGMEM heartbeat_lut[32] = {
+    // Lub (0-7): sube rapido al pico, baja
+    25, 50, 75, 88, 88, 70, 50, 30,
+    // Pausa corta (8-11)
+    20, 18, 18, 20,
+    // Dub (12-19): pico menor que el Lub
+    35, 55, 70, 70, 65, 50, 35, 25,
+    // Pausa larga (20-31): casi flat en valle
+    20, 18, 16, 15, 15, 15, 15, 15,
+    15, 15, 15, 16,
+};
+#    define BG_PULSE() pgm_read_byte(&heartbeat_lut[(uint8_t)(g_rgb_timer >> 5) & 0x1F])
 
 // Math para un solo color (igual que SOLID_SPLASH_math)
 static hsv_t my_wave_math(hsv_t hsv, int16_t dx, int16_t dy, uint8_t dist, uint16_t tick) {
