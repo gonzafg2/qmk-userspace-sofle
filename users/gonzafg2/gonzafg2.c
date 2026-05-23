@@ -122,9 +122,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             tap_code(KC_PAST);
             return false;
 
-        case GFG_SCRF:
-            tap_code16(LGUI(LSFT(KC_3)));
-            return false;
         case GFG_SCRA:
             tap_code16(LGUI(LSFT(KC_4)));
             return false;

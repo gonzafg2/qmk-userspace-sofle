@@ -25,7 +25,6 @@ enum gfg_keycodes {
     GFG_NULC,
     GFG_OPTC,
     GFG_POW,
-    GFG_SCRF,
     GFG_SCRA,
     GFG_SCRT,
     GFG_LOCK,

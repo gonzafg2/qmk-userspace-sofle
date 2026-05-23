@@ -273,6 +273,94 @@ Tras los fixes de Copilot y nuevas features pedidas por el usuario, el OLED mast
 
 **Validación pendiente**: probar físicamente después de flashear que ´+vocal funciona consistente al escribir rápido. Tipear palabras como "también", "tenía", "está", "más rápido" y verificar que no se pierden vocales.
 
+## 2026-05-23 · Sesión 2: Reorganización keymap (workflow Tech Lead) + mouse kinetic
+
+**Contexto**: tras resolver el bug de dead keys con NKRO (decisión anterior), el user revisó el keymap completo y pidió 10 cambios para acomodar mejor su workflow diario como Tech Lead en macOS (window management, screenshare zoom, mouse preciso, layout más ergonómico).
+
+### Cambios aplicados
+
+**1. Convención de diagramas ASCII reescrita** (keymap.c comentarios + README.md). Los thumb clusters de Lower/Raise/Mouse mostraban contenido inconsistente con el código real (todos los thumbs son `_______` que heredan de Base, pero los diagramas mostraban combinaciones distintas — eran de iteraciones previas que nunca se actualizaron). Nueva convención documentada al inicio de `keymap.c`:
+- `[KEY]` = heredada de Base (slot `_______`)
+- `KEY` (sin corchetes) = asignada en esta capa
+- `---` = bloqueada (`XXXXXXX`)
+- `▼` = thumb que estás holdeando para activar la capa actual
+- `[MUTM]` / `[PLAY]` = encoder push heredado de Base
+
+Abreviaciones de 5 chars por límite visual: `[AGR]`=AltGr, `[RCT]`=RCtl, `[BSD]`=BSDL mod-morph, `[E/A]`=ESC/Adjust LT, `[MUT]`=MUTM, `[PLY]`=PLAY.
+
+**2. Lower thumbs externos**: las dos únicas posiciones realmente libres del thumb cluster (pos 0 izq y pos 9 der, que en Base son `XXXXXXX`) ahora tienen propósito contextual al numpad activo en Lower:
+- Pos 0 izq: `KC_PEQL` (= numpad)
+- Pos 9 der: `KC_PENT` (Enter numpad)
+
+**3. Raise mano derecha reorganizada para workflow Tech Lead**:
+
+Fila 1 — Window/Spaces management mac (6 keycodes, 0 B en flash por ser combos QMK estándar):
+- `MCTL` = `LCTL(KC_UP)` Mission Control
+- `APXP` = `LCTL(KC_DOWN)` App Exposé
+- `SPC-` / `SPC+` = `LCTL(KC_LEFT)` / `LCTL(KC_RGHT)` Space prev/next
+- `ZM-` / `ZM+` = `LGUI(KC_PMNS)` / `LGUI(KC_PPLS)` Zoom out/in (para navegador, screenshare, IDE — verificar en LATAM Mac, si falla crear macro custom)
+
+Fila 2 col 6-9: macros mac `SCRA`/`SCRT`/`LOCK`/`FQT` (movidas desde Adjust — más accesibles cerca de los cursores que se usan a menudo).
+Fila 2 col 10: `QK_REP` (movido desde col 7).
+Fila 3 col 10: `LGUI(KC_SPC)` Spotlight. Razón: el user dijo "tengo lejos CMD+Space"; ahora descansa en home row de la mano derecha.
+Fila 3 col 3 izq: `GFG_MIEQ` (`-=`) reemplaza `S(KC_6)` (`^`). Razón: tener `+=` y `-=` juntos en orden. `^` se elimina de Raise (sigue accesible en Lower como `S(KC_6)`).
+
+**4. Adjust limpiado**:
+- `SCRF` (screenshot completo `⌘⇧3`) eliminado completamente del enum, handler y keymap. Poco uso confirmado.
+- `SCRA`/`SCRT`/`LOCK`/`FQT` movidas a Raise (ver punto 3).
+- Media (`VOL-`/`MUTE`/`VOL+` y `PREV`/`PLAY`/`NEXT`) movida una casilla a la derecha (cols 7-9 → 8-10). Razón ergonómica del user: descansan mejor en el meñique extendido en vez del índice al llegar desde el thumb hold.
+
+**5. Mouse cascada completa**:
+- Botones `BTN1`/`BTN3`/`BTN2`: fila 1 → fila 2
+- Movimiento `MS_LEFT`/`DOWN`/`UP`/`RGHT`: fila 2 → fila 3
+- Scroll `MS_WHLL`/`D`/`U`/`R`: fila 3 → fila 4 (cols 8-11)
+- Fila 1 queda solo con `EXIT` en col 11; `EXIT` también en fila 4 col 13 (sin cambio)
+
+Razón: la fila 1 era físicamente difícil de alcanzar con dedos descansados. Ahora botones en home row (fila 2), movimiento en alcance natural (fila 3), scroll en posición más extendida pero menos usado (fila 4).
+
+**6. Mouse precisión con `MK_KINETIC_SPEED`**: activado en `users/gonzafg2/config.h` con parámetros tuneados:
+```c
+#define MK_KINETIC_SPEED
+#define MOUSEKEY_DELAY              8
+#define MOUSEKEY_INTERVAL           8
+#define MOUSEKEY_MOVE_DELTA         16     // default 25
+#define MOUSEKEY_INITIAL_SPEED      50     // default 100
+#define MOUSEKEY_BASE_SPEED         3000   // default 5000
+#define MOUSEKEY_DECELERATED_SPEED  400
+#define MOUSEKEY_ACCELERATED_SPEED  3000
+```
+Resultado: tap individual = ~16 px (preciso para clicks de precisión), hold acelera suavemente con momentum tipo trackpad hasta 3000 px/s. Modo kinetic preferido sobre accelerated default por feel más natural.
+
+### Medición de pesos
+
+| Cambio | Costo en flash |
+|---|---|
+| `MK_KINETIC_SPEED` + params | +150 B (medido al toggle) |
+| 7 keycodes Tech Lead (LCTL/LGUI combos) | 0 B (son macros QMK estándar) |
+| `GFG_SCRF` eliminado (enum + case) | -30 B aprox |
+| Reorganización keymap (mover keycodes) | 0 B |
+| Diagramas ASCII | 0 B (solo comentarios) |
+| **Total neto** | **+120 B aprox** |
+
+Tamaño: 28020 → 28170 / 28672 (652 → 502 libres, 97% → 98%).
+
+### Validación pendiente al flashear
+
+1. **Zoom in/out** (`LGUI(KC_PPLS)` y `LGUI(KC_PMNS)`) en navegador/screenshare/IDE. Si no funciona en LATAM Mac, crear macro custom con `tap_code16(LGUI(LSFT(KC_0)))` para Cmd+Shift+0 (= Cmd++ en LATAM) y similar para Cmd+-.
+2. **Mouse kinetic feel**: ¿tap individual = movimiento preciso? ¿hold acelera bien?
+3. **Window management mac**: Mission Control, App Exposé, Spaces funcionan
+4. **Spotlight** se abre rápido con la nueva posición home row
+5. **Macros mac en Raise** (SCRA/SCRT/LOCK/FQT) cómodas sobre cursores
+6. **Thumbs externos Lower** (= y Enter numpad) útiles cuando usas el numpad
+
+### Reversible
+
+Sí. Cada cambio es independiente:
+- Quitar `MK_KINETIC_SPEED` + sus params → vuelve a accelerated default
+- Restaurar bloques en `keymap.c` → keymap previo
+- Re-agregar `GFG_SCRF` al enum + case → recupera screenshot completo
+- Re-agregar `STARLIGHT`/`MULTICROSS` requiere quitar algo más (no caben en 502 B libres con todo lo nuevo)
+
 ## Decisiones pendientes (sin resolver)
 
 Ver [thumb-cluster-iteration.md](./thumb-cluster-iteration.md):

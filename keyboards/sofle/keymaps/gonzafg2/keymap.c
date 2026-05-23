@@ -1,6 +1,14 @@
 #include QMK_KEYBOARD_H
 #include "gonzafg2.h"
 
+/* Convencion de los diagramas ASCII:
+ *   [KEY]   = slot _______ que hereda KEY de la capa Base (no esta sobrescrita)
+ *   ---     = slot XXXXXXX (bloqueado, no produce nada)
+ *   KEY     = keycode asignado en esta capa
+ *   ▼       = thumb que esta siendo holdeado para entrar a esta capa
+ *   [MUTM]  = encoder push izq heredado (LT _MOUSE KC_MUTE en Base)
+ *   [PLAY]  = encoder push der heredado (KC_MPLY en Base)
+ */
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 /* Base
@@ -24,16 +32,17 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 ),
 
 /* Lower (numpad + simbolos LATAM, fila numerica se mantiene de Base)
+ * Heredadas de Base se muestran como [KEY] entre corchetes.
  * ,-----------------------------------------.                    ,-----------------------------------------.
  * | F12  |  F1  |  F2  |  F3  |  F4  |  F5  |                    |  F6  |  F7  |  F8  |  F9  | F10  | F11  |
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * | TAB  |  7   |  8   |  9   |  /   |  *   |                    |  (   |  )   |  \   |  !   |  ?   | BSDL |
+ * |[TAB] |  7   |  8   |  9   |  /   |  *   |                    |  (   |  )   |  \   |  !   |  ?   |[BSDL]|
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * | SFT  |  4   |  5   |  6   |  +   |  -   |-------.    ,-------|  {   |  }   |  ~   |  '   |  "   |  `   |
+ * |[SFT] |  4   |  5   |  6   |  +   |  -   |-------.    ,-------|  {   |  }   |  ~   |  '   |  "   |  `   |
  * |------+------+------+------+------+------| BRDN  |    | BRUP  |------+------+------+------+------+------|
- * | CMD  |  1   |  2   |  3   |  .   |  0   |-------|    |-------|  [   |  ]   |  <   |  >   |  |   |  _   |
+ * |[CMD] |  1   |  2   |  3   |  .   |  0   |-------|    |-------|  [   |  ]   |  <   |  >   |  |   |  _   |
  * `-----------------------------------------/       /     \      \-----------------------------------------'
- *           | CTL | ALT | --- |  ▼  | SPC |        | ENT | RSE | --- | RALT | RCTL |
+ *           | KP=  |[ALT]|[CTL]|  ▼  |[SPC]|        |[ENT]|[RSE]|[ALTGR]|[RCTL]| KPENT|
  */
 // Right side: keycodes posicionales para macOS layout Spanish LATAM (mismo enfoque que zmk-config-corne)
 [_LOWER] = LAYOUT(
@@ -41,69 +50,94 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   _______,  KC_7,    KC_8,    KC_9,    KC_PSLS, KC_PAST,                                    S(KC_8),    S(KC_9),    A(KC_MINS),   KC_EXLM,    S(KC_MINS), _______,
   _______,  KC_4,    KC_5,    KC_6,    KC_PPLS, KC_PMNS,                                    KC_QUOT,    KC_BSLS,    A(KC_RBRC),   KC_MINS,    S(KC_2),    A(KC_BSLS),
   _______,  KC_1,    KC_2,    KC_3,    KC_DOT,  KC_0,    KC_BRID,                KC_BRIU,   S(KC_QUOT), S(KC_BSLS), KC_NUBS,      S(KC_NUBS), KC_GRV,     S(KC_SLSH),
-                     _______, _______, _______, _______, _______,                _______,   _______, _______, _______, _______
+                     KC_PEQL, _______, _______, _______, _______,                _______,   _______, _______, _______, KC_PENT
 ),
 
-/* Raise (operadores programacion + navegacion)
+/* Raise (operadores programacion + navegacion + window mgmt mac + zoom + spotlight)
+ * Heredadas de Base se muestran como [KEY] entre corchetes.
+ *
+ * Window/Spaces management mac (fila 1 mano der):
+ *   MCTL = Mission Control (LCTL+UP)      APXP = App Expose (LCTL+DN)
+ *   SPC- = Space prev (LCTL+LEFT)         SPC+ = Space next (LCTL+RGHT)
+ *   ZM-  = Zoom out (LGUI+numpad-)        ZM+  = Zoom in  (LGUI+numpad+)
+ * Spotlight: SPOT (LGUI+SPC) en fila 3 col 10 (donde estaba -=).
+ *
+ * Macros mac (sobre cursores, fila 2 col 6-9):
+ *   SCRA = screenshot area (LGUI+LSFT+4)  SCRT = screenshot tool (LGUI+LSFT+5)
+ *   LOCK = lock pantalla (LGUI+LCTL+Q)    FQT  = Force Quit (LGUI+LALT+ESC)
+ * QK_REP movido a col 10. SCRF (screenshot completo) eliminado: poco uso.
+ *
  * ,-----------------------------------------.                    ,-----------------------------------------.
- * |  =   |  >=  |  <=  |  ??  |  ?.  |  **  |                    |      |      |      |      |      |      |
+ * |  =   |  >=  |  <=  |  ??  |  ?.  |  **  |                    | MCTL | APXP | SPC- | SPC+ | ZM-  | ZM+  |
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * | TAB  |  !   |  @   |  #   |  $   |  %   |                    |      |QK_REP|      |      |      | BSDL |
+ * |[TAB] |  !   |  @   |  #   |  $   |  %   |                    | SCRA | SCRT | LOCK | FQT  | RPT  |[BSDL]|
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * | SFT  |  ^   |  +=  |  &   |  &&  |  ||  |-------.    ,-------| LEFT | DOWN |  UP  | RGHT | -=   |      |
- * |------+------+------+------+------+------| MUTM  |    | PLAY  |------+------+------+------+------+------|
- * | CMD  | =>   | ...  |  ==  |  !== |  === |-------|    |-------| HOME | PGDN | PGUP | END  |      | ESCAD|
+ * |[SFT] |  ^   |  +=  |  -=  |  &&  |  ||  |-------.    ,-------| LEFT | DOWN |  UP  | RGHT | SPOT |      |
+ * |------+------+------+------+------+------|[MUTM] |    |[PLAY] |------+------+------+------+------+------|
+ * |[CMD] | =>   | ...  |  ==  |  !== |  === |-------|    |-------| HOME | PGDN | PGUP | END  |      |[ESC/A]
  * `-----------------------------------------/       /     \      \-----------------------------------------'
- *           | CTL | ALT | --- | LWR | SPC |        | ENT |  ▼  | --- | RALT | RCTL |
+ *           | ---  |[ALT]|[CTL]|[LWR]|[SPC]|        |[ENT]|  ▼  |[ALTGR]|[RCTL]| ---  |
  */
 [_RAISE] = LAYOUT(
-  S(KC_0),  GFG_GTEQ,GFG_LTEQ,GFG_NULC,GFG_OPTC,GFG_POW,                                    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
-  _______,  KC_EXLM,    A(KC_Q),   KC_HASH, KC_DLR,  KC_PERC,                                XXXXXXX, QK_REP,  XXXXXXX, XXXXXXX, XXXXXXX, _______,
-  _______,  A(KC_QUOT), GFG_PLEQ,  S(KC_6), GFG_AND, GFG_OR,                                 KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, GFG_MIEQ,XXXXXXX,
+  S(KC_0),  GFG_GTEQ,GFG_LTEQ,GFG_NULC,GFG_OPTC,GFG_POW,                                    LCTL(KC_UP), LCTL(KC_DOWN), LCTL(KC_LEFT), LCTL(KC_RGHT), LGUI(KC_PMNS), LGUI(KC_PPLS),
+  _______,  KC_EXLM,    A(KC_Q),   KC_HASH, KC_DLR,  KC_PERC,                                GFG_SCRA, GFG_SCRT, GFG_LOCK, GFG_FQUIT, QK_REP, _______,
+  _______,  A(KC_QUOT), GFG_PLEQ,  GFG_MIEQ, GFG_AND, GFG_OR,                                KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, LGUI(KC_SPC), XXXXXXX,
   _______,  GFG_ARROW,GFG_SPREAD,GFG_EQEQ,GFG_NEQ,GFG_TEQ,_______,                _______,  KC_HOME, KC_PGDN, KC_PGUP, KC_END,  XXXXXXX, _______,
                      _______, _______, _______, _______, _______,                _______,   _______, _______, _______, _______
 ),
 
-/* Adjust (sistema, media, macros mac, mouse toggle, RGB)
+/* Adjust (sistema, media, mouse toggle, RGB)
  * Acceso: hold ambos LWR+RSE (tri-layer) | hold ESC pinky der
+ * Heredadas de Base se muestran como [KEY] entre corchetes.
+ * Macros mac (SCRA/SCRT/LOCK/FQT) movidas a RAISE sobre cursores. SCRF eliminado.
+ * VOL y media movidos una casilla a la derecha (col 7-9 -> 8-10) para descansar
+ * en el meñique extendido en vez del indice.
+ *
  * ,-----------------------------------------.                    ,-----------------------------------------.
  * | BOOT | TOG  | NXT  | HU+  | SA+  | VA+  |                    |      |      |      |      |      |      |
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
  * | SP+  | SP-  | PRV  | HU-  | SA-  | VA-  |                    |TGMOU |      |      |      |      |      |
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * |      | SCRF | SCRA | SCRT | LOCK | FQT  |-------.    ,-------|      | VOLD | MUTE | VOLU |      |      |
- * |------+------+------+------+------+------|       |    |       |------+------+------+------+------+------|
- * |      |      |      |      |      |      |-------|    |-------|      | MPRV | MPLY | MNXT |      |      |
+ * |      |      |      |      |      |      |-------.    ,-------|      |      | VOLD | MUTE | VOLU |      |
+ * |------+------+------+------+------+------|[MUTM] |    |[PLAY] |------+------+------+------+------+------|
+ * |      |      |      |      |      |      |-------|    |-------|      |      | MPRV | MPLY | MNXT |      |
  * `-----------------------------------------/       /     \      \-----------------------------------------'
- *           |     |     | --- |     |     |        |     |     | --- |     |     |
+ *           | ---  |[ALT]|[CTL]|  ▼  |[SPC]|        |[ENT]|  ▼  |[ALTGR]|[RCTL]| ---  |
  */
 [_ADJUST] = LAYOUT(
   QK_BOOT,  RM_TOGG, RM_NEXT, RM_HUEU, RM_SATU, RM_VALU,                                    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
   RM_SPDU,  RM_SPDD, RM_PREV, RM_HUED, RM_SATD, RM_VALD,                                    TG(_MOUSE), XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
-  XXXXXXX,  GFG_SCRF,GFG_SCRA,GFG_SCRT,GFG_LOCK,GFG_FQUIT,                                  XXXXXXX, KC_VOLD, KC_MUTE, KC_VOLU, XXXXXXX, XXXXXXX,
-  XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                _______,   XXXXXXX, KC_MPRV, KC_MPLY, KC_MNXT, XXXXXXX, XXXXXXX,
+  XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                                    XXXXXXX, XXXXXXX, KC_VOLD, KC_MUTE, KC_VOLU, XXXXXXX,
+  XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                _______,   XXXXXXX, XXXXXXX, KC_MPRV, KC_MPLY, KC_MNXT, XXXXXXX,
                      _______, _______, _______, _______, _______,                _______,   _______, _______, _______, _______
 ),
 
 /* Mouse (movimiento, scroll, clicks)
  * Acceso: hold encoder push izq (momentaneo) | tap TG_MOUSE desde Adjust (persistente)
- * Salir persistente: tap EXIT (esquina sup der o esquina inf der)
+ * Salir persistente: tap EXIT (esquina sup der o esquina inf der fila 4)
+ * Heredadas de Base se muestran como [KEY] entre corchetes.
+ *
+ * Cascada (sesion 2026-05-23): botones BTN1/3/2 bajaron de fila 1 -> fila 2;
+ * movimiento M_* de fila 2 -> fila 3; scroll S_* de fila 3 -> fila 4. Razon
+ * ergonomica: BTN en fila 2 (home row de la mano descansada) en vez de fila 1
+ * (estiramiento hacia arriba).
+ *
  * ,-----------------------------------------.                    ,-----------------------------------------.
- * |      |      |      |      |      |      |                    | BTN1 | BTN3 | BTN2 |      |      | EXIT |
+ * |      |      |      |      |      |      |                    |      |      |      |      |      | EXIT |
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * |      |      |      |      |      |      |                    | M_LF | M_DN | M_UP | M_RT |      |      |
+ * |      |      |      |      |      |      |                    | BTN1 | BTN3 | BTN2 |      |      |      |
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * | SFT  |      |      |      |      |      |-------.    ,-------| S_LF | S_DN | S_UP | S_RT |      |      |
- * |------+------+------+------+------+------|       |    |       |------+------+------+------+------+------|
- * | CMD  |      |      |      |      |      |-------|    |-------|      |      |      |      |      | EXIT |
+ * |[SFT] |      |      |      |      |      |-------.    ,-------| M_LF | M_DN | M_UP | M_RT |      |      |
+ * |------+------+------+------+------+------|[MUTM] |    |[PLAY] |------+------+------+------+------+------|
+ * |[CMD] |      |      |      |      |      |-------|    |-------|      | S_LF | S_DN | S_UP | S_RT | EXIT |
  * `-----------------------------------------/       /     \      \-----------------------------------------'
- *           | CTL | ALT | --- |     | SPC |        | ENT |     | --- | RALT | RCTL |
+ *           | ---  |[ALT]|[CTL]|[LWR]|[SPC]|        |[ENT]|[RSE]|[ALTGR]|[RCTL]| ---  |
  */
 [_MOUSE] = LAYOUT(
-  XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                                    MS_BTN1, MS_BTN3, MS_BTN2, XXXXXXX, XXXXXXX, TG(_MOUSE),
-  XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                                    MS_LEFT, MS_DOWN, MS_UP,   MS_RGHT, XXXXXXX, XXXXXXX,
-  _______,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                                    MS_WHLL, MS_WHLD, MS_WHLU, MS_WHLR, XXXXXXX, XXXXXXX,
-  _______,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______,                _______,   XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, TG(_MOUSE),
+  XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                                    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, TG(_MOUSE),
+  XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                                    MS_BTN1, MS_BTN3, MS_BTN2, XXXXXXX, XXXXXXX, XXXXXXX,
+  _______,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                                    MS_LEFT, MS_DOWN, MS_UP,   MS_RGHT, XXXXXXX, XXXXXXX,
+  _______,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______,                _______,   XXXXXXX, MS_WHLL, MS_WHLD, MS_WHLU, MS_WHLR, TG(_MOUSE),
                      _______, _______, _______, _______, _______,                _______,   _______, _______, _______, _______
 ),
 };

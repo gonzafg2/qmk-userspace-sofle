@@ -49,6 +49,20 @@ Hermano del repo [zmk-config-corne](https://github.com/gonzafg2/zmk-config-corne
 
 Salir de Mouse persistente: tap **EXIT** (esquina sup der o esquina inf der dentro de Mouse).
 
+### Convención de los diagramas
+
+En los diagramas de Lower / Raise / Adjust / Mouse se usa esta notación para distinguir teclas asignadas en la capa de teclas heredadas de Base:
+
+| Símbolo | Significado |
+|---|---|
+| `KEY` (sin corchetes) | Keycode asignado en esta capa (sobrescribe a Base) |
+| `[KEY]` (entre corchetes) | Slot `_______` que **hereda** la tecla `KEY` de Base (no está sobrescrita) |
+| `---` | Slot `XXXXXXX` (bloqueado, no produce nada) |
+| `▼` | Thumb que estás **holdeando** ahora para activar esta capa |
+| `[MUTM]` / `[PLAY]` | Encoder push heredado de Base (LT mouse / play) |
+
+Abreviaciones por espacio en celdas de 5 chars: `[SFT]`=LSFT, `[CMD]`=LGUI, `[CTL]`=LCTL, `[ALT]`=LALT, `[AGR]`=AltGr, `[RCT]`=RCtl, `[BSD]`=BSDL mod-morph, `[E/A]`=ESC tap/Adjust hold.
+
 ### Base — QWERTY LATAM macOS
 
 ```
@@ -74,58 +88,91 @@ Salir de Mouse persistente: tap **EXIT** (esquina sup der o esquina inf der dent
 ┌─────┬─────┬─────┬─────┬─────┬─────┐                              ┌─────┬─────┬─────┬─────┬─────┬─────┐
 │ F12 │ F1  │ F2  │ F3  │ F4  │ F5  │                              │ F6  │ F7  │ F8  │ F9  │ F10 │ F11 │
 ├─────┼─────┼─────┼─────┼─────┼─────┤                              ├─────┼─────┼─────┼─────┼─────┼─────┤
-│     │  7  │  8  │  9  │  /  │  *  │                              │  (  │  )  │  \  │  !  │  ?  │     │
+│[TAB]│  7  │  8  │  9  │  /  │  *  │                              │  (  │  )  │  \  │  !  │  ?  │[BSD]│
 ├─────┼─────┼─────┼─────┼─────┼─────┤                              ├─────┼─────┼─────┼─────┼─────┼─────┤
-│     │  4  │  5  │  6  │  +  │  -  │                              │  {  │  }  │  ~  │  '  │  "  │  `  │
+│[SFT]│  4  │  5  │  6  │  +  │  -  │                              │  {  │  }  │  ~  │  '  │  "  │  `  │
 ├─────┼─────┼─────┼─────┼─────┼─────┼─────┐                  ┌─────┼─────┼─────┼─────┼─────┼─────┼─────┤
-│     │  1  │  2  │  3  │  .  │  0  │BRDN │ ◉brillo   scrH◉  │BRUP │  [  │  ]  │  <  │  >  │  |  │  _  │
+│[CMD]│  1  │  2  │  3  │  .  │  0  │BRDN │ ◉brillo   scrH◉  │BRUP │  [  │  ]  │  <  │  >  │  |  │  _  │
 └─────┴─────┴─────┼─────┼─────┼─────┴─────┴─────┐        ┌───┴─────┴─────┼─────┼─────┼─────┴─────┴─────┘
-                  │     │     │     │  ▼  │     │        │     │     │     │     │     │
+                  │ KP= │[ALT]│[CTL]│  ▼  │[SPC]│        │[ENT]│[RSE]│[AGR]│[RCT]│KENT │
                   └─────┴─────┴─────┴─────┴─────┘        └─────┴─────┴─────┴─────┴─────┘
                                     ▲ activa
 ```
 
-Casillas vacías = transparent (heredan de Base). Encoder izq cambia a brillo, encoder der a scroll horizontal.
+Encoder izq cambia a brillo, encoder der a scroll horizontal.
 
-### Raise — operadores programación + navegación
+**Thumbs externos (nuevos, sesión 2026-05-23):**
+- `KP=` (thumb izq exterior): `KC_PEQL` — `=` del numpad, útil para calculadora
+- `KENT` (thumb der exterior): `KC_PENT` — Enter del numpad
+
+Estas dos posiciones eran las únicas realmente libres en el thumb cluster (en Base son `XXXXXXX`). Ahora tienen propósito contextual al numpad activo en Lower.
+
+### Raise — operadores programación + navegación + window mgmt mac
 
 ```
 ┌─────┬─────┬─────┬─────┬─────┬─────┐                              ┌─────┬─────┬─────┬─────┬─────┬─────┐
-│  =  │ >=  │ <=  │ ??  │ ?.  │ **  │                              │     │     │     │     │     │     │
+│  =  │ >=  │ <=  │ ??  │ ?.  │ **  │                              │MCTL │APXP │SPC- │SPC+ │ ZM- │ ZM+ │
 ├─────┼─────┼─────┼─────┼─────┼─────┤                              ├─────┼─────┼─────┼─────┼─────┼─────┤
-│     │  !  │  @  │  #  │  $  │  %  │                              │     │ RPT │     │     │     │     │
+│[TAB]│  !  │  @  │  #  │  $  │  %  │                              │SCRA │SCRT │LOCK │FQT  │ RPT │[BSD]│
 ├─────┼─────┼─────┼─────┼─────┼─────┤                              ├─────┼─────┼─────┼─────┼─────┼─────┤
-│     │  ^  │ +=  │  &  │ &&  │ ||  │                              │  ←  │  ↓  │  ↑  │  →  │ -=  │     │
+│[SFT]│  ^  │ +=  │ -=  │ &&  │ ||  │                              │  ←  │  ↓  │  ↑  │  →  │SPOT │ --- │
 ├─────┼─────┼─────┼─────┼─────┼─────┼─────┐                  ┌─────┼─────┼─────┼─────┼─────┼─────┼─────┤
-│     │ =>  │ ... │ ==  │ !== │ === │     │ ◉tab     word◉   │     │HOME │PGDN │PGUP │ END │     │     │
+│[CMD]│ =>  │ ... │ ==  │ !== │ === │[MUT]│ ◉tab     word◉   │[PLY]│HOME │PGDN │PGUP │ END │ --- │[E/A]│
 └─────┴─────┴─────┼─────┼─────┼─────┴─────┴─────┐        ┌───┴─────┴─────┼─────┼─────┼─────┴─────┴─────┘
-                  │     │     │     │     │     │        │     │  ▼  │     │     │     │
+                  │ --- │[ALT]│[CTL]│[LWR]│[SPC]│        │[ENT]│  ▼  │[AGR]│[RCT]│ --- │
                   └─────┴─────┴─────┴─────┴─────┘        └─────┴─────┴─────┴─────┴─────┘
                                                                 ▲ activa
 ```
 
-`RPT` = `QK_REP` (repite la última tecla pulsada). Encoder izq cambia a tab nav (`⌘[` / `⌘]`), encoder der a word nav (`⌥←` / `⌥→`).
+**Operadores prog (mano izq):** `=` · `>=` · `<=` · `??` · `?.` · `**` (fila 1); `!` · `@` · `#` · `$` · `%` (fila 2); `^` · `+=` · `-=` · `&&` · `||` (fila 3, nuevo `-=` reemplaza al `&` previo); `=>` · `...` · `==` · `!==` · `===` (fila 4).
 
-### Adjust — sistema, macros mac, media, **RGB**
+**Window/Spaces management mac (fila 1 mano der):**
+
+| Label | Keycode | Acción macOS |
+|---|---|---|
+| `MCTL` | `LCTL(KC_UP)` | Mission Control |
+| `APXP` | `LCTL(KC_DOWN)` | App Exposé |
+| `SPC-` / `SPC+` | `LCTL(KC_LEFT)` / `LCTL(KC_RGHT)` | Space anterior / siguiente |
+| `ZM-` / `ZM+` | `LGUI(KC_PMNS)` / `LGUI(KC_PPLS)` | Zoom out / Zoom in (en navegador, screenshare, IDE — verificar en LATAM Mac tras flasheo, si no funciona ajustamos con macro custom) |
+| `SPOT` | `LGUI(KC_SPC)` | Spotlight (Cmd+Space, cómodo en home row der) |
+
+**Macros mac sobre cursores (fila 2 mano der, movidas desde Adjust en sesión 2026-05-23):**
+
+| Label | Keycode | Acción macOS |
+|---|---|---|
+| `SCRA` | `⌘⇧4` | Screenshot área |
+| `SCRT` | `⌘⇧5` | Screenshot herramienta (Captura) |
+| `LOCK` | `⌘⌃Q` | Lock pantalla |
+| `FQT` | `⌘⌥Esc` | Force Quit |
+| `RPT` | `QK_REP` | Repite la última tecla pulsada |
+
+> `SCRF` (screenshot completo `⌘⇧3`) **eliminado** en la misma sesión: poco uso. Si lo necesitas, vuelve a agregarlo al enum y a `process_record_user` en `users/gonzafg2/`.
+
+Encoder izq: tab nav (`⌘[` / `⌘]`). Encoder der: word nav (`⌥←` / `⌥→`).
+
+### Adjust — sistema, media, mouse toggle, **RGB**
 
 ```
 ┌─────┬─────┬─────┬─────┬─────┬─────┐                              ┌─────┬─────┬─────┬─────┬─────┬─────┐
-│BOOT │ TOG │ NXT │ HU+ │ SA+ │ VA+ │                              │     │     │     │     │     │     │
+│BOOT │ TOG │ NXT │ HU+ │ SA+ │ VA+ │                              │ --- │ --- │ --- │ --- │ --- │ --- │
 ├─────┼─────┼─────┼─────┼─────┼─────┤                              ├─────┼─────┼─────┼─────┼─────┼─────┤
-│ SP+ │ SP- │ PRV │ HU- │ SA- │ VA- │                              │TGMOU│     │     │     │     │     │
+│ SP+ │ SP- │ PRV │ HU- │ SA- │ VA- │                              │TGMOU│ --- │ --- │ --- │ --- │ --- │
 ├─────┼─────┼─────┼─────┼─────┼─────┤                              ├─────┼─────┼─────┼─────┼─────┼─────┤
-│     │SCRF │SCRA │SCRT │LOCK │FQT  │                              │     │VOL- │MUTE │VOL+ │     │     │
+│ --- │ --- │ --- │ --- │ --- │ --- │                              │ --- │ --- │VOL- │MUTE │VOL+ │ --- │
 ├─────┼─────┼─────┼─────┼─────┼─────┼─────┐                  ┌─────┼─────┼─────┼─────┼─────┼─────┼─────┤
-│     │     │     │     │     │     │     │ ◉track  brillo◉  │     │     │PREV │PLAY │NEXT │     │     │
+│ --- │ --- │ --- │ --- │ --- │ --- │[MUT]│ ◉track  brillo◉  │[PLY]│ --- │ --- │PREV │PLAY │NEXT │ --- │
 └─────┴─────┴─────┼─────┼─────┼─────┴─────┴─────┐        ┌───┴─────┴─────┼─────┼─────┼─────┴─────┴─────┘
-                  │     │     │     │  ▼  │     │        │     │  ▼  │     │     │     │
+                  │ --- │[ALT]│[CTL]│  ▼  │[SPC]│        │[ENT]│  ▼  │[AGR]│[RCT]│ --- │
                   └─────┴─────┴─────┴─────┴─────┘        └─────┴─────┴─────┴─────┴─────┘
                           ▲ hold ambos LWR+RSE | hold ESC
 ```
 
-**Sistema y macros mac:**
-`BOOT` = `QK_BOOT` (entra a bootloader para flashear) · `SCRF/A/T` = screenshots mac (`⌘⇧3`/`4`/`5`)
-`LOCK` = `⌘⌃Q` · `FQT` = Force Quit (`⌘⌥Esc`) · `TGMOU` = toggle capa Mouse persistente
+**Cambios sesión 2026-05-23:**
+- Las 5 macros mac (`SCRF`/`SCRA`/`SCRT`/`LOCK`/`FQT`) ya no viven en Adjust — `SCRF` eliminado, las otras 4 movidas a Raise sobre los cursores
+- Media (VOL/MUTE y PREV/PLAY/NEXT) movido **una casilla a la derecha** (cols 7-9 → 8-10) para descansar en meñique extendido en vez de índice — más cómodo cuando llegas desde el thumb hold
+
+**Sistema:**
+`BOOT` = `QK_BOOT` (entra a bootloader para flashear) · `TGMOU` = toggle capa Mouse persistente
 
 **Controles RGB (RGB_MATRIX, keycodes `RM_*`):**
 
@@ -158,15 +205,15 @@ Los efectos custom están implementados en [`rgb_matrix_user.inc`](./keyboards/s
 
 ```
 ┌─────┬─────┬─────┬─────┬─────┬─────┐                              ┌─────┬─────┬─────┬─────┬─────┬─────┐
-│     │     │     │     │     │     │                              │BTN1 │BTN3 │BTN2 │     │     │EXIT │
+│     │     │     │     │     │     │                              │     │     │     │     │     │EXIT │
 ├─────┼─────┼─────┼─────┼─────┼─────┤                              ├─────┼─────┼─────┼─────┼─────┼─────┤
-│     │     │     │     │     │     │                              │ ←M  │ ↓M  │ ↑M  │ →M  │     │     │
+│     │     │     │     │     │     │                              │BTN1 │BTN3 │BTN2 │ --- │ --- │ --- │
 ├─────┼─────┼─────┼─────┼─────┼─────┤                              ├─────┼─────┼─────┼─────┼─────┼─────┤
-│ SFT │     │     │     │     │     │                              │ ←S  │ ↓S  │ ↑S  │ →S  │     │     │
+│[SFT]│     │     │     │     │     │                              │ ←M  │ ↓M  │ ↑M  │ →M  │ --- │ --- │
 ├─────┼─────┼─────┼─────┼─────┼─────┼─────┐                  ┌─────┼─────┼─────┼─────┼─────┼─────┼─────┤
-│ CMD │     │     │     │     │     │     │  ◉scrV    scrH◉  │     │     │     │     │     │     │EXIT │
+│[CMD]│     │     │     │     │     │[MUT]│  ◉scrV    scrH◉  │[PLY]│ --- │ ←S  │ ↓S  │ ↑S  │ →S  │EXIT │
 └─────┴─────┴─────┼─────┼─────┼─────┴─────┴─────┐        ┌───┴─────┴─────┼─────┼─────┼─────┴─────┴─────┘
-                  │ CTL │ ALT │     │     │ SPC │        │ ENT │     │     │ALTGR│ CTL │
+                  │ --- │[ALT]│[CTL]│[LWR]│[SPC]│        │[ENT]│[RSE]│[AGR]│[RCT]│ --- │
                   └─────┴─────┴─────┴─────┴─────┘        └─────┴─────┴─────┴─────┴─────┘
               ▲ hold encoder push izq (momentario) | tap TGMOU desde Adjust (persistente)
 ```
@@ -174,6 +221,10 @@ Los efectos custom están implementados en [`rgb_matrix_user.inc`](./keyboards/s
 `M` = movimiento del cursor · `S` = scroll · `BTN1/2/3` = clic izq / medio / der · `EXIT` = `TG(_MOUSE)` apaga la capa
 
 Mano izq mantiene Shift y Cmd para combos: Shift+click (selección), Cmd+click (abrir en nueva pestaña), Ctrl+click (menú contextual mac).
+
+**Cascada de filas (sesión 2026-05-23):** botones BTN1/3/2 bajaron de fila 1 → fila 2; movimiento de fila 2 → fila 3; scroll de fila 3 → fila 4. Razón: la fila 1 quedaba muy alta para los dedos descansados, físicamente difícil de alcanzar. Ahora botones quedan en home row, movimiento en fila 3 (alcance natural del meñique-anular-medio-índice), scroll en fila 4 (más extendido pero menos usado).
+
+**Precisión del movimiento (sesión 2026-05-23):** activado `MK_KINETIC_SPEED` en `users/gonzafg2/config.h` para movimiento smooth con momentum (más natural tipo trackpad). Parámetros tuneados para más precisión: `MOUSEKEY_MOVE_DELTA 16` (default 25), `MOUSEKEY_INITIAL_SPEED 50` (default 100), `MOUSEKEY_BASE_SPEED 3000` (default 5000). Resultado: tap individual = ~16 px (preciso), hold acelera suavemente hasta 3000 px/s. Costo en flash: ~150 B.
 
 ## Modificadores standard PC — dónde queda cada uno
 
@@ -209,17 +260,18 @@ Doble tap rápido de **Shift** (LSFT) activa Caps Word — mayúsculas temporale
 
 Activado vía `DOUBLE_TAP_SHIFT_TURNS_ON_CAPS_WORD` (built-in de QMK, sin overhead de `COMBO_ENABLE`).
 
-## Macros macOS (Adjust)
+## Macros macOS (Raise)
 
-Implementadas con `tap_code16` LATAM-aware en `users/gonzafg2/gonzafg2.c`:
+Implementadas con `tap_code16` LATAM-aware en `users/gonzafg2/gonzafg2.c`. **Movidas de Adjust a Raise en sesión 2026-05-23** (encima de los cursores) para acceso más rápido:
 
 | Tecla | Acción |
 |---|---|
-| `SCRF` | `⌘⇧3` (screenshot completo) |
-| `SCRA` | `⌘⇧4` (área) |
-| `SCRT` | `⌘⇧5` (herramienta) |
+| `SCRA` | `⌘⇧4` (screenshot área) |
+| `SCRT` | `⌘⇧5` (screenshot herramienta) |
 | `LOCK` | `⌘⌃Q` (lock pantalla) |
 | `FQT` | `⌘⌥Esc` (Force Quit) |
+
+`SCRF` (`⌘⇧3` screenshot completo) eliminado — poco uso. Si vuelve a hacer falta, agregarlo al enum `gfg_keycodes` en `gonzafg2.h` y al switch en `gonzafg2.c`.
 
 ## Operadores de programación (Raise)
 
@@ -434,7 +486,7 @@ Haz push a `main` → GitHub Actions corre `qmk_userspace_build.yml` + `qmk_user
 
 ## Features deshabilitadas (trade-offs AVR)
 
-El ATmega32U4 tiene 28672 bytes usables (`28KB - bootloader Caterina`). Build actual: **28020 / 28672 bytes (97%, 652 libres)** medidos con `avr-gcc 8.5.0` + LTO. Para llegar a este balance se sacrificó:
+El ATmega32U4 tiene 28672 bytes usables (`28KB - bootloader Caterina`). Build actual: **28170 / 28672 bytes (98%, 502 libres)** medidos con `avr-gcc 8.5.0` + LTO tras agregar `MK_KINETIC_SPEED` + 7 keycodes Tech Lead + reorganización. Para llegar a este balance se sacrificó:
 
 | Feature | Estado | Por qué se quitó |
 |---|---|---|
@@ -453,14 +505,16 @@ El ATmega32U4 tiene 28672 bytes usables (`28KB - bootloader Caterina`). Build ac
 | `OLED_ENABLE` + renderers custom | `yes` | ~2200 B | Logo GFG, capa, mods L/R, gata, Luna pet, indicador RGB |
 | `MOUSEKEY_ENABLE` | `yes` | ~700 B | Necesario para la capa `_MOUSE` |
 | `NKRO_ENABLE` + `FORCE_NKRO` | `yes` | **368 B** | Activado 2026-05-23 para resolver race condition de dead keys LATAM en split |
+| `MK_KINETIC_SPEED` | `yes` | ~150 B | Activado 2026-05-23: modo mouse kinetic con momentum, más natural y preciso |
 | `CAPS_WORD_ENABLE` | `yes` | ~250 B | Doble-tap Shift para CAPS WORD |
 | `ENCODER_MAP_ENABLE` | `yes` | ~180 B | Encoder por capa declarativo |
 
-**Para revertir algún sacrificio**: hay que liberar el equivalente quitando otra feature. Las opciones más pesadas activas son `RGB_MATRIX_ENABLE` (~3 KB) y `OLED_ENABLE` (~2.2 KB). Con los 652 B libres actuales puedes:
+**Para revertir algún sacrificio**: hay que liberar el equivalente quitando otra feature. Las opciones más pesadas activas son `RGB_MATRIX_ENABLE` (~3 KB) y `OLED_ENABLE` (~2.2 KB). Con los 502 B libres actuales puedes:
 
-- ✅ Agregar 1 efecto RGB chico tipo `BREATHING` (~50 B) o `RAINBOW_MOVING_CHEVRON` (~150 B)
+- ✅ Agregar 1 efecto RGB chico tipo `BREATHING` (~50 B)
 - ✅ Recuperar `SPLIT_LAYER_STATE_ENABLE` (~130 B)
-- ❌ Reactivar `WPM_ENABLE` + `STARLIGHT` + `MULTICROSS` juntos (sumarían >800 B)
+- ⚠️ `RAINBOW_MOVING_CHEVRON` (~150 B) ajustado pero entra
+- ❌ Reactivar `WPM_ENABLE` + `STARLIGHT` juntos (sumarían >630 B)
 - ❌ Habilitar `VIA_ENABLE` (~2500 B, no cabe sin sacrificar RGB o OLED)
 
 Catálogo completo de pesos medidos por feature en [`claudedocs/feature-weights.md`](./claudedocs/feature-weights.md), con descripción detallada de cada componente del firmware activo.
