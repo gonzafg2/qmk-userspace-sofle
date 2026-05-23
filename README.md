@@ -254,6 +254,17 @@ Mano izq mantiene Shift y Cmd para combos: Shift+click (selección), Cmd+click (
 
 > **⚠️ Hardware conocido**: en la unidad actual los **push de los encoders no registran señal eléctrica** (cold joint diagnosticado, no es bug de firmware). La rotación funciona correctamente. Los keycodes de tap/hold están asignados correctamente y funcionarán una vez resoldados los pines del switch del EC11. Detalle del diagnóstico en [`claudedocs/hardware-notes.md`](./claudedocs/hardware-notes.md).
 
+## Split — comunicación master ↔ slave
+
+El Sofle es un teclado **split** con dos mitades comunicándose por TRRS. La mitad izquierda es la **master** (`MASTER_LEFT` en config); es la que se conecta por USB al Mac. La derecha es la **slave**.
+
+**Cómo procesa pulsaciones:** la slave detecta una tecla apretada físicamente y manda solo "posición (fila, col) apretada" al master por TRRS. El master, que sabe en qué capa estás, traduce esa posición usando `keymaps[][][]` y manda el keycode resultante a USB. La slave **nunca conoce la capa** por default.
+
+**`SPLIT_LAYER_STATE_ENABLE` (activado en sesión 2026-05-23 sesión 3):** sincroniza el `layer_state` (qué capa está activa) del master a la slave por TRRS. Costó **0 B** en este contexto por dividendos de LTO con otras features split presentes. Hoy no tiene efecto visible — habilita futuro:
+1. Mostrar capa actual en el OLED de la slave (hoy solo muestra "Eres / un / Crack" + Luna pet estático)
+2. RGB indicators per-capa en la slave (ej. cambiar color del thumb derecho según capa activa)
+3. Cualquier feedback visual no-USB en la slave que dependa de la capa
+
 ## Caps Word
 
 Doble tap rápido de **Shift** (LSFT) activa Caps Word — mayúsculas temporales hasta que pulses espacio, enter, tab o pase un timeout. Útil para escribir constantes (`MAX_RETRIES`) o acrónimos sin mantener Shift.
@@ -486,7 +497,12 @@ Haz push a `main` → GitHub Actions corre `qmk_userspace_build.yml` + `qmk_user
 
 ## Features deshabilitadas (trade-offs AVR)
 
-El ATmega32U4 tiene 28672 bytes usables (`28KB - bootloader Caterina`). Build actual: **28170 / 28672 bytes (98%, 502 libres)** medidos con `avr-gcc 8.5.0` + LTO tras agregar `MK_KINETIC_SPEED` + 7 keycodes Tech Lead + reorganización. Para llegar a este balance se sacrificó:
+El ATmega32U4 tiene 28672 bytes usables (`28KB - bootloader Caterina`). Build actual: **28170 / 28672 bytes (98%, 502 libres)** medidos con `avr-gcc 8.5.0` + LTO. Resultado de 3 sesiones del 2026-05-23:
+1. **NKRO + DEBOUNCE 8** para fix de dead keys LATAM (368 B), quitando STARLIGHT + MULTICROSS para liberar 846 B
+2. **Reorganización keymap Tech Lead** + `MK_KINETIC_SPEED` mouse (+150 B neto)
+3. **`SPLIT_LAYER_STATE_ENABLE`** reactivado (0 B por LTO compartido), `CHORDAL_HOLD` probado y descartado (1236 B, no cabe + ROI marginal)
+
+Para llegar a este balance se sacrificó:
 
 | Feature | Estado | Por qué se quitó |
 |---|---|---|

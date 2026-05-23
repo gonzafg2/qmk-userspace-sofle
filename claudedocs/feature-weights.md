@@ -11,8 +11,10 @@ Catálogo de cuánto pesa cada feature en este firmware específico. Útil para 
 | Versión QMK | 0.32.14 (master, 2026-05-17) |
 | Compilador | avr-gcc 8.5.0 (Homebrew, keg-only en `/opt/homebrew/opt/avr-gcc@8/bin`) |
 | LTO | habilitado |
-| Build actual | **28020 / 28672 bytes (97%, 652 libres)** — tras activar NKRO y quitar STARLIGHT + MULTICROSS (2026-05-23) |
-| Build previo | 28498 / 28672 bytes (99%, 174 libres) — con STARLIGHT + MULTICROSS, sin NKRO |
+| Build actual | **28170 / 28672 bytes (98%, 502 libres)** — tras sesión 3 del 2026-05-23 (`SPLIT_LAYER_STATE_ENABLE` reactivado a costo 0 B) |
+| Sesión 2 (mismo día) | 28170 / 28672 bytes (98%, 502 libres) — keymap reorg Tech Lead + MK_KINETIC_SPEED mouse + diagramas `[KEY]` |
+| Sesión 1 (mismo día) | 28020 / 28672 bytes (97%, 652 libres) — NKRO + DEBOUNCE 8, quitando STARLIGHT + MULTICROSS |
+| Build previo (pre-2026-05-23) | 28498 / 28672 bytes (99%, 174 libres) — con STARLIGHT + MULTICROSS, sin NKRO |
 
 ## Cómo leer esta tabla
 
@@ -147,7 +149,7 @@ Con script (futuro, ver propuesta de `scripts/measure-feature.sh` en discusión)
 
 ## Componentes del firmware — descripción y peso
 
-Esta sección describe **qué hace cada componente activo**, su rol en el día a día del teclado, y su costo en flash en el build actual (2026-05-23, `28020 / 28672 B`).
+Esta sección describe **qué hace cada componente activo**, su rol en el día a día del teclado, y su costo en flash en el build actual (2026-05-23 sesión 3, `28170 / 28672 B`).
 
 ### Núcleo QMK (no removible)
 
@@ -211,7 +213,7 @@ Esta sección describe **qué hace cada componente activo**, su rol en el día a
 | Componente | Estado | Peso | Descripción |
 |---|---|---|---|
 | Transport serial (default) | ON | (incluido en core) | Comunicación serial 1-wire entre las dos mitades por el cable TRRS. |
-| `SPLIT_LAYER_STATE_ENABLE` | OFF | ~130 B | Sin esto, el slave no sabe en qué capa está. Quitado porque no se necesita en el slave (sus teclas se envían al master que las traduce). |
+| `SPLIT_LAYER_STATE_ENABLE` | ON (desde 2026-05-23 sesión 3) | **0 B en este contexto** | Sincroniza el `layer_state` del master al slave por TRRS para que el slave sepa qué capa está activa. Reactivado en sesión 3 sin costo flash (LTO comparte código con otras features split presentes). Hoy no se usa visualmente, pero abre futuro: mostrar capa en OLED slave o pintar LEDs slave por capa. |
 | `SPLIT_TRANSPORT_MIRROR` | OFF | ~150 B | Quitado en sesión inicial. |
 | `SPLIT_OLED_ENABLE` | OFF | ~80 B | Quitado: cada OLED renderiza independientemente. |
 | `SPLIT_MODS_ENABLE` | OFF | ~70 B | Quitado: slave no necesita conocer mods. |
@@ -243,19 +245,26 @@ Esta sección describe **qué hace cada componente activo**, su rol en el día a
 
 ```
 Total flash:        28672 bytes
-Usado:              28020 bytes (97.7%)
-Libre:                652 bytes (2.3%)
+Usado:              28170 bytes (98.3%)
+Libre:                502 bytes (1.7%)
 
 Mayor consumidor:   RGB_MATRIX_ENABLE (~3000 B = 10.5% del flash)
 2do consumidor:     OLED_ENABLE + renderers custom (~2200 B = 7.7%)
 3ro consumidor:     MOUSEKEY_ENABLE (~700 B = 2.4%)
-Nuevo costo:        NKRO_ENABLE (368 B = 1.3%)
+Sesión 2026-05-23:  NKRO_ENABLE (368 B = 1.3%) + MK_KINETIC_SPEED (~150 B)
+                    + SPLIT_LAYER_STATE_ENABLE (0 B, LTO compartido)
 ```
 
-Con 652 B libres puedes:
-- Agregar 1 efecto RGB chico tipo `BREATHING` (~50 B) o `RAINBOW_MOVING_CHEVRON` (~150 B)
-- Agregar 1-2 indicadores OLED extra
-- Recuperar `SPLIT_LAYER_STATE_ENABLE` (~130 B)
+Con 502 B libres puedes:
+- Agregar 1 efecto RGB chico tipo `BREATHING` (~50 B)
+- `RAINBOW_MOVING_CHEVRON` (~150 B) ajustado pero entra
+- 1-2 indicadores OLED extra
+
+No caben (sin sacrificar algo):
+- `CHORDAL_HOLD` (~1236 B medido en sesión 3, mucho más que docs típica de QMK)
+- `UNICODE_ENABLE` (~500-1000 B + conflicto con LATAM Input Source en macOS)
+- `WPM_ENABLE` + `STARLIGHT` juntos (~630 B)
+- `VIA_ENABLE` (~2500 B)
 
 No puedes:
 - Reactivar `WPM_ENABLE` + `STARLIGHT` + `MULTICROSS` juntos (sumarían >800 B)
