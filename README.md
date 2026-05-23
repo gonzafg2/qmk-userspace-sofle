@@ -138,15 +138,15 @@ Casillas vacías = transparent (heredan de Base). Encoder izq cambia a brillo, e
 | `VA+` / `VA-` | `RM_VALU` / `RM_VALD` | Brillo +/- (tope a 150 por límite USB) |
 | `SP+` / `SP-` | `RM_SPDU` / `RM_SPDD` | Velocidad animación +/- |
 
-**7 efectos en el ciclo** (`NXT` cicla todos):
+**5 efectos en el ciclo** (`NXT` cicla todos):
 
 1. `RGB_MATRIX_SOLID_COLOR` *(always-on de QMK, no se puede deshabilitar; aparece como `RGB?` en el OLED)* — todo el teclado en un solo color fijo del HUE actual
 2. `RGB_MATRIX_GRADIENT_LEFT_RIGHT` *(default al boot)* — gradient estático rojo→violeta de izq a der
-3. `RGB_MATRIX_STARLIGHT` — LEDs random titilan suavemente como estrellas (ambiental)
-4. `RGB_MATRIX_SOLID_MULTISPLASH` — ondas circulares un solo color (reactivo, sin BG idle)
-5. `RGB_MATRIX_SOLID_REACTIVE_MULTICROSS` — al pulsar, fila + columna se iluminan en cruz (reactivo, sin BG idle)
-6. **`MY_WAVE` (custom)** — ondas un solo color + **fondo idle pulsando (respiración)** del HUE actual
-7. **`MY_RAIN` (custom)** — ondas arcoíris + **fondo idle pulsando (respiración)** del HUE actual
+3. `RGB_MATRIX_SOLID_MULTISPLASH` — ondas circulares un solo color (reactivo, sin BG idle)
+4. **`MY_WAVE` (custom)** — ondas un solo color + **fondo idle pulsando (respiración)** del HUE actual
+5. **`MY_RAIN` (custom)** — ondas arcoíris + **fondo idle pulsando (respiración)** del HUE actual
+
+> **Histórico** — sesión 2026-05-23: removidos `RGB_MATRIX_STARLIGHT` (label `Star`) y `RGB_MATRIX_SOLID_REACTIVE_MULTICROSS` (label `Cros`) para liberar 846 B y habilitar `NKRO_ENABLE` (368 B). Ver [decisions-log.md](./claudedocs/decisions-log.md) para el diagnóstico completo del race condition de dead keys LATAM que motivó el cambio.
 
 Los efectos custom están implementados en [`rgb_matrix_user.inc`](./keyboards/sofle/keymaps/gonzafg2/rgb_matrix_user.inc). El BG idle **late tipo corazón** (lub-dub + pausa) usando una lookup table piecewise de 32 frames × ~32ms = ciclo ~1 segundo (~60 BPM). Pico del lub: 88 (~35%); pico del dub: 70 (~28%); reposo: ~15-20 (~6-8%). El brillo total queda modulado por el VAL global.
 
@@ -242,7 +242,7 @@ RGBv2         fila 7     — identificación del PCB
 [gata pet]    filas 9-12 — gata estática (sentada alerta, 32×32)
 CC AA         fila 13    — Ctrl izq/der + Alt/AltGr (ver abajo)
 SS MM         fila 14    — Shift izq/der + Cmd izq/der (ver abajo)
-Lower / Star  fila 15    — capa actual O efecto RGB (ver abajo)
+Lower / Wave  fila 15    — capa actual O efecto RGB (ver abajo)
 ```
 
 **Filas 13-14 - indicadores de mods con distinción L/R** (codificación posicional fija, 2 filas × 5 chars = 8 mods + 2 separadores):
@@ -282,9 +282,7 @@ Cada posición tiene una letra fija que aparece sólo cuando ese mod específico
 | Label | Efecto |
 |---|---|
 | `Grad` | `RGB_MATRIX_GRADIENT_LEFT_RIGHT` |
-| `Star` | `RGB_MATRIX_STARLIGHT` |
 | `Wave` | `RGB_MATRIX_SOLID_MULTISPLASH` (ondas mono, sin BG idle) |
-| `Cros` | `RGB_MATRIX_SOLID_REACTIVE_MULTICROSS` (cruz fila+columna) |
 | `iWav` | `MY_WAVE` custom (ondas mono **+ BG idle pulsando**) |
 | `iRai` | `MY_RAIN` custom (ondas arcoíris **+ BG idle pulsando**) |
 | `RGB?` | `RGB_MATRIX_SOLID_COLOR` (always-on, sin label propio para ahorrar flash) |
@@ -371,18 +369,44 @@ La app Claude Desktop tiene un atajo global asignado a `\` (abre asistente de ca
 - Desactivar el atajo: Claude Desktop → Settings → Shortcuts
 - O cerrar el asistente cuando aparece: las pulsaciones siguientes de `\` ya van al campo activo
 
+### Tipeo rápido y dead keys (NKRO)
+
+Si al escribir muy rápido en LATAM notabas que **´+vocal no producía la tilde** (ej. tipear "también" rápido salía "tambien" o "tambi´en"), era un race condition entre las dos mitades del split y el modo HID **6KRO** de QMK.
+
+**Causa raíz**: la ´ (`KC_LBRC`) está en la mitad derecha; las vocales en la izquierda (master). Al teclear rápido, el evento de la ´ viaja por TRRS al master, y si llega dentro de la misma ventana de polling USB (~1 ms) que la siguiente vocal, ambos se reportan en un único reporte HID 6KRO sin orden claro. macOS no sabe cuál tecla vino primero y la dead key del layout LATAM no combina, dejando como si no hubieras apretado nada.
+
+**Fix aplicado** (sesión 2026-05-23, ver [decisions-log.md](./claudedocs/decisions-log.md)):
+
+- `NKRO_ENABLE = yes` + `FORCE_NKRO` → cambia el reporte HID de array 6KRO (6 slots, orden ambiguo) a bitmap NKRO (cada cambio = evento atómico ordenado). Costo: **368 B medidos**.
+- `DEBOUNCE 8` (default QMK = 5) → margen extra anti-chatter. Costo: 0 B (es un define numérico).
+
+El firmware arranca siempre en NKRO sin necesidad de hotkey de toggle. Si por alguna razón necesitas volver a 6KRO en una máquina con BIOS antiguo o KVM problemático, hay que recompilar quitando `FORCE_NKRO`.
+
+**Verificación**: tipea palabras con tildes lo más rápido posible — "también", "tenía", "está", "más rápido", "véelo" — y todas las vocales acentuadas deberían salir consistentes.
+
 ## Build
 
 ### Build local (requiere toolchain AVR)
 
 ```bash
-brew install qmk/qmk/qmk
+brew install qmk/qmk/qmk          # instala qmk + avr-gcc@8 como dependencia
 qmk setup
 qmk config user.overlay_dir="$(pwd)"
 qmk compile -kb sofle/rev1 -km gonzafg2
 ```
 
-El `.hex` queda en `~/qmk_firmware/sofle_rev1_gonzafg2.hex`.
+El `.hex` queda en `~/qmk_firmware/sofle_rev1_gonzafg2.hex` y también en la raíz del userspace.
+
+> **⚠️ Gotcha — `avr-gcc` no está en el PATH por default**
+>
+> Homebrew instala `avr-gcc@8` como **keg-only** (no se simbolinkea a `/opt/homebrew/bin`) porque su tap permite tener múltiples versiones coexistiendo. Resultado: `qmk compile` falla con `sh: avr-gcc: command not found` aunque el paquete esté instalado.
+>
+> **Fix persistente** — agregar a `~/.zshrc`:
+> ```bash
+> export PATH="/opt/homebrew/opt/avr-gcc@8/bin:/opt/homebrew/opt/avr-binutils/bin:$PATH"
+> ```
+>
+> **Por qué fijar a la serie 8.x y no actualizar a versiones mayores**: QMK tiene problemas conocidos con `avr-gcc >= 9` (binarios 10-20% más grandes). Con el firmware al 97% del ATmega32U4, `avr-gcc 12+` muy probablemente no cabe. El CI oficial de QMK usa intencionalmente `avr-gcc 8.x`, y este repo documenta `8.5.0` como baseline en [`claudedocs/feature-weights.md`](./claudedocs/feature-weights.md). `brew upgrade avr-gcc@8` para parches dentro de 8.x es seguro.
 
 ### Build CI (recomendado)
 
@@ -410,16 +434,36 @@ Haz push a `main` → GitHub Actions corre `qmk_userspace_build.yml` + `qmk_user
 
 ## Features deshabilitadas (trade-offs AVR)
 
-El ATmega32U4 tiene 28KB usables. Build actual está al **~99%** (muy cerca del límite — el número exacto cambia con cada feature y aparece en el output de `qmk compile`). Para llegar a este balance se sacrificó:
+El ATmega32U4 tiene 28672 bytes usables (`28KB - bootloader Caterina`). Build actual: **28020 / 28672 bytes (97%, 652 libres)** medidos con `avr-gcc 8.5.0` + LTO. Para llegar a este balance se sacrificó:
 
 | Feature | Estado | Por qué se quitó |
 |---|---|---|
 | `VIA_ENABLE` | `no` | ~2.5 KB para Luna pet (sesión 2026-05-21) |
 | `WPM_ENABLE` | `no` | ~500 B para meter `RGB_MATRIX_ENABLE` (sesión 2026-05-22). Luna ya no reacciona a velocidad de tipeo, cicla por timer fijo |
 | `SPLIT_LAYER_STATE_ENABLE` | `no` | ~130 B para meter STARLIGHT como 5to efecto RGB. Sin impacto visible (slave no muestra capa por OLED ni RGB indicators) |
+| `ENABLE_RGB_MATRIX_STARLIGHT` (`Star`) | quitado 2026-05-23 | Liberar espacio para `NKRO_ENABLE` (368 B). Ver gotcha de tipeo rápido / dead keys arriba |
+| `ENABLE_RGB_MATRIX_SOLID_REACTIVE_MULTICROSS` (`Cros`) | quitado 2026-05-23 | Mismo motivo. Quitar **STARLIGHT + MULTICROSS + 2 cases OLED juntos** liberó **846 B medidos** — mucho más que la suma individual estimada (~320 B), porque LTO produce dividendos no-lineales cuando se eliminan varios efectos a la vez |
 | `SPLIT_TRANSPORT_MIRROR`, `SPLIT_OLED_ENABLE`, `SPLIT_MODS_ENABLE`, `SPLIT_LED_STATE_ENABLE` | `no` | Build excedía 28KB en sesión inicial |
 
-**Para revertir algún sacrificio**: hay que liberar el equivalente quitando otra feature. Las opciones más pesadas que aún siguen activas son `MOUSEKEY_ENABLE` (~700 B) y `RGB_MATRIX_ENABLE` (~3 KB).
+**Features activadas significativas (con peso medido en este build):**
+
+| Feature | Estado | Peso | Notas |
+|---|---|---|---|
+| `RGB_MATRIX_ENABLE` + ws2812 + 5 efectos | `yes` | ~3000 B | El mayor consumidor del firmware |
+| `OLED_ENABLE` + renderers custom | `yes` | ~2200 B | Logo GFG, capa, mods L/R, gata, Luna pet, indicador RGB |
+| `MOUSEKEY_ENABLE` | `yes` | ~700 B | Necesario para la capa `_MOUSE` |
+| `NKRO_ENABLE` + `FORCE_NKRO` | `yes` | **368 B** | Activado 2026-05-23 para resolver race condition de dead keys LATAM en split |
+| `CAPS_WORD_ENABLE` | `yes` | ~250 B | Doble-tap Shift para CAPS WORD |
+| `ENCODER_MAP_ENABLE` | `yes` | ~180 B | Encoder por capa declarativo |
+
+**Para revertir algún sacrificio**: hay que liberar el equivalente quitando otra feature. Las opciones más pesadas activas son `RGB_MATRIX_ENABLE` (~3 KB) y `OLED_ENABLE` (~2.2 KB). Con los 652 B libres actuales puedes:
+
+- ✅ Agregar 1 efecto RGB chico tipo `BREATHING` (~50 B) o `RAINBOW_MOVING_CHEVRON` (~150 B)
+- ✅ Recuperar `SPLIT_LAYER_STATE_ENABLE` (~130 B)
+- ❌ Reactivar `WPM_ENABLE` + `STARLIGHT` + `MULTICROSS` juntos (sumarían >800 B)
+- ❌ Habilitar `VIA_ENABLE` (~2500 B, no cabe sin sacrificar RGB o OLED)
+
+Catálogo completo de pesos medidos por feature en [`claudedocs/feature-weights.md`](./claudedocs/feature-weights.md), con descripción detallada de cada componente del firmware activo.
 
 ## Diferencias vs Corne (ZMK)
 

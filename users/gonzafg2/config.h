@@ -5,6 +5,9 @@
 #define PERMISSIVE_HOLD
 #define HOLD_ON_OTHER_KEY_PRESS
 
+#define FORCE_NKRO
+#define DEBOUNCE 8
+
 #define COMBO_TERM 50
 #define COMBO_MUST_HOLD_PER_COMBO
 

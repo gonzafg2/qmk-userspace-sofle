@@ -79,6 +79,26 @@ Después del primer build de RGB_MATRIX, varias features adicionales sumaron al 
 
 **Tamaño final del PR**: ~99% (10 bytes libres en el último compile). Para nuevas features se requiere sacrificar algo existente.
 
+## Sesión 2026-05-23 — fix dead-key intermitente en LATAM (NKRO)
+
+**Síntoma**: al escribir rápido en macOS LATAM, la tecla ´ "no hacía nada" y había que repetirla para que ´+vocal combinara en á/é/í/ó/ú. Intermitente, más frecuente al inicio de uso del Mac.
+
+**Diagnóstico** (ver [decisions-log.md](./decisions-log.md)): race condition entre las dos mitades del split + modo HID 6KRO. Los eventos del slave (donde está ´) llegan al USB tan cerca de los del master (vocales) que macOS no puede determinar cuál vino primero, rompiendo el dead key.
+
+**Cambios aplicados**:
+1. `users/gonzafg2/config.h`: + `FORCE_NKRO`, + `DEBOUNCE 8`
+2. `users/gonzafg2/rules.mk`: + `NKRO_ENABLE = yes`
+3. `keyboards/sofle/keymaps/gonzafg2/config.h`: – `ENABLE_RGB_MATRIX_STARLIGHT`, – `ENABLE_RGB_MATRIX_SOLID_REACTIVE_MULTICROSS`
+4. `keyboards/sofle/keymaps/gonzafg2/keymap.c`: – 2 cases del switch OLED (`Star`, `Cros`)
+5. `~/dotfiles/zsh/.zshrc`: + bloque PATH para `avr-gcc@8` (keg-only en Homebrew, hasta hoy nunca había compilado local — todo era CI)
+
+**Medición de pesos** (✅ compilado local con avr-gcc 8.5.0):
+- NKRO_ENABLE: **368 B medidos** (27652 → 28020)
+- STARLIGHT + MULTICROSS + 2 cases OLED (combinado): **846 B liberados** — mucho más que la suma individual estimada (~320 B), confirmando que LTO produce dividendos no-lineales al quitar varios efectos juntos
+- Tamaño final: **28020 / 28672 bytes (97%, 652 libres)**
+
+**Validación pendiente**: probar físicamente tras flashear que ´+vocal funciona consistente al escribir rápido.
+
 ## Trade-offs aceptados
 
 | Decisión | Por qué | Reversible |
@@ -89,6 +109,7 @@ Después del primer build de RGB_MATRIX, varias features adicionales sumaron al 
 | SPLIT_LAYER_STATE_ENABLE removido | Para meter STARLIGHT como 5to efecto. Slave no necesita saber capa porque no muestra OLED de capa ni RGB indicators per-capa | Sí, si se agregan indicadores RGB de capa en el slave |
 | SPLIT_* otras features quitadas | Firmware excedía 28KB de ATmega32U4 | Sí, si liberamos espacio |
 | VIA con custom keycodes hex | VIA mainline no conoce los `GFG_*` | Sí, generando vial.json |
+| STARLIGHT + MULTICROSS removidos (2026-05-23) | Liberar 846 B para meter NKRO (368 B) y resolver dead-key intermitente en LATAM. Set RGB final shipped: `Grad`, `Wave`, `iWav`, `iRai` (4 efectos vs 6 previos) | Sí, requiere desactivar NKRO o sacrificar otra cosa |
 
 ## Convenciones de pulgar (importante para próximas iteraciones)
 

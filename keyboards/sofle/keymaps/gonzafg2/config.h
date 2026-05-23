@@ -19,9 +19,8 @@
 #define RGB_MATRIX_DEFAULT_MODE RGB_MATRIX_GRADIENT_LEFT_RIGHT
 
 #define ENABLE_RGB_MATRIX_GRADIENT_LEFT_RIGHT
-#define ENABLE_RGB_MATRIX_STARLIGHT
 #define ENABLE_RGB_MATRIX_SOLID_MULTISPLASH
-#define ENABLE_RGB_MATRIX_SOLID_REACTIVE_MULTICROSS
+// STARLIGHT y SOLID_REACTIVE_MULTICROSS removidos: liberar ~280 B para NKRO.
 // Removidos por espacio para meter el BG pulsando:
 // - CYCLE_LEFT_RIGHT: ambiental, sustituible por la pulsacion del BG idle.
 // - MULTISPLASH: MY_RAIN custom (iRai) lo reemplaza con BG idle pulsando.

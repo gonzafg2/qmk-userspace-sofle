@@ -9,9 +9,10 @@ Catálogo de cuánto pesa cada feature en este firmware específico. Útil para 
 | Target QMK | `sofle/rev1` (ATmega32U4) |
 | Flash usable | 28672 bytes (28KB - bootloader Caterina) |
 | Versión QMK | 0.32.14 (master, 2026-05-17) |
-| Compilador | avr-gcc 8.5.0 (Homebrew) |
+| Compilador | avr-gcc 8.5.0 (Homebrew, keg-only en `/opt/homebrew/opt/avr-gcc@8/bin`) |
 | LTO | habilitado |
-| Build actual | 28498 / 28672 bytes (99%, 174 libres) |
+| Build actual | **28020 / 28672 bytes (97%, 652 libres)** — tras activar NKRO y quitar STARLIGHT + MULTICROSS (2026-05-23) |
+| Build previo | 28498 / 28672 bytes (99%, 174 libres) — con STARLIGHT + MULTICROSS, sin NKRO |
 
 ## Cómo leer esta tabla
 
@@ -37,6 +38,7 @@ Los pesos **incluyen** interacciones con el resto del config actual. Cambiar el 
 | `SPLIT_LED_STATE_ENABLE` | OFF | ~50 B | 🟡 | Para sincronizar Caps Lock LED etc. |
 | `ENCODER_MAP_ENABLE` | ON | ~180 B | 🟡 | Modo declarativo de encoders por capa. |
 | `LTO_ENABLE` | ON | ahorra ~10-15% | 🟡 | Link-time optimization. NUNCA quitar. |
+| `NKRO_ENABLE` | ON | **368 B** | 🟢 | Medido 2026-05-23: 27652 → 28020 al activarlo. Cambia HID report a bitmap (~32 B/reporte) en vez de array 6KRO (8 B). Soluciona race condition de eventos solapados en split que rompía dead keys de macOS LATAM. |
 
 ## Efectos RGB Matrix (incrementales sobre `RGB_MATRIX_ENABLE`)
 
@@ -45,7 +47,7 @@ Cada `ENABLE_RGB_MATRIX_*` agrega ~50-500 B según la complejidad del efecto. Co
 | Efecto | Peso aprox | Confianza | Notas |
 |---|---|---|---|
 | `TYPING_HEATMAP` | **~500 B** | 🟢 | El más pesado encontrado. Usa difusión térmica + paleta runtime + decay por LED. Quitarlo liberó ~500 B en esta sesión. |
-| `SOLID_REACTIVE_MULTICROSS` | ~150 B | 🟡 | **Activado** actualmente (label `Cros`). |
+| `SOLID_REACTIVE_MULTICROSS` | ~150 B individual / **~458 B combinado** | 🟢 | **Quitado** 2026-05-23 junto con STARLIGHT para meter NKRO. La medición combinada (846 B liberados al quitar ambos + 2 cases OLED) demuestra que LTO produce dividendos no-lineales cuando se quitan varios efectos juntos. |
 | `SOLID_MULTISPLASH` | ~130 B | 🟡 | **Activado** actualmente (label `Wave`). Quitarlo paradojicamente sube el binario por dependencias LTO compartidas con el runner de MY_WAVE custom. |
 | `MULTISPLASH` | **~88 B** | 🟢 | Medido al agregarlo, luego **quitado**: MY_RAIN (iRai) lo reemplaza con BG idle pulsando. |
 | `MY_WAVE` + `MY_RAIN` (custom, BG idle + drops) | **~406 B** | 🟢 | **Activados** actualmente (labels `iWav`, `iRai`). 2 math funcs + 1 runner shared + 2 entries en `rgb_matrix_user.inc` + cases en OLED switch. |
@@ -54,7 +56,7 @@ Cada `ENABLE_RGB_MATRIX_*` agrega ~50-500 B según la complejidad del efecto. Co
 | `CYCLE_LEFT_RIGHT` | **~134 B** | 🟢 | **Quitado**: ambiental sustituible por el propio pulso del BG idle. Liberó espacio crítico para el breathing del BG. |
 | `TYPING_HEATMAP` | **~500 B** | 🟢 | **Quitado**: el más pesado del set inicial, liberado al cambiar a MULTISPLASH/MULTICROSS. |
 | `SOLID_REACTIVE_SIMPLE` | ~50 B | 🟡 | **Quitado** al cambiar a MULTISPLASH/MULTICROSS. |
-| `STARLIGHT` | ~130 B | 🟢 | **Activado** actualmente (label `Star`). |
+| `STARLIGHT` | ~130 B individual / **~388 B combinado** | 🟢 | **Quitado** 2026-05-23 junto con MULTICROSS para meter NKRO. Ver nota de medición combinada en MULTICROSS. |
 | `BREATHING` | ~50 B | 🟢 | Medido cuando estaba activado al inicio del PR; ahora **no está**. |
 | `GRADIENT_LEFT_RIGHT` | ~25 B | 🟡 | **Activado** actualmente (default al boot, label `Grad`). |
 | `SOLID_COLOR` | 0 B (always-on) | 🟢 | Always-on de QMK, no requiere ENABLE_*. Aparece en el ciclo como `RGB?` en el OLED. |
@@ -139,3 +141,122 @@ Con script (futuro, ver propuesta de `scripts/measure-feature.sh` en discusión)
 - Al activar/desactivar efectos RGB → anotar costo individual
 - Al hacer upgrade de QMK upstream → re-medir las features críticas (`RGB_MATRIX_ENABLE`, `OLED_ENABLE`, `VIA_ENABLE`)
 - Al cambiar avr-gcc (improbable, pero si pasa)
+
+---
+
+## Componentes del firmware — descripción y peso
+
+Esta sección describe **qué hace cada componente activo**, su rol en el día a día del teclado, y su costo en flash en el build actual (2026-05-23, `28020 / 28672 B`).
+
+### Núcleo QMK (no removible)
+
+| Componente | Peso aprox | Descripción |
+|---|---|---|
+| Bootloader Caterina | (fuera del flash usable, 4 KB) | Permite entrar a modo flash con doble-tap del botón reset en el Pro Micro. No se toca desde el firmware. |
+| TMK/QMK core + LUFA USB stack | ~10 KB | Maquinaria base: matriz de teclas → keycodes → reportes HID → USB. |
+| Matrix scan + debounce | (incluido en core) | Lee la matriz GPIO cada ~1 ms. `DEBOUNCE 8` significa que un cambio debe mantenerse estable 8 ms antes de registrarse. |
+
+### Comunicación USB / HID
+
+| Componente | Estado | Peso | Descripción |
+|---|---|---|---|
+| `NKRO_ENABLE` + `FORCE_NKRO` | ON | **368 B** 🟢 | Cambia el formato HID de **6KRO** (8 bytes con array de 6 slots) a **NKRO** (bitmap de ~32 bytes que permite ~240 teclas simultáneas). En tu Sofle resuelve el síntoma de "presiono ´+vocal rápido y no sale la tilde" — al ser split, los eventos viajan por serial entre mitades y en 6KRO pueden llegar al Mac dentro de la misma ventana de polling USB sin orden claro, rompiendo la dead key del layout LATAM. NKRO envía cada cambio como evento atómico ordenado. `FORCE_NKRO` asegura que arranque siempre en NKRO sin necesidad de hotkey. |
+| `EXTRAKEY_ENABLE` | ON | (no medido individual) | Habilita teclas de sistema y consumer (volumen, media play/pause, brillo). Sin esto, encoder push de Mute/Play no funciona. |
+
+### Iluminación RGB
+
+| Componente | Estado | Peso | Descripción |
+|---|---|---|---|
+| `RGB_MATRIX_ENABLE` + driver ws2812 | ON | ~3000 B | Framework completo de RGB Matrix para 72 LEDs SK6812 MINI (36 por mitad). Permite efectos animados, brillo, color, modo reactivo a teclas. |
+| `RGB_MATRIX_GRADIENT_LEFT_RIGHT` (label `Grad`) | ON | ~25 B | Default al boot. Gradiente horizontal estático. Bajo costo, ambiental. |
+| `RGB_MATRIX_SOLID_MULTISPLASH` (label `Wave`) | ON | ~130 B | Splashes reactivos a teclas presionadas. **Mantenido pese a poder quitarlo**: comparte código LTO con el runner de `MY_WAVE` custom; quitarlo paradójicamente sube el binario. |
+| `MY_WAVE` custom (label `iWav`) | ON | ~200 B (parte del bundle de 406 B) | Efecto propio: fondo idle con respiración tipo heartbeat (lub-dub-pausa) + drops reactivos al teclear. |
+| `MY_RAIN` custom (label `iRai`) | ON | ~200 B (parte del bundle) | Variante de `MY_WAVE` con paleta tipo lluvia. Comparte runner con MY_WAVE. |
+| Heartbeat LUT (32 frames PROGMEM) | ON | **84 B** 🟢 | Tabla precalculada del pulso BG, leída con `pgm_read_byte`. Más liviano que `sin8 + scale8` calculado en runtime. |
+
+### OLED dual
+
+| Componente | Estado | Peso | Descripción |
+|---|---|---|---|
+| `OLED_ENABLE` + driver ssd1306 | ON | ~1850 B | Framework para los 2 OLEDs SSD1306 (uno por mitad). |
+| `render_logo` (master, GFG 32×32) | ON | ~150 B + 128 B PROGMEM | Logo arriba en el OLED master. |
+| `render_layer_state` (master, capa + modo RGB) | ON | ~300 B + ~50 B strings | Muestra nombre de capa activa (Base/Lower/Raise/Adjust/Mouse) y código de efecto RGB cuando se cambia (indicador efímero 2s). |
+| `render_mod_status` (master, mods L/R) | ON | ~120 B | Indica qué mods (Shift/Ctrl/Alt/GUI) están activos, por lado. |
+| Logo slave + texto "Eres un Crack" | ON | ~100 B + 128 B PROGMEM | OLED de la mitad derecha. |
+| `render_luna` (slave, pet animado walk loop) | ON | ~150 B + 640 B PROGMEM | Mascota Luna corriendo en loop fijo en el OLED slave. |
+
+### Encoders
+
+| Componente | Estado | Peso | Descripción |
+|---|---|---|---|
+| `ENCODER_ENABLE` + `ENCODER_MAP_ENABLE` | ON | ~180 B | Permite definir qué hace cada encoder por capa de forma declarativa (`encoder_map[]`). En Base: izq = volumen, der = scroll. En Lower/Raise: navegación de palabras/desktops/brillo. |
+
+### Procesamiento de teclas
+
+| Componente | Estado | Peso | Descripción |
+|---|---|---|---|
+| `MOUSEKEY_ENABLE` | ON | ~700 B | Permite usar el teclado como ratón (capa `_MOUSE`). Movimiento, click, scroll, todo desde teclas. |
+| `CAPS_WORD_ENABLE` | ON | ~250 B | Doble-tap LShift activa CAPS WORD: solo la próxima palabra va en mayúsculas. Termina al espacio o tras 5 s sin teclear. |
+| Mod-morph `GFG_BSDL` (BS / Shift+BS = Del) | ON | ~30 B | Hecho a mano en `process_record_user`, más liviano que un keycode `MT()` o `tap_dance`. |
+| Custom keycodes `GFG_*` (operadores, macros macOS) | ON | ~400 B aprox | ~15 keycodes con `SEND_STRING(...)`: `=>`, `&&`, `||`, `==`, `!==`, `===`, `+=`, `-=`, screenshots, lock, force quit. |
+| `LT()` / `MT()` hold-tap | ON | (incluido en core) | LWR/RSE thumb keys con hold = capa, tap = enter/space. `TAPPING_TERM 200`, `QUICK_TAP_TERM 150`, `PERMISSIVE_HOLD`, `HOLD_ON_OTHER_KEY_PRESS`. |
+| `TAP_DANCE_ENABLE` | OFF | (libera ~400 B si OFF) | No se usa. |
+| `COMBO_ENABLE` | OFF | (libera ~500 B si OFF) | No se usa (los combos quedaron descartados después de la sesión inicial). |
+| `VIA_ENABLE` | OFF | (libera ~2500 B) | No se usa, demasiado pesado para AVR + RGB Matrix. |
+| `WPM_ENABLE` | OFF | (libera ~500 B) | Se quitó para liberar espacio. Luna ya no muestra WPM. |
+
+### Split (comunicación master ↔ slave)
+
+| Componente | Estado | Peso | Descripción |
+|---|---|---|---|
+| Transport serial (default) | ON | (incluido en core) | Comunicación serial 1-wire entre las dos mitades por el cable TRRS. |
+| `SPLIT_LAYER_STATE_ENABLE` | OFF | ~130 B | Sin esto, el slave no sabe en qué capa está. Quitado porque no se necesita en el slave (sus teclas se envían al master que las traduce). |
+| `SPLIT_TRANSPORT_MIRROR` | OFF | ~150 B | Quitado en sesión inicial. |
+| `SPLIT_OLED_ENABLE` | OFF | ~80 B | Quitado: cada OLED renderiza independientemente. |
+| `SPLIT_MODS_ENABLE` | OFF | ~70 B | Quitado: slave no necesita conocer mods. |
+| `SPLIT_LED_STATE_ENABLE` | OFF | ~50 B | Quitado: no hay Caps Lock LED físico. |
+
+### Configuración (defines en `config.h`, peso ~0)
+
+| Define | Valor | Descripción |
+|---|---|---|
+| `TAPPING_TERM` | 200 ms | Tiempo máximo que una hold-tap (`LT`, `MT`) considera "tap". Más allá es "hold". |
+| `QUICK_TAP_TERM` | 150 ms | Si pulsas la misma hold-tap dos veces dentro de este tiempo, la 2da se interpreta como tap normal (no como hold). Útil para escribir "ll" o repetir letras rápido sin disparar capa. |
+| `PERMISSIVE_HOLD` | (flag) | Cualquier otra tecla apretada-y-soltada **dentro** de una hold-tap dispara el hold inmediatamente. Mejora la sensación de capas rápidas. |
+| `HOLD_ON_OTHER_KEY_PRESS` | (flag) | Más agresivo: ni siquiera espera que se suelte la otra tecla. Junto con PERMISSIVE_HOLD da capas casi instantáneas. |
+| `DEBOUNCE` | 8 ms | Tiempo de estabilidad para confirmar un cambio de switch. Default QMK = 5 ms; subido a 8 ms el 2026-05-23 para margen anti-chatter sin latencia perceptible. |
+| `FORCE_NKRO` | (flag) | Arranca siempre en NKRO. Sin esto, NKRO_ENABLE = yes hace que arranque en 6KRO y requiere keycode `NK_TOGG` para cambiar. |
+| `COMBO_TERM` | 50 ms | (Ya no aplica porque COMBO_ENABLE = no, pero se mantiene el define por si se reactiva.) |
+| `CAPS_WORD_IDLE_TIMEOUT` | 5000 ms | CAPS WORD se desactiva sola tras 5 s sin teclear. |
+| `USB_SUSPEND_WAKEUP_DELAY` | 0 ms | Sin delay al despertar de suspensión USB. Útil tras dormir el Mac. |
+| `OLED_TIMEOUT` | 60000 ms | OLEDs se apagan tras 1 min sin actividad. Quemado-de-pantalla preventivo. |
+| `OLED_BRIGHTNESS` | 128 | Brillo medio de los OLEDs (0-255). |
+| `DYNAMIC_KEYMAP_LAYER_COUNT` | 5 | Sobrescribe el default QMK (4) porque tenemos 5 capas. |
+| `DOUBLE_TAP_SHIFT_TURNS_ON_CAPS_WORD` | (flag) | Doble-tap LShift activa CAPS WORD (en vez del default Caps Lock). |
+| `RGB_MATRIX_MAXIMUM_BRIGHTNESS` | 150 | Tope de brillo RGB. Limita consumo USB (5V × ~1 A si todos los 72 LEDs estuvieran en blanco al 100%). |
+| `RGB_MATRIX_DEFAULT_VAL` | 100 | Brillo al boot. |
+| `RGB_MATRIX_DEFAULT_MODE` | `GRADIENT_LEFT_RIGHT` | Efecto al boot. |
+| `MASTER_LEFT` | (flag) | La mitad izquierda es el master (la que se conecta al USB). |
+
+### Resumen del balance actual
+
+```
+Total flash:        28672 bytes
+Usado:              28020 bytes (97.7%)
+Libre:                652 bytes (2.3%)
+
+Mayor consumidor:   RGB_MATRIX_ENABLE (~3000 B = 10.5% del flash)
+2do consumidor:     OLED_ENABLE + renderers custom (~2200 B = 7.7%)
+3ro consumidor:     MOUSEKEY_ENABLE (~700 B = 2.4%)
+Nuevo costo:        NKRO_ENABLE (368 B = 1.3%)
+```
+
+Con 652 B libres puedes:
+- Agregar 1 efecto RGB chico tipo `BREATHING` (~50 B) o `RAINBOW_MOVING_CHEVRON` (~150 B)
+- Agregar 1-2 indicadores OLED extra
+- Recuperar `SPLIT_LAYER_STATE_ENABLE` (~130 B)
+
+No puedes:
+- Reactivar `WPM_ENABLE` + `STARLIGHT` + `MULTICROSS` juntos (sumarían >800 B)
+- Habilitar `VIA_ENABLE` (~2500 B, no cabe)
+- Habilitar `TAP_DANCE_ENABLE` (~400 B, cabe pero deja muy poco margen)

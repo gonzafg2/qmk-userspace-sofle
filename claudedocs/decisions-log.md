@@ -241,6 +241,38 @@ Tras los fixes de Copilot y nuevas features pedidas por el usuario, el OLED mast
 
 **Reversible**: sí. Si en el futuro se prefiere recuperar WPM reactivo, volver a `WPM_ENABLE = yes`, restaurar `render_luna()` original y deshabilitar `RGB_MATRIX_ENABLE` (o cambiar a `RGBLIGHT_ENABLE` que es más liviano y permite mantener WPM).
 
+## 2026-05-23 · Activar NKRO + `DEBOUNCE 8` para resolver dead-key intermitente en LATAM
+
+**Decisión**: activar `NKRO_ENABLE = yes` + `FORCE_NKRO` en config, subir `DEBOUNCE` de 5 ms (default) a 8 ms. Para hacer espacio en flash, quitar los efectos RGB `STARLIGHT` y `SOLID_REACTIVE_MULTICROSS` (junto con sus cases en el switch OLED).
+
+**Síntoma reportado**: al escribir rápido en LATAM (macOS), la tecla ´ (KC_LBRC) "no hace nada" y hay que repetirla para que la combinación ´+vocal produzca á/é/í/ó/ú. Intermitente, más frecuente al inicio de uso del Mac o tipeo rápido.
+
+**Diagnóstico**:
+- Verificado que `KC_LBRC` es keycode puro sin `LT()`/`MT()` ni combos → no es interferencia del firmware
+- Verificado que NO había chatter (la tecla siempre registra cuando se prueba aislada)
+- Causa raíz: **race condition entre las dos mitades del split + modo HID 6KRO de QMK**. La ´ está en la mitad derecha (slave), las vocales en la izquierda (master). El evento de ´ viaja por serial (~1-3 ms de lag) y, al escribir rápido, llega al master tan cerca del evento de la vocal que ambos se reportan en la misma ventana de polling USB (1 ms). En 6KRO el reporte HID es un array de 6 slots con orden ambiguo. macOS no puede saber qué tecla vino primero y la dead key del layout LATAM no combina.
+
+**Por qué NKRO lo arregla**: cambia el reporte HID a un bitmap individual por tecla. Cada cambio se manda como evento atómico ordenado. Ya no hay ambigüedad de orden dentro de un mismo reporte.
+
+**Por qué `DEBOUNCE 8` (no es la causa principal pero ayuda)**: subir de 5 a 8 ms agrega margen anti-chatter sin latencia perceptible al humano (8 ms < 1 frame a 60 fps). Costo en flash = 0 (es un define numérico).
+
+**Costo en flash**: NKRO pesó **368 B medidos** (27652 → 28020). Antes del cambio el firmware estaba a 28498/28672 (174 libres) → no cabía. Se liberaron 846 B quitando STARLIGHT + MULTICROSS + sus cases OLED (medición conjunta; LTO produce dividendos no-lineales al quitar varios efectos juntos). Resultado final: **28020/28672 (652 libres)**.
+
+**Por qué `STARLIGHT` y `MULTICROSS` y no otros**:
+- `STARLIGHT` (label `Star`): efecto ambiental decorativo, no único — el gradient + custom MY_WAVE/MY_RAIN cubren el rol estético
+- `SOLID_REACTIVE_MULTICROSS` (label `Cros`): efecto reactivo, pero el custom MY_RAIN ya provee reactividad con personalidad propia
+- `SOLID_MULTISPLASH` (label `Wave`) **no se quitó** porque su código se comparte por LTO con el runner de MY_WAVE custom — quitarlo paradójicamente sube el binario (medido en sesión anterior)
+
+**Por qué `FORCE_NKRO` y no `NKRO_ENABLE` solo**: `NKRO_ENABLE = yes` deja el binario con soporte para ambos modos pero arranca en 6KRO; requiere keycode `NK_TOGG` para cambiar. `FORCE_NKRO` asegura que arranque siempre en NKRO. El user pidió no incluir hotkey de toggle.
+
+**Reversible**: sí. Si NKRO causara problemas en algún BIOS antiguo o KVM (improbable en macOS):
+1. Quitar `FORCE_NKRO` y `NKRO_ENABLE = yes` → vuelve a 6KRO
+2. Re-activar `ENABLE_RGB_MATRIX_STARLIGHT` y `ENABLE_RGB_MATRIX_SOLID_REACTIVE_MULTICROSS`
+3. Restaurar los 2 cases en el switch OLED (`Star`, `Cros`)
+4. Bajar `DEBOUNCE` a 5 (o quitar el define)
+
+**Validación pendiente**: probar físicamente después de flashear que ´+vocal funciona consistente al escribir rápido. Tipear palabras como "también", "tenía", "está", "más rápido" y verificar que no se pierden vocales.
+
 ## Decisiones pendientes (sin resolver)
 
 Ver [thumb-cluster-iteration.md](./thumb-cluster-iteration.md):
