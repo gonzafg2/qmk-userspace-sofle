@@ -12,7 +12,7 @@ RGB_MATRIX_EFFECT(MY_RAIN)
 
 #ifdef RGB_MATRIX_CUSTOM_EFFECT_IMPLS
 
-#    define BG_VALUE 30 // 30/255 = ~12% de brillo idle. Subir/bajar a gusto.
+#    define BG_VALUE 50 // 50/255 = ~20% de brillo idle. Subir/bajar a gusto.
 
 // Math para un solo color (igual que SOLID_SPLASH_math)
 static hsv_t my_wave_math(hsv_t hsv, int16_t dx, int16_t dy, uint8_t dist, uint16_t tick) {

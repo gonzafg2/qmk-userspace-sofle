@@ -150,7 +150,7 @@ Casillas vacías = transparent (heredan de Base). Encoder izq cambia a brillo, e
 8. **`MY_WAVE` (custom)** — ondas un solo color + **fondo idle tenue** del HUE actual
 9. **`MY_RAIN` (custom)** — ondas arcoíris + **fondo idle tenue** del HUE actual
 
-Los efectos custom (8-9) están implementados en [`rgb_matrix_user.inc`](./keyboards/sofle/keymaps/gonzafg2/rgb_matrix_user.inc) y usan `BG_VALUE = 30` (~12% de brillo idle, modulado por VAL global).
+Los efectos custom (8-9) están implementados en [`rgb_matrix_user.inc`](./keyboards/sofle/keymaps/gonzafg2/rgb_matrix_user.inc) y usan `BG_VALUE = 50` (~20% de brillo idle, modulado por VAL global).
 
 **Pre-requisito físico**: jumper `Light Sel` del PCB debe estar en `UND` o `BL&UND` para alimentar los SK6812.
 
