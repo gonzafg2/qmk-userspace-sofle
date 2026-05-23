@@ -36,7 +36,7 @@ Hermano del repo [zmk-config-corne](https://github.com/gonzafg2/zmk-config-corne
     │ LOWER │    │ RAISE │    │ ADJUST│    │ MOUSE │    │ MOUSE │
     │  (1)  │    │  (2)  │    │  (3)  │    │  (4)  │    │  (4)  │
     └───────┘    └───────┘    └───────┘    └───────┘    └───────┘
-                                  ▲ tambien: hold ESC pinky der
+                                  ▲ también: hold ESC pinky der
 ```
 
 | Capa | # | Activación | Tipo |
@@ -138,7 +138,10 @@ Estas dos posiciones eran las únicas realmente libres en el thumb cluster (en B
 | `SPOT` | `LGUI(KC_SPC)` | Spotlight (Cmd+Space, cómodo en home row der) |
 | `EMJI` | `LGUI(LCTL(KC_SPC))` | Emoji & Symbol picker (Cmd+Ctrl+Space) — fila 3 col 11 al lado de SPOT |
 
-> **Tip — cambio de Spaces se siente lento**: macOS anima el cambio de Space ~300 ms y el foco llega después. Si el problema es "cambias de Space y empiezas a tipear en el anterior", **activa Reduce Motion** en `System Settings → Accessibility → Display → Reduce Motion`. Acelera la animación dramáticamente. No es problema del firmware.
+> **Tip — cambio de Spaces se siente lento**: macOS anima el cambio de Space ~300 ms y el foco llega después. Si el problema es "cambias de Space y empiezas a tipear en el anterior", **no es del firmware** — es animación del OS. Hay dos formas de mitigarlo, con trade-off:
+>
+> - **Opción A — `Reduce Motion` ON** (search "reduce motion" en System Settings; en versiones recientes está en Accessibility → Motion o Display según release). Acelera dramáticamente el cambio de Space. **Trade-off**: estatiza también las animaciones del Liquid Glass (los widgets siguen translúcidos pero sin la refracción animada que les da el efecto "vivo"). Si te molesta visualmente, usa la Opción B.
+> - **Opción B — Hack del Dock**: `defaults write com.apple.dock expose-animation-duration -float 0.05; killall Dock`. Acelera solo la animación de Mission Control / Spaces sin tocar Liquid Glass. **Trade-off**: en macOS reciente (Sequoia 15+ / Tahoe 26+) `killall Dock` puede no ser suficiente — quizás requiera **logout completo** (`osascript -e 'tell app "System Events" to log out'`) para que WindowServer recoja el cambio. Y aún así, en algunas versiones este setting ya no afecta al Space switching por keyboard shortcut. Si confirmás que no aplica, queda la Opción A.
 
 **Neovim / IDE shortcut:**
 
