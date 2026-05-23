@@ -173,10 +173,14 @@ Mute + Play es más coherente con la rotación del encoder (que ya controla volu
 
 #define ENABLE_RGB_MATRIX_GRADIENT_LEFT_RIGHT
 #define ENABLE_RGB_MATRIX_STARLIGHT
-#define ENABLE_RGB_MATRIX_CYCLE_LEFT_RIGHT
-#define ENABLE_RGB_MATRIX_TYPING_HEATMAP
-#define ENABLE_RGB_MATRIX_SOLID_REACTIVE_SIMPLE
+#define ENABLE_RGB_MATRIX_SOLID_MULTISPLASH
+#define ENABLE_RGB_MATRIX_SOLID_REACTIVE_MULTICROSS
+
+// Efectos custom propios en rgb_matrix_user.inc con BG idle heartbeat
+#define RGB_MATRIX_CUSTOM_USER
 ```
+
+⚠️ La lista de `#define ENABLE_*` original (que incluía `CYCLE_LEFT_RIGHT`, `TYPING_HEATMAP`, `SOLID_REACTIVE_SIMPLE`) fue iterada varias veces durante el desarrollo del PR. Lo de arriba refleja el **estado final shipped**, no la primera versión activada. Ver "Iteraciones post-PR original" más abajo y `feature-weights.md` para el historial completo.
 
 **Keycodes en `_ADJUST`** (mano izquierda): se usan los nombres modernos `RM_*`, NO los legacy `RGB_*` (esos son solo para `RGBLIGHT_ENABLE`).
 

@@ -11,7 +11,7 @@ Catálogo de cuánto pesa cada feature en este firmware específico. Útil para 
 | Versión QMK | 0.32.14 (master, 2026-05-17) |
 | Compilador | avr-gcc 8.5.0 (Homebrew) |
 | LTO | habilitado |
-| Build actual | 28120 / 28672 bytes (98%, 552 libres) |
+| Build actual | 28498 / 28672 bytes (99%, 174 libres) |
 
 ## Cómo leer esta tabla
 
@@ -45,19 +45,19 @@ Cada `ENABLE_RGB_MATRIX_*` agrega ~50-500 B según la complejidad del efecto. Co
 | Efecto | Peso aprox | Confianza | Notas |
 |---|---|---|---|
 | `TYPING_HEATMAP` | **~500 B** | 🟢 | El más pesado encontrado. Usa difusión térmica + paleta runtime + decay por LED. Quitarlo liberó ~500 B en esta sesión. |
-| `SOLID_REACTIVE_MULTICROSS` | ~150 B | 🟡 | Activado actualmente (label `Cros`). |
-| `SOLID_MULTISPLASH` | ~130 B | 🟡 | Activado actualmente (label `Wave`). |
-| `MULTISPLASH` | **~88 B** | 🟢 | Medido al agregarlo. Activado actualmente (label `Rain`). Variante full-gradient de SOLID_MULTISPLASH. |
-| `MY_WAVE` + `MY_RAIN` (custom, BG idle + drops) | **~406 B** | 🟢 | Medido al agregar ambos efectos custom en `rgb_matrix_user.inc`. Incluye 2 math funcs + 1 runner shared + 2 entries + 3 cases extra en OLED switch (SOLID_COLOR, iWav, iRai). |
-| Breathing del BG (sin8 + scale8 inline en el runner) | **~134 B** | 🟢 | Medido al subir `BG_VALUE` constante a `BG_PULSE()` macro con `sin8(g_rgb_timer >> 3)`. El `g_rgb_timer` es uint32_t pero el cast a uint8_t después del shift evita división de 32-bit (que pesaría ~100B sola). **Reemplazado por heartbeat LUT (más liviano).** |
-| Heartbeat LUT del BG (lub-dub-pausa, 32 frames PROGMEM) | **~84 B** | 🟢 | Tabla de 32 bytes + lógica `pgm_read_byte(&lut[(uint8_t)(g_rgb_timer >> 5) & 0x1F])`. Sorprendentemente más liviano que el sinusoidal (-50 B) porque pgm_read_byte es más directo que sin8 + scale8 + suma. |
-| `CYCLE_LEFT_RIGHT` | **~134 B** | 🟢 | Medido al quitarlo para que cupiera el breathing del BG. Ambiental sustituible por el pulso del BG idle. |
-| `MULTISPLASH` (eliminado) | -88 B liberados | 🟢 | Quitado: MY_RAIN (iRai) lo reemplaza con BG idle pulsando. |
-| `STARLIGHT` | ~130 B | 🟢 | Medido vs BREATHING al hacer el swap. |
-| `BREATHING` | ~50 B | 🟢 | Comparado con STARLIGHT en la sesión. |
-| `CYCLE_LEFT_RIGHT` | ~50 B | 🟡 | Activado actualmente. |
-| `SOLID_REACTIVE_SIMPLE` | ~50 B | 🟡 | Quitado al cambiar a MULTISPLASH/MULTICROSS. |
-| `GRADIENT_LEFT_RIGHT` | ~25 B | 🟡 | Activado actualmente (default). |
+| `SOLID_REACTIVE_MULTICROSS` | ~150 B | 🟡 | **Activado** actualmente (label `Cros`). |
+| `SOLID_MULTISPLASH` | ~130 B | 🟡 | **Activado** actualmente (label `Wave`). Quitarlo paradojicamente sube el binario por dependencias LTO compartidas con el runner de MY_WAVE custom. |
+| `MULTISPLASH` | **~88 B** | 🟢 | Medido al agregarlo, luego **quitado**: MY_RAIN (iRai) lo reemplaza con BG idle pulsando. |
+| `MY_WAVE` + `MY_RAIN` (custom, BG idle + drops) | **~406 B** | 🟢 | **Activados** actualmente (labels `iWav`, `iRai`). 2 math funcs + 1 runner shared + 2 entries en `rgb_matrix_user.inc` + cases en OLED switch. |
+| Heartbeat LUT del BG (lub-dub-pausa, 32 frames PROGMEM) | **~84 B** | 🟢 | **Activo** dentro de MY_WAVE/MY_RAIN. Tabla 32 B + `pgm_read_byte(&lut[(uint8_t)(g_rgb_timer >> 5) & 0x1F])`. Sorprendentemente más liviano que el sinusoidal previo (-50 B): pgm_read_byte es más directo que sin8 + scale8 + suma. |
+| Breathing sinusoidal del BG (sin8 + scale8) | **~134 B** | 🟢 | Medición intermedia, **reemplazado** por heartbeat LUT por ser más liviano. |
+| `CYCLE_LEFT_RIGHT` | **~134 B** | 🟢 | **Quitado**: ambiental sustituible por el propio pulso del BG idle. Liberó espacio crítico para el breathing del BG. |
+| `TYPING_HEATMAP` | **~500 B** | 🟢 | **Quitado**: el más pesado del set inicial, liberado al cambiar a MULTISPLASH/MULTICROSS. |
+| `SOLID_REACTIVE_SIMPLE` | ~50 B | 🟡 | **Quitado** al cambiar a MULTISPLASH/MULTICROSS. |
+| `STARLIGHT` | ~130 B | 🟢 | **Activado** actualmente (label `Star`). |
+| `BREATHING` | ~50 B | 🟢 | Medido cuando estaba activado al inicio del PR; ahora **no está**. |
+| `GRADIENT_LEFT_RIGHT` | ~25 B | 🟡 | **Activado** actualmente (default al boot, label `Grad`). |
+| `SOLID_COLOR` | 0 B (always-on) | 🟢 | Always-on de QMK, no requiere ENABLE_*. Aparece en el ciclo como `RGB?` en el OLED. |
 | `RAINBOW_MOVING_CHEVRON` | ~150 B | 🔴 | Doc-only, no probado. |
 | `CYCLE_UP_DOWN` | ~50 B | 🔴 | Doc-only. |
 | `PIXEL_FLOW` | ~120 B | 🔴 | Doc-only. |

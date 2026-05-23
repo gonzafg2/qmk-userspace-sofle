@@ -138,7 +138,7 @@ Casillas vacías = transparent (heredan de Base). Encoder izq cambia a brillo, e
 | `VA+` / `VA-` | `RM_VALU` / `RM_VALD` | Brillo +/- (tope a 150 por límite USB) |
 | `SP+` / `SP-` | `RM_SPDU` / `RM_SPDD` | Velocidad animación +/- |
 
-**6 efectos en el ciclo** (`NXT` cicla todos):
+**7 efectos en el ciclo** (`NXT` cicla todos):
 
 1. `RGB_MATRIX_SOLID_COLOR` *(always-on de QMK, no se puede deshabilitar; aparece como `RGB?` en el OLED)* — todo el teclado en un solo color fijo del HUE actual
 2. `RGB_MATRIX_GRADIENT_LEFT_RIGHT` *(default al boot)* — gradient estático rojo→violeta de izq a der
@@ -283,7 +283,6 @@ Cada posición tiene una letra fija que aparece sólo cuando ese mod específico
 |---|---|
 | `Grad` | `RGB_MATRIX_GRADIENT_LEFT_RIGHT` |
 | `Star` | `RGB_MATRIX_STARLIGHT` |
-| `Cycl` | `RGB_MATRIX_CYCLE_LEFT_RIGHT` |
 | `Wave` | `RGB_MATRIX_SOLID_MULTISPLASH` (ondas mono, sin BG idle) |
 | `Cros` | `RGB_MATRIX_SOLID_REACTIVE_MULTICROSS` (cruz fila+columna) |
 | `iWav` | `MY_WAVE` custom (ondas mono **+ BG idle pulsando**) |

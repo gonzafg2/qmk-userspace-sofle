@@ -62,7 +62,7 @@ Firmware final: **26044/28672 bytes (90%, 2628 libres)**.
    - `WPM_ENABLE = yes → no` (liberó ~500 B)
    - `SPLIT_LAYER_STATE_ENABLE` removido (~130 B; sin impacto visible)
 5. **Iteraciones de Luna**: primero a walk loop fijo (post-WPM), después **Luna ciclando** entre sit→walk→run cada 6s (los 5 sprites originales mantenidos, frijol-y-nieblita stay).
-6. **Set final de 5 efectos RGB**: `GRADIENT_LEFT_RIGHT` (default), `STARLIGHT` (ambiental "estrellas"), `CYCLE_LEFT_RIGHT`, `TYPING_HEATMAP` (reactivo), `SOLID_REACTIVE_SIMPLE` (reactivo).
+6. **Set inicial de efectos RGB** (luego iterado): `GRADIENT_LEFT_RIGHT` (default), `STARLIGHT`, `CYCLE_LEFT_RIGHT`, `TYPING_HEATMAP`, `SOLID_REACTIVE_SIMPLE`. Después de varias iteraciones el **set final shipped** quedó: `GRADIENT_LEFT_RIGHT`, `STARLIGHT`, `SOLID_MULTISPLASH`, `SOLID_REACTIVE_MULTICROSS` + custom `MY_WAVE` + `MY_RAIN` con BG idle heartbeat. `SOLID_COLOR` siempre activo (always-on en QMK).
 7. **Verificado físicamente**: gradient rojo→violeta enciende al boot. **Titileo en brillo alto confirmó undervolt** — no subir `RGB_MATRIX_MAXIMUM_BRIGHTNESS` arriba de 150 sin cambiar fuente USB.
 8. **Firmware tras activar RGB_MATRIX**: ~99% del AVR (cerca del límite, varias decenas de bytes libres). Estable pero apretado.
 
