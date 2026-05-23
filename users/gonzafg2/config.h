@@ -8,6 +8,10 @@
 #define FORCE_NKRO
 #define DEBOUNCE 8
 
+// CHORDAL_HOLD: descomentar para activar (probado 2026-05-23, pesaba ~1100 B
+// en esta config, demasiado para el espacio disponible).
+// #define CHORDAL_HOLD
+
 // Mouse: modo kinetic para movimiento smooth con momentum (mas natural,
 // mas preciso al inicio del tap, acelera con hold).
 #define MK_KINETIC_SPEED

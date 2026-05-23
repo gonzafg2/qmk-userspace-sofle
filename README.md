@@ -492,7 +492,7 @@ El ATmega32U4 tiene 28672 bytes usables (`28KB - bootloader Caterina`). Build ac
 |---|---|---|
 | `VIA_ENABLE` | `no` | ~2.5 KB para Luna pet (sesión 2026-05-21) |
 | `WPM_ENABLE` | `no` | ~500 B para meter `RGB_MATRIX_ENABLE` (sesión 2026-05-22). Luna ya no reacciona a velocidad de tipeo, cicla por timer fijo |
-| `SPLIT_LAYER_STATE_ENABLE` | `no` | ~130 B para meter STARLIGHT como 5to efecto RGB. Sin impacto visible (slave no muestra capa por OLED ni RGB indicators) |
+| `SPLIT_LAYER_STATE_ENABLE` | `yes` (reactivado 2026-05-23) | Activado de nuevo, costo medido **0 B** (LTO comparte código con otras features split ya presentes). Habilita futuro mostrar capa en OLED slave o RGB indicators per-layer. |
 | `ENABLE_RGB_MATRIX_STARLIGHT` (`Star`) | quitado 2026-05-23 | Liberar espacio para `NKRO_ENABLE` (368 B). Ver gotcha de tipeo rápido / dead keys arriba |
 | `ENABLE_RGB_MATRIX_SOLID_REACTIVE_MULTICROSS` (`Cros`) | quitado 2026-05-23 | Mismo motivo. Quitar **STARLIGHT + MULTICROSS + 2 cases OLED juntos** liberó **846 B medidos** — mucho más que la suma individual estimada (~320 B), porque LTO produce dividendos no-lineales cuando se eliminan varios efectos a la vez |
 | `SPLIT_TRANSPORT_MIRROR`, `SPLIT_OLED_ENABLE`, `SPLIT_MODS_ENABLE`, `SPLIT_LED_STATE_ENABLE` | `no` | Build excedía 28KB en sesión inicial |
@@ -512,10 +512,12 @@ El ATmega32U4 tiene 28672 bytes usables (`28KB - bootloader Caterina`). Build ac
 **Para revertir algún sacrificio**: hay que liberar el equivalente quitando otra feature. Las opciones más pesadas activas son `RGB_MATRIX_ENABLE` (~3 KB) y `OLED_ENABLE` (~2.2 KB). Con los 502 B libres actuales puedes:
 
 - ✅ Agregar 1 efecto RGB chico tipo `BREATHING` (~50 B)
-- ✅ Recuperar `SPLIT_LAYER_STATE_ENABLE` (~130 B)
+- ✅ `SPLIT_LAYER_STATE_ENABLE` ya está activado (costó 0 B por LTO)
 - ⚠️ `RAINBOW_MOVING_CHEVRON` (~150 B) ajustado pero entra
+- ❌ `CHORDAL_HOLD` (probado 2026-05-23: pesó **1236 B**, no cabe — 3-4× más de lo que reporta la docs de QMK; ver `claudedocs/feature-weights.md` para el detalle)
 - ❌ Reactivar `WPM_ENABLE` + `STARLIGHT` juntos (sumarían >630 B)
 - ❌ Habilitar `VIA_ENABLE` (~2500 B, no cabe sin sacrificar RGB o OLED)
+- ❌ `UNICODE_ENABLE` (~500-1000 B + conflicto con LATAM Input Source en macOS)
 
 Catálogo completo de pesos medidos por feature en [`claudedocs/feature-weights.md`](./claudedocs/feature-weights.md), con descripción detallada de cada componente del firmware activo.
 

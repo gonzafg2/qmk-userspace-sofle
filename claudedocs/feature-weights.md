@@ -31,7 +31,8 @@ Los pesos **incluyen** interacciones con el resto del config actual. Cambiar el 
 | `OLED_ENABLE` + driver ssd1306 | ON | ~1850 B | 🟡 | Framework completo + driver. No incluye los `render_*` custom. |
 | `WPM_ENABLE` | OFF | **~500 B** | 🟢 | Medido al quitarlo + simplificar `render_luna`. |
 | `VIA_ENABLE` | OFF | ~2500 B | 🟡 | De la sesión anterior cuando se quitó. Incluye dynamic keymap. |
-| `SPLIT_LAYER_STATE_ENABLE` | OFF | **~130 B** | 🟢 | Medido al quitarlo para meter STARLIGHT. |
+| `SPLIT_LAYER_STATE_ENABLE` | ON | **0 B (en este contexto)** | 🟢 | Reactivado 2026-05-23 sesión 3. Medición previa decía ~130 B (al quitarlo para meter STARLIGHT), pero al reactivarlo ahora costó **0 B** — LTO comparte código con algo ya presente en el build actual. Habilita futuro mostrar capa en OLED slave o RGB indicators per-layer en la mitad derecha. |
+| `CHORDAL_HOLD` | OFF | **~1236 B** | 🟢 | Medido 2026-05-23 sesión 3: al activarlo (con array `chordal_hold_layout` PROGMEM en keymap.c), el binario subió de 28170 a 29406 (734 B over). **3-4× más pesado que la docs típica** (~340 B), probablemente por interacción con `HOLD_ON_OTHER_KEY_PRESS` + `PERMISSIVE_HOLD` activos + tamaño de matriz Sofle. **Descartado**: en este keymap solo aplica a `GFG_ESCAD` (único LT), el ROI no justifica sacrificar 1.2 KB de otras features. Si en el futuro se agregan home-row mods o más LT, re-evaluar. |
 | `SPLIT_TRANSPORT_MIRROR` | OFF | ~150 B | 🟡 | Quitado en la sesión inicial. |
 | `SPLIT_OLED_ENABLE` | OFF | ~80 B | 🟡 | Para sincronizar contenido OLED entre mitades. |
 | `SPLIT_MODS_ENABLE` | OFF | ~70 B | 🟡 | Para que slave conozca mods del master. |

@@ -361,6 +361,61 @@ Sí. Cada cambio es independiente:
 - Re-agregar `GFG_SCRF` al enum + case → recupera screenshot completo
 - Re-agregar `STARLIGHT`/`MULTICROSS` requiere quitar algo más (no caben en 502 B libres con todo lo nuevo)
 
+## 2026-05-23 · Sesión 3: Activar `SPLIT_LAYER_STATE_ENABLE`, descartar `CHORDAL_HOLD`
+
+**Contexto**: tras quedar con 502 B libres tras la sesión 2, el user pidió evaluar features de productividad que aporten valor. Se evaluaron `UNICODE_ENABLE`, `CHORDAL_HOLD`, `SPLIT_LAYER_STATE_ENABLE`, `TAPPING_TERM_PER_KEY` y otras.
+
+### `SPLIT_LAYER_STATE_ENABLE`: activado (costo 0 B)
+
+**Decisión**: activar `SPLIT_LAYER_STATE_ENABLE = yes` en `users/gonzafg2/rules.mk`.
+
+**Por qué**: habilita que la mitad slave conozca la capa activa. Sin esto, el slave es ciego a la capa (solo procesa pulsaciones físicas y las manda al master, que las traduce). Activarlo abre tres puertas futuras:
+1. Mostrar capa actual en el OLED slave (hoy muestra solo "Eres / un / Crack" + Luna)
+2. RGB indicators per-layer en el slave (ej. cambiar color del thumb derecho según capa)
+3. Animaciones reactivas a capa en el slave
+
+**Costo medido**: **0 B**. Sorprendente — la medición previa (sesión 2026-05-22) decía ~130 B al quitarlo para meter STARLIGHT. Reactivarlo ahora costó 0 B porque LTO comparte código con algo ya presente en el build actual (probablemente las funciones de split transport ya están instanciadas por otras features de split que sí dependen del state).
+
+**Tamaño**: 28170 → 28170 / 28672 (502 libres sin cambio).
+
+**Reversible**: sí, `SPLIT_LAYER_STATE_ENABLE = no` y vuelve al estado anterior.
+
+### `CHORDAL_HOLD`: probado y descartado
+
+**Decisión**: NO activar `CHORDAL_HOLD`. Probado en sesión, pesó 1236 B (no cabe en 502 B libres, excede por 734 B).
+
+**Plan probado** (revertido):
+- `#define CHORDAL_HOLD` en `users/gonzafg2/config.h`
+- Array `chordal_hold_layout[MATRIX_ROWS][MATRIX_COLS] PROGMEM` en `keymap.c` con `'L'`/`'R'` por posición usando el macro `LAYOUT`
+
+**Costo medido**: **1236 B** (28170 → 29406, 734 B sobre el límite de 28672). Esto es **3-4× más pesado que la docs típica de QMK** (~340 B). Hipótesis: interacción con `HOLD_ON_OTHER_KEY_PRESS` + `PERMISSIVE_HOLD` ya activos, más el tamaño de la matriz del Sofle (5×14 = 70 posiciones × 1 byte cada una = 70 B solo del array, sin contar la lógica). Si la docs reporta ~340 B en keymaps mínimos, el costo escala con el contexto.
+
+**Por qué se descartó (más allá del tamaño)**: en este keymap específico **CHORDAL_HOLD solo aplica a `GFG_ESCAD`** (LT(_ADJUST, KC_ESC) en el pinky derecho). No hay otros LT ni MT (`GFG_LWR`/`GFG_RSE` son `MO()`, no LT). El único caso de uso real sería evitar que ESC active Adjust accidentalmente al tipear rápido "ESC + tecla izq", que es un caso raro. ROI no justifica sacrificar 1.2 KB de otras features.
+
+**Cuándo re-evaluar**: si en el futuro se agregan **home-row mods** (cada tecla de home row es un `MT()` con modificador en hold) o **más LT en thumbs**, CHORDAL_HOLD se vuelve crítico y valdría la pena buscar 1.2 KB sacrificando algo.
+
+**Reversible**: sí, el código quedó comentado en `users/gonzafg2/config.h` con la nota:
+```c
+// CHORDAL_HOLD: descomentar para activar (probado 2026-05-23, pesaba ~1100 B
+// en esta config, demasiado para el espacio disponible).
+// #define CHORDAL_HOLD
+```
+
+### `UNICODE_ENABLE`: descartado sin probar
+
+**Decisión**: NO activar.
+
+**Por qué**:
+1. Tamaño: ~500-1000 B según features, no cabe
+2. Conflicto crítico con LATAM en macOS: requiere "Unicode Hex Input" como Input Source, choca con LATAM. Cambiar input source manualmente rompe el flujo de tipeo en español; cambiarlo desde firmware introduce delay y falla a veces
+3. Mejores alternativas en macOS sin firmware: `Ctrl+Cmd+Space` (emoji picker nativo), Text Replacements en System Settings, Raycast/Alfred snippets, espanso. Todos funcionan en todas las apps sin tocar el teclado
+
+### Estado final tras sesión 3
+
+- Tamaño: 28170 / 28672 (502 libres, **sin cambio** del estado tras sesión 2)
+- Único cambio efectivo: `SPLIT_LAYER_STATE_ENABLE = yes` (gratis, habilita futuro)
+- Medición valiosa documentada: `CHORDAL_HOLD` pesa 1236 B en esta config (vs ~340 B típico de docs)
+
 ## Decisiones pendientes (sin resolver)
 
 Ver [thumb-cluster-iteration.md](./thumb-cluster-iteration.md):
