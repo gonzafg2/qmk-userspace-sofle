@@ -4,10 +4,10 @@ Notas recopiladas de las fotos del PCB del usuario (sesión inicial). Útil para
 
 ## Identificación del PCB
 
+- **Nombre comercial completo**: **Sofle RGB V2 Rev2.1** (confirmado por el usuario en sesión 2026-05-22)
 - **Serigrafía visible**: `Power by Sofle RGB, Dane Evans` (parte inferior del PCB) + logo lagarto de ZoneKeyboards
-- Significa: **PCB original de Dane Evans**, fabricado por ZK con su branding del lagarto. No es un re-diseño, es el mismo electrónicamente.
-- Repo de referencia: https://github.com/devevans/sofle (NO el original de Josef Adamcik, que es `josefadamcik/SofleKeyboard`)
-- **Compatible con `keyboards/sofle/rev1` de QMK mainline** (mismo pinout y matriz)
+- **Origen del diseño**: PCB v2.1 original de Josef Adamcik (https://github.com/josefadamcik/SofleKeyboard) con la modificación RGB de Dane Evans encima. ZK lo fabrica y le pone su branding del lagarto.
+- **Compatible con `keyboards/sofle/rev1` de QMK mainline** (mismo pinout y matriz, mismo target QMK)
 
 ## Controlador
 
@@ -26,11 +26,17 @@ Notas recopiladas de las fotos del PCB del usuario (sesión inicial). Útil para
 
 Mix de dos sistemas (jumper `Light Sel` selecciona cuál se alimenta):
 1. **Backlight tradicional**: LEDs SMD blancos pequeños (3528-2pin) entre cada switch socket
-2. **RGB direccionable**: LEDs SK6812 5050 (4-pin, cuadrado blanco con cruz negra) intercalados
+2. **RGB direccionable**: **72 LEDs SK6812 MINI** total (36 per side): 58 per-key + 14 underglow
 3. Jumper `Backlight enable` controla el backlight
 4. Jumper `Ind bypass` para el indicator LED del Pro Micro
 
-**No identificado**: pin exacto del data line RGB en el ATmega32U4 (probablemente D3 según convención Sofle/Dane Evans pero hay que confirmar con el esquemático).
+**Configuración RGB confirmada** (de `keyboards/sofle/info.json` mainline):
+- Pin data line: **D3** (definido en mainline como `ws2812.pin`)
+- `rgb_matrix.split_count = [36, 36]`
+- `rgb_matrix.driver = ws2812`
+- Layout completo (per-LED matrix coords + underglow flags) ya definido en mainline
+
+**Implicación**: para activar RGB **no se necesitan defines** de pin/count/split en `config.h` del keymap. Solo defines estéticos (default mode, brightness, lista de efectos).
 
 ## Encoders
 
@@ -76,16 +82,17 @@ Del `keyboards/sofle/rev1/keyboard.json` de QMK mainline:
 }
 ```
 
+## RGB Matrix activo (estado actual desde 2026-05-22)
+
+`RGB_MATRIX_ENABLE = yes` en `keyboards/sofle/keymaps/gonzafg2/rules.mk`. Defines estéticos en `config.h` del keymap. Ver [decisions-log.md](./decisions-log.md) entrada del 2026-05-22 para detalle completo.
+
+**Pre-requisito físico para que enciendan los LEDs**: jumper `Light Sel` del PCB debe estar en `UND` o `BL&UND`.
+
 ## Posibles ampliaciones futuras
 
-- **Activar RGB**: agregar override en `users/gonzafg2/config.h`:
-  ```c
-  #define WS2812_DI_PIN D3  // por confirmar
-  #define RGBLED_NUM 70     // ~35 per side, contar SK6812 SMD del PCB
-  ```
-  Y `RGBLIGHT_ENABLE = yes` en rules.mk (revisar tamaño AVR, ~3KB extra).
+- **Activar backlight blanco** (no direccionable): usar `BACKLIGHT_ENABLE = yes` y configurar `BACKLIGHT_PIN`. Atención: ocupa flash adicional y requiere jumper `Light Sel` en `BL` o `BL&UND`.
 
-- **Activar backlight blanco** (no direccionable): usar `BACKLIGHT_ENABLE = yes` y configurar `BACKLIGHT_PIN`.
+- **Recuperar WPM reactivo en Luna**: si se libera espacio (p.ej. quitando MOUSEKEY o efectos RGB), revertir `WPM_ENABLE = yes` + restaurar `render_luna()` original.
 
 - **VIA con custom keycodes legibles**: generar `vial.json` para el repo (alternativa a VIA mainline).
 
