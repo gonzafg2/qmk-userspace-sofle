@@ -1,13 +1,20 @@
 #include QMK_KEYBOARD_H
 #include "gonzafg2.h"
 
-/* Convencion de los diagramas ASCII:
- *   [KEY]   = slot _______ que hereda KEY de la capa Base (no esta sobrescrita)
+/* Convención de los diagramas ASCII:
+ *   [KEY]   = slot _______ que hereda KEY de la capa Base (no está sobrescrita)
  *   ---     = slot XXXXXXX (bloqueado, no produce nada)
  *   KEY     = keycode asignado en esta capa
- *   ▼       = thumb que esta siendo holdeado para entrar a esta capa
+ *   ▼       = thumb que estás holdeando para entrar a esta capa
  *   [MUTM]  = encoder push izq heredado (LT _MOUSE KC_MUTE en Base)
  *   [PLAY]  = encoder push der heredado (KC_MPLY en Base)
+ *
+ * Convención de columnas (referencias en comentarios de cada capa):
+ *   0-indexed global. Filas 1-3 tienen 12 cols: cols 0-5 = mano izquierda,
+ *   cols 6-11 = mano derecha. La fila 4 tiene 14 cols por los 2 encoder push
+ *   centrales: cols 0-5 = izq, cols 6 y 7 = encoder push izq y der, cols
+ *   8-13 = mano derecha. Ej: "fila 2 col 6-9" = primeros 4 slots de la mano
+ *   derecha en fila 2 (físicamente bajo Y/U/I/O del Base).
  */
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 

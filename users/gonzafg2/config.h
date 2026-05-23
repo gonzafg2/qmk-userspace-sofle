@@ -8,8 +8,13 @@
 #define FORCE_NKRO
 #define DEBOUNCE 8
 
-// CHORDAL_HOLD: descomentar para activar (probado 2026-05-23, pesaba ~1100 B
-// en esta config, demasiado para el espacio disponible).
+// CHORDAL_HOLD: descomentar para activar. Probado 2026-05-23 sesion 3:
+// peso medido 1236 B (binario subio de 28170 a 29406, 734 B sobre el limite).
+// Es 3-4x mas pesado que la docs tipica de QMK (~340 B), probablemente por
+// interaccion con HOLD_ON_OTHER_KEY_PRESS + PERMISSIVE_HOLD ya activos +
+// tamaño matriz Sofle. Descartado: en este keymap solo aplica a GFG_ESCAD
+// (unico LT), ROI no justifica sacrificar 1.2 KB. Re-evaluar si se agregan
+// home-row mods o mas LT en thumbs.
 // #define CHORDAL_HOLD
 
 // Mouse: modo kinetic para movimiento smooth con momentum (mas natural,
