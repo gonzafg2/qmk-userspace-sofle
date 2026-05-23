@@ -138,14 +138,19 @@ Casillas vacías = transparent (heredan de Base). Encoder izq cambia a brillo, e
 | `VA+` / `VA-` | `RM_VALU` / `RM_VALD` | Brillo +/- (tope a 150 por límite USB) |
 | `SP+` / `SP-` | `RM_SPDU` / `RM_SPDD` | Velocidad animación +/- |
 
-**6 efectos habilitados** (ciclar con `NXT`):
+**9 efectos en el ciclo** (`NXT` cicla todos):
 
-1. `RGB_MATRIX_GRADIENT_LEFT_RIGHT` *(default)* — gradient estático rojo→violeta de izq a der
-2. `RGB_MATRIX_STARLIGHT` — LEDs random titilan suavemente como estrellas (ambiental)
-3. `RGB_MATRIX_CYCLE_LEFT_RIGHT` — colores corren horizontalmente (ambiental)
-4. `RGB_MATRIX_SOLID_MULTISPLASH` — ondas circulares se expanden desde cada tecla pulsada con un solo color (reactivo)
-5. `RGB_MATRIX_SOLID_REACTIVE_MULTICROSS` — al pulsar, fila + columna se iluminan en cruz (reactivo)
-6. `RGB_MATRIX_MULTISPLASH` — ondas circulares con **arcoíris completo** (reactivo, drops multi-color)
+1. `RGB_MATRIX_SOLID_COLOR` *(always-on de QMK, no se puede deshabilitar)* — todo el teclado en un solo color fijo del HUE actual
+2. `RGB_MATRIX_GRADIENT_LEFT_RIGHT` *(default al boot)* — gradient estático rojo→violeta de izq a der
+3. `RGB_MATRIX_STARLIGHT` — LEDs random titilan suavemente como estrellas (ambiental)
+4. `RGB_MATRIX_CYCLE_LEFT_RIGHT` — colores corren horizontalmente (ambiental)
+5. `RGB_MATRIX_SOLID_MULTISPLASH` — ondas circulares un solo color (reactivo, sin BG idle)
+6. `RGB_MATRIX_SOLID_REACTIVE_MULTICROSS` — al pulsar, fila + columna se iluminan en cruz (reactivo, sin BG idle)
+7. `RGB_MATRIX_MULTISPLASH` — ondas arcoíris (reactivo, sin BG idle)
+8. **`MY_WAVE` (custom)** — ondas un solo color + **fondo idle tenue** del HUE actual
+9. **`MY_RAIN` (custom)** — ondas arcoíris + **fondo idle tenue** del HUE actual
+
+Los efectos custom (8-9) están implementados en [`rgb_matrix_user.inc`](./keyboards/sofle/keymaps/gonzafg2/rgb_matrix_user.inc) y usan `BG_VALUE = 30` (~12% de brillo idle, modulado por VAL global).
 
 **Pre-requisito físico**: jumper `Light Sel` del PCB debe estar en `UND` o `BL&UND` para alimentar los SK6812.
 
@@ -281,9 +286,12 @@ Cada posición tiene una letra fija que aparece sólo cuando ese mod específico
 | `Grad` | `RGB_MATRIX_GRADIENT_LEFT_RIGHT` |
 | `Star` | `RGB_MATRIX_STARLIGHT` |
 | `Cycl` | `RGB_MATRIX_CYCLE_LEFT_RIGHT` |
-| `Wave` | `RGB_MATRIX_SOLID_MULTISPLASH` (ondas, color único basado en HUE) |
+| `Soli` | `RGB_MATRIX_SOLID_COLOR` (color sólido fijo) |
+| `Wave` | `RGB_MATRIX_SOLID_MULTISPLASH` (ondas mono, sin BG idle) |
 | `Cros` | `RGB_MATRIX_SOLID_REACTIVE_MULTICROSS` (cruz fila+columna) |
-| `Rain` | `RGB_MATRIX_MULTISPLASH` (ondas, gradient arcoíris completo) |
+| `Rain` | `RGB_MATRIX_MULTISPLASH` (ondas arcoíris, sin BG idle) |
+| `iWav` | `MY_WAVE` custom (ondas mono **+ BG idle tenue**) |
+| `iRai` | `MY_RAIN` custom (ondas arcoíris **+ BG idle tenue**) |
 
 Detección autocontenida en `render_layer_state()` — compara `rgb_matrix_get_mode()` con el último modo conocido, dispara el indicador en cambios. No requiere hooks en `process_record_user`.
 

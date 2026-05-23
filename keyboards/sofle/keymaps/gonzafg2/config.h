@@ -25,3 +25,6 @@
 #define ENABLE_RGB_MATRIX_SOLID_REACTIVE_MULTICROSS
 #define ENABLE_RGB_MATRIX_MULTISPLASH
 
+// Efectos custom propios en rgb_matrix_user.inc (BG tenue + drops reactivos)
+#define RGB_MATRIX_CUSTOM_USER
+
