@@ -163,7 +163,9 @@ Mute + Play es más coherente con la rotación del encoder (que ya controla volu
 
 **Hallazgo importante**: mainline `keyboards/sofle/info.json` ya configura `ws2812.pin=D3`, `rgb_matrix.split_count=[36,36]`, layout completo, y driver. **No** se necesita override en `config.h` de esos valores — solo defines estéticos.
 
-**Trade-off para caber en AVR**: el framework RGB_MATRIX cuesta ~3KB y excedió por 498 bytes. Sacrificio elegido: **`WPM_ENABLE = no`** + simplificar `render_luna()` a walk loop fijo (sin reactividad a velocidad de tecleo). Luna sigue animándose, solo pierde el cambio sit/walk/run según WPM.
+**Trade-off para caber en AVR**: el framework RGB_MATRIX cuesta ~3KB y excedió por 498 bytes. Sacrificio elegido: **`WPM_ENABLE = no`** + simplificar `render_luna()` (sin reactividad a velocidad de tecleo). Luna sigue animándose, solo pierde el cambio sit/walk/run según WPM.
+
+> ⚠️ Nota: la primera versión de `render_luna()` post-WPM fue un walk loop fijo. **El estado final shipped** es Luna ciclando por timer entre `sit → walk → run → sit` cada 6 segundos — ver "Iteraciones de la misma sesión" más abajo (iteración #1) para el código real.
 
 **Configuración final** (`keyboards/sofle/keymaps/gonzafg2/config.h`):
 ```c
