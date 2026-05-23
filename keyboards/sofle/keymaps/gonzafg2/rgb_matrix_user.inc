@@ -12,7 +12,18 @@ RGB_MATRIX_EFFECT(MY_RAIN)
 
 #ifdef RGB_MATRIX_CUSTOM_EFFECT_IMPLS
 
-#    define BG_VALUE 50 // 50/255 = ~20% de brillo idle. Subir/bajar a gusto.
+// El BG idle "respira": pulsa suave entre BG_MIN y BG_MAX usando sin8.
+// Patrón sinusoidal continuo, no heartbeat biologico (eso requeriria
+// lookup table piecewise y no cabe en flash actual).
+//
+// Notas de optimizacion para AVR:
+// - g_rgb_timer es uint32_t. (uint8_t)(g_rgb_timer >> 3) = /8 con mod 256
+//   gratis al castear, sin division 32-bit.
+// - Macro en vez de funcion: evita el RCALL/RET (~15 B) y permite que
+//   GCC haga constant folding con BG_MAX - BG_MIN.
+#    define BG_MIN 15 // valle del pulso (poco brillo)
+#    define BG_MAX 70 // pico del pulso (mas brillo, ~28%)
+#    define BG_PULSE() (BG_MIN + scale8(BG_MAX - BG_MIN, sin8((uint8_t)(g_rgb_timer >> 3))))
 
 // Math para un solo color (igual que SOLID_SPLASH_math)
 static hsv_t my_wave_math(hsv_t hsv, int16_t dx, int16_t dy, uint8_t dist, uint16_t tick) {
@@ -40,7 +51,7 @@ static bool my_reactive_bg_runner(effect_params_t* params, reactive_splash_f eff
     for (uint8_t i = led_min; i < led_max; i++) {
         RGB_MATRIX_TEST_LED_FLAGS();
         hsv_t hsv = rgb_matrix_config.hsv;
-        hsv.v     = BG_VALUE; // <-- esto es lo unico distinto del runner del core
+        hsv.v     = BG_PULSE(); // BG idle respira en lugar de ser fijo
         for (uint8_t j = 0; j < count; j++) {
             int16_t  dx   = g_led_config.point[i].x - g_last_hit_tracker.x[j];
             int16_t  dy   = g_led_config.point[i].y - g_last_hit_tracker.y[j];

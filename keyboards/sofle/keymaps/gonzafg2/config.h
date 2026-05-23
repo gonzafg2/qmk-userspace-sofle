@@ -20,10 +20,13 @@
 
 #define ENABLE_RGB_MATRIX_GRADIENT_LEFT_RIGHT
 #define ENABLE_RGB_MATRIX_STARLIGHT
-#define ENABLE_RGB_MATRIX_CYCLE_LEFT_RIGHT
 #define ENABLE_RGB_MATRIX_SOLID_MULTISPLASH
 #define ENABLE_RGB_MATRIX_SOLID_REACTIVE_MULTICROSS
-#define ENABLE_RGB_MATRIX_MULTISPLASH
+// Removidos por espacio para meter el BG pulsando:
+// - CYCLE_LEFT_RIGHT: ambiental, sustituible por la pulsacion del BG idle.
+// - MULTISPLASH: MY_RAIN custom (iRai) lo reemplaza con BG idle pulsando.
+// SOLID_MULTISPLASH (Wave) se mantiene: LTO comparte codigo con MY_WAVE custom;
+// quitarlo paradojicamente sube el tamano por dependencias internas del runner.
 
 // Efectos custom propios en rgb_matrix_user.inc (BG tenue + drops reactivos)
 #define RGB_MATRIX_CUSTOM_USER

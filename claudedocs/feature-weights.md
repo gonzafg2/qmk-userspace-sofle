@@ -49,6 +49,9 @@ Cada `ENABLE_RGB_MATRIX_*` agrega ~50-500 B según la complejidad del efecto. Co
 | `SOLID_MULTISPLASH` | ~130 B | 🟡 | Activado actualmente (label `Wave`). |
 | `MULTISPLASH` | **~88 B** | 🟢 | Medido al agregarlo. Activado actualmente (label `Rain`). Variante full-gradient de SOLID_MULTISPLASH. |
 | `MY_WAVE` + `MY_RAIN` (custom, BG idle + drops) | **~406 B** | 🟢 | Medido al agregar ambos efectos custom en `rgb_matrix_user.inc`. Incluye 2 math funcs + 1 runner shared + 2 entries + 3 cases extra en OLED switch (SOLID_COLOR, iWav, iRai). |
+| Breathing del BG (sin8 + scale8 inline en el runner) | **~134 B** | 🟢 | Medido al subir `BG_VALUE` constante a `BG_PULSE()` macro con `sin8(g_rgb_timer >> 3)`. El `g_rgb_timer` es uint32_t pero el cast a uint8_t después del shift evita división de 32-bit (que pesaría ~100B sola). |
+| `CYCLE_LEFT_RIGHT` | **~134 B** | 🟢 | Medido al quitarlo para que cupiera el breathing del BG. Ambiental sustituible por el pulso del BG idle. |
+| `MULTISPLASH` (eliminado) | -88 B liberados | 🟢 | Quitado: MY_RAIN (iRai) lo reemplaza con BG idle pulsando. |
 | `STARLIGHT` | ~130 B | 🟢 | Medido vs BREATHING al hacer el swap. |
 | `BREATHING` | ~50 B | 🟢 | Comparado con STARLIGHT en la sesión. |
 | `CYCLE_LEFT_RIGHT` | ~50 B | 🟡 | Activado actualmente. |

@@ -165,13 +165,10 @@ static void render_layer_state(void) {
     oled_set_cursor(0, 15);
     if (show_rgb) {
         switch (current_mode) {
-            case RGB_MATRIX_SOLID_COLOR:                oled_write_P(PSTR("Soli "), false); break;
             case RGB_MATRIX_GRADIENT_LEFT_RIGHT:        oled_write_P(PSTR("Grad "), false); break;
             case RGB_MATRIX_STARLIGHT:                  oled_write_P(PSTR("Star "), false); break;
-            case RGB_MATRIX_CYCLE_LEFT_RIGHT:           oled_write_P(PSTR("Cycl "), false); break;
             case RGB_MATRIX_SOLID_MULTISPLASH:          oled_write_P(PSTR("Wave "), false); break;
             case RGB_MATRIX_SOLID_REACTIVE_MULTICROSS:  oled_write_P(PSTR("Cros "), false); break;
-            case RGB_MATRIX_MULTISPLASH:                oled_write_P(PSTR("Rain "), false); break;
             case RGB_MATRIX_CUSTOM_MY_WAVE:             oled_write_P(PSTR("iWav "), false); break;
             case RGB_MATRIX_CUSTOM_MY_RAIN:             oled_write_P(PSTR("iRai "), false); break;
             default:                                    oled_write_P(PSTR("RGB? "), false);
