@@ -416,6 +416,83 @@ Sí. Cada cambio es independiente:
 - Único cambio efectivo: `SPLIT_LAYER_STATE_ENABLE = yes` (gratis, habilita futuro)
 - Medición valiosa documentada: `CHORDAL_HOLD` pesa 1236 B en esta config (vs ~340 B típico de docs)
 
+## 2026-05-23 · Sesión 4: ajustes post-flasheo (feedback del user)
+
+**Contexto**: tras flashear la build de la sesión 3 y probar físicamente, el user reportó 6 ajustes basados en uso real. Esta sesión los aplica.
+
+### 1. Mouse aceleración muy rápida
+
+**Reporte**: "es muy lento al principio lo que está bien, pero al acelerar lo hace muy rápido."
+
+**Cambio**: `MOUSEKEY_BASE_SPEED 3000 → 2000` en `users/gonzafg2/config.h`. Tap individual sigue preciso (~16 px), pero el tope del kinetic ahora es 2000 px/s en vez de 3000. Si aún se siente rápido, bajamos a 1500.
+
+**Costo**: 0 B (cambio numérico).
+
+### 2. `TGMOU` debería bajar para coherencia con VOL/PREV
+
+**Reporte**: "TGMOU sigue en la misma posición, debería haber bajado para tener coherencia con VOL y PREV."
+
+**Cambio**: `TG(_MOUSE)` en Adjust mano der: fila 2 col 6 → **fila 3 col 6**. Queda en la misma fila que VOL/MUTE/VOL+ (cols 8-10), lado izquierdo. Coherente con la lógica del bloque "media controls" inferior.
+
+**Costo**: 0 B (mover keycode).
+
+### 3. Mouse scroll desfasado un espacio a la derecha
+
+**Reporte**: "en la capa mouse, el scroll quedó desfasado un espacio a la derecha. Debe estar en la misma fila de EXIT y estar alineado con el movimiento y los botones."
+
+**Cambio**: scroll `MS_WHLL/D/U/R` en fila 4: cols 9-12 → **cols 8-11**. Físicamente queda alineado vertical con movimiento (fila 3 cols 6-9) y botones (fila 2 cols 6-8). Las cols 9-12 vs cols 8-11 numéricamente confunden por el offset del LAYOUT (2 center keys en fila 4 desplazan el indexing), pero son las MISMAS columnas físicas. EXIT queda en col 13 (sin cambio).
+
+**Costo**: 0 B (mover keycodes).
+
+### 4. `ZM0` reset zoom + rename `SPC-`/`SPC+` → `SPCL`/`SPCR`
+
+**Reporte**: "en raise `[BSD]` podrías poner un `ZM0` para restablecer". También: "`SPC-` y `SPC+` no son de suma o resta sino que son L y R pero se entienden".
+
+**Cambios**:
+- Raise fila 2 col 11 (era `_______` que heredaba `[BSDL]`) → `LGUI(KC_0)`. Label `ZM0`. Trade-off: pierdes BSDL en Raise, pero al soltar RSE recuperas BSDL en Base. Para uso típico de Tech Lead (zoom rápido en screenshare) vale la pena.
+- Labels diagrama: `SPC-`/`SPC+` → `SPCL`/`SPCR` (más claros: Space izq/der).
+
+**Sobre el delay al cambiar Space** ("termino escribiendo en el escritorio anterior"): **no es del firmware**, es la animación nativa de macOS Spaces (~300 ms). Fix recomendado al user: `System Settings → Accessibility → Display → Reduce Motion` ON.
+
+**Costo**: 0 B (combo QMK estándar).
+
+### 5. Emoji picker al lado de `SPOT`
+
+**Reporte**: "al lado derecho de SPOT podrías poner CMD+CTRL+SPACE para lanzar el selector de iconos."
+
+**Cambio**: Raise fila 3 col 11 (era `XXXXXXX`) → `LGUI(LCTL(KC_SPC))`. Label `EMJI`. Abre el emoji & symbol picker nativo de macOS sin necesidad de Ctrl+Cmd+Space manual.
+
+**Costo**: 0 B.
+
+### 6. Raise mano izq col 0 fila 2-4 (`[TAB]`/`[SFT]`/`[CMD]` heredados)
+
+**Reporte**: "analiza si nos sirven de algo en esta capa, sino, veamos con qué más podemos reemplazarlos. Uso neovim, quizás algo con eso de uso frecuente."
+
+**Análisis diferenciado por fila**:
+
+| Pos | Heredado | Decisión | Razón |
+|---|---|---|---|
+| Fila 2 col 0 | `[TAB]` | **Reemplazado** con `LCTL(KC_O)` (label `JBk`) | TAB no es modifier, perderlo en Raise no rompe combos. `Ctrl+O` = jump back en jumplist de neovim, también funciona en IDEs con plugin vim. Súper frecuente al navegar código entre archivos |
+| Fila 3 col 0 | `[SFT]` | **Mantenido heredado** | Shift ES modifier. Útil en Raise: `Shift+←/→` para selección por carácter, `Shift+ENTER` para nueva línea sin enviar, `Shift+TAB` para deindent |
+| Fila 4 col 0 | `[CMD]` | **Mantenido heredado** | Cmd ES modifier. **Crítico** mientras editas en Raise: `Cmd+S` (save), `Cmd+Z` (undo), `Cmd+/` (comment), `Cmd+C/V`. Perderlo te obliga a soltar RSE para guardar/deshacer — flujo roto |
+
+**Costo**: 0 B (combo QMK estándar).
+
+### Tamaño final
+
+28170 → 28170 / 28672 (502 libres, **sin cambio**). Todos los cambios fueron 0 B: combos QMK estándar (LGUI+0, LGUI+LCTL+SPC, LCTL+O), reordenamientos (TGMOU, scroll) y cambios numéricos (BASE_SPEED).
+
+### Validación pendiente (tras re-flashear)
+
+1. **Mouse aceleración** se siente bien al hold (no muy rápido)
+2. **TGMOU** en nueva posición (Adjust fila 3 col 6) responde a TG_MOUSE
+3. **Scroll en Mouse** alineado físicamente con movimiento (no desfasado)
+4. **ZM0** (Raise + col 11 fila 2) hace Cmd+0 reset zoom en navegador/IDE
+5. **EMJI** (Raise + col 11 fila 3) abre el emoji picker
+6. **JBk** (Raise + col 0 fila 2) hace jump back en neovim/IDE
+7. **`Reduce Motion` activado** en macOS — el cambio de Space ya no se siente lento
+8. **SFT y CMD heredados en Raise** siguen funcionando para Shift+arrow y Cmd+S/Z
+
 ## Decisiones pendientes (sin resolver)
 
 Ver [thumb-cluster-iteration.md](./thumb-cluster-iteration.md):

@@ -53,26 +53,30 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                      KC_PEQL, _______, _______, _______, _______,                _______,   _______, _______, _______, KC_PENT
 ),
 
-/* Raise (operadores programacion + navegacion + window mgmt mac + zoom + spotlight)
+/* Raise (operadores programacion + navegacion + window mgmt mac + zoom + spotlight + neovim)
  * Heredadas de Base se muestran como [KEY] entre corchetes.
  *
  * Window/Spaces management mac (fila 1 mano der):
  *   MCTL = Mission Control (LCTL+UP)      APXP = App Expose (LCTL+DN)
- *   SPC- = Space prev (LCTL+LEFT)         SPC+ = Space next (LCTL+RGHT)
+ *   SPCL = Space izq (LCTL+LEFT)          SPCR = Space der (LCTL+RGHT)
  *   ZM-  = Zoom out (LGUI+numpad-)        ZM+  = Zoom in  (LGUI+numpad+)
- * Spotlight: SPOT (LGUI+SPC) en fila 3 col 10 (donde estaba -=).
  *
  * Macros mac (sobre cursores, fila 2 col 6-9):
  *   SCRA = screenshot area (LGUI+LSFT+4)  SCRT = screenshot tool (LGUI+LSFT+5)
  *   LOCK = lock pantalla (LGUI+LCTL+Q)    FQT  = Force Quit (LGUI+LALT+ESC)
  * QK_REP movido a col 10. SCRF (screenshot completo) eliminado: poco uso.
  *
+ * ZM0  = reset zoom (LGUI+0), reemplaza [BSDL] heredado en col 11 fila 2.
+ * SPOT = Spotlight (LGUI+SPC) en fila 3 col 10.
+ * EMJI = emoji picker (LGUI+LCTL+SPC) en fila 3 col 11.
+ * JBk  = jump back neovim/IDE (LCTL+O), reemplaza [TAB] heredado en col 0 fila 2.
+ *
  * ,-----------------------------------------.                    ,-----------------------------------------.
- * |  =   |  >=  |  <=  |  ??  |  ?.  |  **  |                    | MCTL | APXP | SPC- | SPC+ | ZM-  | ZM+  |
+ * |  =   |  >=  |  <=  |  ??  |  ?.  |  **  |                    | MCTL | APXP | SPCL | SPCR | ZM-  | ZM+  |
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * |[TAB] |  !   |  @   |  #   |  $   |  %   |                    | SCRA | SCRT | LOCK | FQT  | RPT  |[BSDL]|
+ * | JBk  |  !   |  @   |  #   |  $   |  %   |                    | SCRA | SCRT | LOCK | FQT  | RPT  | ZM0  |
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * |[SFT] |  ^   |  +=  |  -=  |  &&  |  ||  |-------.    ,-------| LEFT | DOWN |  UP  | RGHT | SPOT |      |
+ * |[SFT] |  ^   |  +=  |  -=  |  &&  |  ||  |-------.    ,-------| LEFT | DOWN |  UP  | RGHT | SPOT | EMJI |
  * |------+------+------+------+------+------|[MUTM] |    |[PLAY] |------+------+------+------+------+------|
  * |[CMD] | =>   | ...  |  ==  |  !== |  === |-------|    |-------| HOME | PGDN | PGUP | END  |      |[ESC/A]
  * `-----------------------------------------/       /     \      \-----------------------------------------'
@@ -80,8 +84,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  */
 [_RAISE] = LAYOUT(
   S(KC_0),  GFG_GTEQ,GFG_LTEQ,GFG_NULC,GFG_OPTC,GFG_POW,                                    LCTL(KC_UP), LCTL(KC_DOWN), LCTL(KC_LEFT), LCTL(KC_RGHT), LGUI(KC_PMNS), LGUI(KC_PPLS),
-  _______,  KC_EXLM,    A(KC_Q),   KC_HASH, KC_DLR,  KC_PERC,                                GFG_SCRA, GFG_SCRT, GFG_LOCK, GFG_FQUIT, QK_REP, _______,
-  _______,  A(KC_QUOT), GFG_PLEQ,  GFG_MIEQ, GFG_AND, GFG_OR,                                KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, LGUI(KC_SPC), XXXXXXX,
+  LCTL(KC_O), KC_EXLM,    A(KC_Q),   KC_HASH, KC_DLR,  KC_PERC,                              GFG_SCRA, GFG_SCRT, GFG_LOCK, GFG_FQUIT, QK_REP, LGUI(KC_0),
+  _______,  A(KC_QUOT), GFG_PLEQ,  GFG_MIEQ, GFG_AND, GFG_OR,                                KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, LGUI(KC_SPC), LGUI(LCTL(KC_SPC)),
   _______,  GFG_ARROW,GFG_SPREAD,GFG_EQEQ,GFG_NEQ,GFG_TEQ,_______,                _______,  KC_HOME, KC_PGDN, KC_PGUP, KC_END,  XXXXXXX, _______,
                      _______, _______, _______, _______, _______,                _______,   _______, _______, _______, _______
 ),
@@ -90,15 +94,15 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * Acceso: hold ambos LWR+RSE (tri-layer) | hold ESC pinky der
  * Heredadas de Base se muestran como [KEY] entre corchetes.
  * Macros mac (SCRA/SCRT/LOCK/FQT) movidas a RAISE sobre cursores. SCRF eliminado.
- * VOL y media movidos una casilla a la derecha (col 7-9 -> 8-10) para descansar
- * en el meñique extendido en vez del indice.
+ * VOL y media en cols 8-10 (meñique extendido). TGMOU bajado de fila 2 col 6
+ * a fila 3 col 6 (sesion 4 2026-05-23) para coherencia con bloque media.
  *
  * ,-----------------------------------------.                    ,-----------------------------------------.
  * | BOOT | TOG  | NXT  | HU+  | SA+  | VA+  |                    |      |      |      |      |      |      |
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * | SP+  | SP-  | PRV  | HU-  | SA-  | VA-  |                    |TGMOU |      |      |      |      |      |
+ * | SP+  | SP-  | PRV  | HU-  | SA-  | VA-  |                    |      |      |      |      |      |      |
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * |      |      |      |      |      |      |-------.    ,-------|      |      | VOLD | MUTE | VOLU |      |
+ * |      |      |      |      |      |      |-------.    ,-------|TGMOU |      | VOLD | MUTE | VOLU |      |
  * |------+------+------+------+------+------|[MUTM] |    |[PLAY] |------+------+------+------+------+------|
  * |      |      |      |      |      |      |-------|    |-------|      |      | MPRV | MPLY | MNXT |      |
  * `-----------------------------------------/       /     \      \-----------------------------------------'
@@ -106,8 +110,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  */
 [_ADJUST] = LAYOUT(
   QK_BOOT,  RM_TOGG, RM_NEXT, RM_HUEU, RM_SATU, RM_VALU,                                    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
-  RM_SPDU,  RM_SPDD, RM_PREV, RM_HUED, RM_SATD, RM_VALD,                                    TG(_MOUSE), XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
-  XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                                    XXXXXXX, XXXXXXX, KC_VOLD, KC_MUTE, KC_VOLU, XXXXXXX,
+  RM_SPDU,  RM_SPDD, RM_PREV, RM_HUED, RM_SATD, RM_VALD,                                    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+  XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                                    TG(_MOUSE), XXXXXXX, KC_VOLD, KC_MUTE, KC_VOLU, XXXXXXX,
   XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                _______,   XXXXXXX, XXXXXXX, KC_MPRV, KC_MPLY, KC_MNXT, XXXXXXX,
                      _______, _______, _______, _______, _______,                _______,   _______, _______, _______, _______
 ),
@@ -120,7 +124,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * Cascada (sesion 2026-05-23): botones BTN1/3/2 bajaron de fila 1 -> fila 2;
  * movimiento M_* de fila 2 -> fila 3; scroll S_* de fila 3 -> fila 4. Razon
  * ergonomica: BTN en fila 2 (home row de la mano descansada) en vez de fila 1
- * (estiramiento hacia arriba).
+ * (estiramiento hacia arriba). Scroll alineado vertical con movimiento/botones
+ * (sesion 4 2026-05-23): cols 8-11 = mismas columnas fisicas que M_* y BTN*.
  *
  * ,-----------------------------------------.                    ,-----------------------------------------.
  * |      |      |      |      |      |      |                    |      |      |      |      |      | EXIT |
@@ -129,7 +134,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
  * |[SFT] |      |      |      |      |      |-------.    ,-------| M_LF | M_DN | M_UP | M_RT |      |      |
  * |------+------+------+------+------+------|[MUTM] |    |[PLAY] |------+------+------+------+------+------|
- * |[CMD] |      |      |      |      |      |-------|    |-------|      | S_LF | S_DN | S_UP | S_RT | EXIT |
+ * |[CMD] |      |      |      |      |      |-------|    |-------| S_LF | S_DN | S_UP | S_RT |      | EXIT |
  * `-----------------------------------------/       /     \      \-----------------------------------------'
  *           | ---  |[ALT]|[CTL]|[LWR]|[SPC]|        |[ENT]|[RSE]|[ALTGR]|[RCTL]| ---  |
  */
@@ -137,7 +142,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                                    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, TG(_MOUSE),
   XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                                    MS_BTN1, MS_BTN3, MS_BTN2, XXXXXXX, XXXXXXX, XXXXXXX,
   _______,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                                    MS_LEFT, MS_DOWN, MS_UP,   MS_RGHT, XXXXXXX, XXXXXXX,
-  _______,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______,                _______,   XXXXXXX, MS_WHLL, MS_WHLD, MS_WHLU, MS_WHLR, TG(_MOUSE),
+  _______,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______,                _______,   MS_WHLL, MS_WHLD, MS_WHLU, MS_WHLR, XXXXXXX, TG(_MOUSE),
                      _______, _______, _______, _______, _______,                _______,   _______, _______, _______, _______
 ),
 };

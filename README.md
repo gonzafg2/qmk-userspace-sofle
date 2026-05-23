@@ -107,15 +107,15 @@ Encoder izq cambia a brillo, encoder der a scroll horizontal.
 
 Estas dos posiciones eran las únicas realmente libres en el thumb cluster (en Base son `XXXXXXX`). Ahora tienen propósito contextual al numpad activo en Lower.
 
-### Raise — operadores programación + navegación + window mgmt mac
+### Raise — operadores prog + navegación + window mgmt mac + neovim
 
 ```
 ┌─────┬─────┬─────┬─────┬─────┬─────┐                              ┌─────┬─────┬─────┬─────┬─────┬─────┐
-│  =  │ >=  │ <=  │ ??  │ ?.  │ **  │                              │MCTL │APXP │SPC- │SPC+ │ ZM- │ ZM+ │
+│  =  │ >=  │ <=  │ ??  │ ?.  │ **  │                              │MCTL │APXP │SPCL │SPCR │ ZM- │ ZM+ │
 ├─────┼─────┼─────┼─────┼─────┼─────┤                              ├─────┼─────┼─────┼─────┼─────┼─────┤
-│[TAB]│  !  │  @  │  #  │  $  │  %  │                              │SCRA │SCRT │LOCK │FQT  │ RPT │[BSD]│
+│ JBk │  !  │  @  │  #  │  $  │  %  │                              │SCRA │SCRT │LOCK │FQT  │ RPT │ ZM0 │
 ├─────┼─────┼─────┼─────┼─────┼─────┤                              ├─────┼─────┼─────┼─────┼─────┼─────┤
-│[SFT]│  ^  │ +=  │ -=  │ &&  │ ||  │                              │  ←  │  ↓  │  ↑  │  →  │SPOT │ --- │
+│[SFT]│  ^  │ +=  │ -=  │ &&  │ ||  │                              │  ←  │  ↓  │  ↑  │  →  │SPOT │EMJI │
 ├─────┼─────┼─────┼─────┼─────┼─────┼─────┐                  ┌─────┼─────┼─────┼─────┼─────┼─────┼─────┤
 │[CMD]│ =>  │ ... │ ==  │ !== │ === │[MUT]│ ◉tab     word◉   │[PLY]│HOME │PGDN │PGUP │ END │ --- │[E/A]│
 └─────┴─────┴─────┼─────┼─────┼─────┴─────┴─────┐        ┌───┴─────┴─────┼─────┼─────┼─────┴─────┴─────┘
@@ -124,7 +124,7 @@ Estas dos posiciones eran las únicas realmente libres en el thumb cluster (en B
                                                                 ▲ activa
 ```
 
-**Operadores prog (mano izq):** `=` · `>=` · `<=` · `??` · `?.` · `**` (fila 1); `!` · `@` · `#` · `$` · `%` (fila 2); `^` · `+=` · `-=` · `&&` · `||` (fila 3, nuevo `-=` reemplaza al `&` previo); `=>` · `...` · `==` · `!==` · `===` (fila 4).
+**Operadores prog (mano izq):** `=` · `>=` · `<=` · `??` · `?.` · `**` (fila 1); `!` · `@` · `#` · `$` · `%` (fila 2); `^` · `+=` · `-=` · `&&` · `||` (fila 3); `=>` · `...` · `==` · `!==` · `===` (fila 4). Pinky col 0: `JBk` (jump back neovim/IDE) reemplaza el `[TAB]` heredado; `[SFT]` y `[CMD]` se mantienen heredados porque son modifiers útiles mientras editas en Raise (Shift+arrow para selección, Cmd+S/Z/C/V universales).
 
 **Window/Spaces management mac (fila 1 mano der):**
 
@@ -132,9 +132,19 @@ Estas dos posiciones eran las únicas realmente libres en el thumb cluster (en B
 |---|---|---|
 | `MCTL` | `LCTL(KC_UP)` | Mission Control |
 | `APXP` | `LCTL(KC_DOWN)` | App Exposé |
-| `SPC-` / `SPC+` | `LCTL(KC_LEFT)` / `LCTL(KC_RGHT)` | Space anterior / siguiente |
+| `SPCL` / `SPCR` | `LCTL(KC_LEFT)` / `LCTL(KC_RGHT)` | Space izquierda / derecha |
 | `ZM-` / `ZM+` | `LGUI(KC_PMNS)` / `LGUI(KC_PPLS)` | Zoom out / Zoom in (en navegador, screenshare, IDE — verificar en LATAM Mac tras flasheo, si no funciona ajustamos con macro custom) |
+| `ZM0` | `LGUI(KC_0)` | Zoom reset (Cmd+0) — fila 2 col 11, reemplaza el `[BSDL]` heredado |
 | `SPOT` | `LGUI(KC_SPC)` | Spotlight (Cmd+Space, cómodo en home row der) |
+| `EMJI` | `LGUI(LCTL(KC_SPC))` | Emoji & Symbol picker (Cmd+Ctrl+Space) — fila 3 col 11 al lado de SPOT |
+
+> **Tip — cambio de Spaces se siente lento**: macOS anima el cambio de Space ~300 ms y el foco llega después. Si el problema es "cambias de Space y empiezas a tipear en el anterior", **activa Reduce Motion** en `System Settings → Accessibility → Display → Reduce Motion`. Acelera la animación dramáticamente. No es problema del firmware.
+
+**Neovim / IDE shortcut:**
+
+| Label | Keycode | Acción |
+|---|---|---|
+| `JBk` | `LCTL(KC_O)` | Jump back en jumplist (neovim nativo, también IDEs con plugin vim). Súper frecuente al navegar código entre archivos. Reemplaza el `[TAB]` heredado en col 0 fila 2 |
 
 **Macros mac sobre cursores (fila 2 mano der, movidas desde Adjust en sesión 2026-05-23):**
 
@@ -156,9 +166,9 @@ Encoder izq: tab nav (`⌘[` / `⌘]`). Encoder der: word nav (`⌥←` / `⌥�
 ┌─────┬─────┬─────┬─────┬─────┬─────┐                              ┌─────┬─────┬─────┬─────┬─────┬─────┐
 │BOOT │ TOG │ NXT │ HU+ │ SA+ │ VA+ │                              │ --- │ --- │ --- │ --- │ --- │ --- │
 ├─────┼─────┼─────┼─────┼─────┼─────┤                              ├─────┼─────┼─────┼─────┼─────┼─────┤
-│ SP+ │ SP- │ PRV │ HU- │ SA- │ VA- │                              │TGMOU│ --- │ --- │ --- │ --- │ --- │
+│ SP+ │ SP- │ PRV │ HU- │ SA- │ VA- │                              │ --- │ --- │ --- │ --- │ --- │ --- │
 ├─────┼─────┼─────┼─────┼─────┼─────┤                              ├─────┼─────┼─────┼─────┼─────┼─────┤
-│ --- │ --- │ --- │ --- │ --- │ --- │                              │ --- │ --- │VOL- │MUTE │VOL+ │ --- │
+│ --- │ --- │ --- │ --- │ --- │ --- │                              │TGMOU│ --- │VOL- │MUTE │VOL+ │ --- │
 ├─────┼─────┼─────┼─────┼─────┼─────┼─────┐                  ┌─────┼─────┼─────┼─────┼─────┼─────┼─────┤
 │ --- │ --- │ --- │ --- │ --- │ --- │[MUT]│ ◉track  brillo◉  │[PLY]│ --- │ --- │PREV │PLAY │NEXT │ --- │
 └─────┴─────┴─────┼─────┼─────┼─────┴─────┴─────┐        ┌───┴─────┴─────┼─────┼─────┼─────┴─────┴─────┘
@@ -170,6 +180,7 @@ Encoder izq: tab nav (`⌘[` / `⌘]`). Encoder der: word nav (`⌥←` / `⌥�
 **Cambios sesión 2026-05-23:**
 - Las 5 macros mac (`SCRF`/`SCRA`/`SCRT`/`LOCK`/`FQT`) ya no viven en Adjust — `SCRF` eliminado, las otras 4 movidas a Raise sobre los cursores
 - Media (VOL/MUTE y PREV/PLAY/NEXT) movido **una casilla a la derecha** (cols 7-9 → 8-10) para descansar en meñique extendido en vez de índice — más cómodo cuando llegas desde el thumb hold
+- `TGMOU` bajado de fila 2 col 6 → fila 3 col 6 (sesión 4) para alinearse horizontalmente con el bloque de media (VOL/MUTE/VOL+) en la misma fila
 
 **Sistema:**
 `BOOT` = `QK_BOOT` (entra a bootloader para flashear) · `TGMOU` = toggle capa Mouse persistente
@@ -211,7 +222,7 @@ Los efectos custom están implementados en [`rgb_matrix_user.inc`](./keyboards/s
 ├─────┼─────┼─────┼─────┼─────┼─────┤                              ├─────┼─────┼─────┼─────┼─────┼─────┤
 │[SFT]│     │     │     │     │     │                              │ ←M  │ ↓M  │ ↑M  │ →M  │ --- │ --- │
 ├─────┼─────┼─────┼─────┼─────┼─────┼─────┐                  ┌─────┼─────┼─────┼─────┼─────┼─────┼─────┤
-│[CMD]│     │     │     │     │     │[MUT]│  ◉scrV    scrH◉  │[PLY]│ --- │ ←S  │ ↓S  │ ↑S  │ →S  │EXIT │
+│[CMD]│     │     │     │     │     │[MUT]│  ◉scrV    scrH◉  │[PLY]│ ←S  │ ↓S  │ ↑S  │ →S  │ --- │EXIT │
 └─────┴─────┴─────┼─────┼─────┼─────┴─────┴─────┐        ┌───┴─────┴─────┼─────┼─────┼─────┴─────┴─────┘
                   │ --- │[ALT]│[CTL]│[LWR]│[SPC]│        │[ENT]│[RSE]│[AGR]│[RCT]│ --- │
                   └─────┴─────┴─────┴─────┴─────┘        └─────┴─────┴─────┴─────┴─────┘
@@ -222,9 +233,11 @@ Los efectos custom están implementados en [`rgb_matrix_user.inc`](./keyboards/s
 
 Mano izq mantiene Shift y Cmd para combos: Shift+click (selección), Cmd+click (abrir en nueva pestaña), Ctrl+click (menú contextual mac).
 
-**Cascada de filas (sesión 2026-05-23):** botones BTN1/3/2 bajaron de fila 1 → fila 2; movimiento de fila 2 → fila 3; scroll de fila 3 → fila 4. Razón: la fila 1 quedaba muy alta para los dedos descansados, físicamente difícil de alcanzar. Ahora botones quedan en home row, movimiento en fila 3 (alcance natural del meñique-anular-medio-índice), scroll en fila 4 (más extendido pero menos usado).
+**Cascada de filas (sesión 2026-05-23):** botones BTN1/3/2 bajaron de fila 1 → fila 2; movimiento de fila 2 → fila 3; scroll de fila 3 → fila 4. Razón: la fila 1 quedaba muy alta para los dedos descansados, físicamente difícil de alcanzar. Ahora botones quedan en home row, movimiento en fila 3 (alcance natural del meñique-anular-medio-índice), scroll en fila 4.
 
-**Precisión del movimiento (sesión 2026-05-23):** activado `MK_KINETIC_SPEED` en `users/gonzafg2/config.h` para movimiento smooth con momentum (más natural tipo trackpad). Parámetros tuneados para más precisión: `MOUSEKEY_MOVE_DELTA 16` (default 25), `MOUSEKEY_INITIAL_SPEED 50` (default 100), `MOUSEKEY_BASE_SPEED 3000` (default 5000). Resultado: tap individual = ~16 px (preciso), hold acelera suavemente hasta 3000 px/s. Costo en flash: ~150 B.
+**Alineación scroll (sesión 4 2026-05-23):** scroll movido de cols 9-12 → cols 8-11 en fila 4 para quedar alineado verticalmente con movimiento (fila 3 cols 6-9 físicas) y botones (fila 2 cols 6-8 físicas). Antes el scroll estaba desfasado un espacio a la derecha respecto a movimiento/botones.
+
+**Precisión del movimiento (sesión 2026-05-23):** activado `MK_KINETIC_SPEED` en `users/gonzafg2/config.h` para movimiento smooth con momentum (más natural tipo trackpad). Parámetros tuneados: `MOUSEKEY_MOVE_DELTA 16` (default 25), `MOUSEKEY_INITIAL_SPEED 50` (default 100), `MOUSEKEY_BASE_SPEED 2000` (default 5000, bajado de 3000 en sesión 4 por feedback de aceleración muy rápida). Resultado: tap individual = ~16 px (preciso), hold acelera suavemente hasta 2000 px/s.
 
 ## Modificadores standard PC — dónde queda cada uno
 

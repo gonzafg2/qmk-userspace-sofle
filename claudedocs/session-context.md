@@ -116,6 +116,21 @@ Tras resolver el bug de dead keys, el user revisó el keymap completo y pidió 1
 
 **Medición**: +150 B neto (de 28020 → 28170 / 28672, 502 libres, 97% → 98%). NKRO+combos 0 B, MK_KINETIC +150 B, GFG_SCRF -30 B.
 
+## Sesión 2026-05-23 (sesión 4) — ajustes post-flasheo
+
+Tras flashear y probar, 6 ajustes basados en feedback de uso real (detalle en [decisions-log.md](./decisions-log.md) entrada "Sesión 4"):
+
+1. **Mouse aceleración**: `MOUSEKEY_BASE_SPEED 3000 → 2000` (sentía muy rápido al hold)
+2. **TGMOU**: Adjust fila 2 col 6 → fila 3 col 6 (coherencia con bloque media VOL/MUTE)
+3. **Mouse scroll**: cols 9-12 → cols 8-11 fila 4 (alineado vertical con movimiento y botones)
+4. **`ZM0` reset zoom**: nuevo `LGUI(KC_0)` en Raise fila 2 col 11 (reemplaza `[BSDL]` heredado). Labels `SPC-/SPC+` renombrados a `SPCL/SPCR` para claridad
+5. **Emoji picker**: nuevo `LGUI(LCTL(KC_SPC))` en Raise fila 3 col 11 al lado de SPOT
+6. **Neovim `JBk`**: nuevo `LCTL(KC_O)` jump back en Raise fila 2 col 0 (reemplaza `[TAB]` heredado). `[SFT]` y `[CMD]` mantenidos heredados — son modifiers críticos en Raise
+
+**Nota sobre Spaces lento**: el delay entre cambiar Space y poder tipear es animación nativa de macOS (~300 ms), no firmware. Recomendado activar `System Settings → Accessibility → Display → Reduce Motion`.
+
+**Tamaño**: 28170 / 28672 (502 libres, sin cambio). Todos los cambios fueron 0 B.
+
 ## Sesión 2026-05-23 (sesión 3) — `SPLIT_LAYER_STATE_ENABLE` activado, `CHORDAL_HOLD` descartado
 
 Tras quedar con 502 B libres, evaluamos qué features de productividad valdrían la pena.
