@@ -36,7 +36,7 @@ Hermano del repo [zmk-config-corne](https://github.com/gonzafg2/zmk-config-corne
     │ LOWER │    │ RAISE │    │ ADJUST│    │ MOUSE │    │ MOUSE │
     │  (1)  │    │  (2)  │    │  (3)  │    │  (4)  │    │  (4)  │
     └───────┘    └───────┘    └───────┘    └───────┘    └───────┘
-                                  ▲ tambien: hold ESC pinky der
+                                  ▲ también: hold ESC pinky der
 ```
 
 | Capa | # | Activación | Tipo |
@@ -48,6 +48,20 @@ Hermano del repo [zmk-config-corne](https://github.com/gonzafg2/zmk-config-corne
 | Mouse | 4 | hold encoder push izq (momentary) **o** tap TG_MOUSE en Adjust (persistente) | mixto |
 
 Salir de Mouse persistente: tap **EXIT** (esquina sup der o esquina inf der dentro de Mouse).
+
+### Convención de los diagramas
+
+En los diagramas de Lower / Raise / Adjust / Mouse se usa esta notación para distinguir teclas asignadas en la capa de teclas heredadas de Base:
+
+| Símbolo | Significado |
+|---|---|
+| `KEY` (sin corchetes) | Keycode asignado en esta capa (sobrescribe a Base) |
+| `[KEY]` (entre corchetes) | Slot `_______` que **hereda** la tecla `KEY` de Base (no está sobrescrita) |
+| `---` | Slot `XXXXXXX` (bloqueado, no produce nada) |
+| `▼` | Thumb que estás **holdeando** ahora para activar esta capa |
+| `[MUTM]` / `[PLAY]` | Encoder push heredado de Base (LT mouse / play) |
+
+Abreviaciones por espacio en celdas de 5 chars: `[SFT]`=LSFT, `[CMD]`=LGUI, `[CTL]`=LCTL, `[ALT]`=LALT, `[AGR]`=AltGr, `[RCT]`=RCtl, `[BSD]`=BSDL mod-morph, `[E/A]`=ESC tap/Adjust hold.
 
 ### Base — QWERTY LATAM macOS
 
@@ -74,58 +88,105 @@ Salir de Mouse persistente: tap **EXIT** (esquina sup der o esquina inf der dent
 ┌─────┬─────┬─────┬─────┬─────┬─────┐                              ┌─────┬─────┬─────┬─────┬─────┬─────┐
 │ F12 │ F1  │ F2  │ F3  │ F4  │ F5  │                              │ F6  │ F7  │ F8  │ F9  │ F10 │ F11 │
 ├─────┼─────┼─────┼─────┼─────┼─────┤                              ├─────┼─────┼─────┼─────┼─────┼─────┤
-│     │  7  │  8  │  9  │  /  │  *  │                              │  (  │  )  │  \  │  !  │  ?  │     │
+│[TAB]│  7  │  8  │  9  │  /  │  *  │                              │  (  │  )  │  \  │  !  │  ?  │[BSD]│
 ├─────┼─────┼─────┼─────┼─────┼─────┤                              ├─────┼─────┼─────┼─────┼─────┼─────┤
-│     │  4  │  5  │  6  │  +  │  -  │                              │  {  │  }  │  ~  │  '  │  "  │  `  │
+│[SFT]│  4  │  5  │  6  │  +  │  -  │                              │  {  │  }  │  ~  │  '  │  "  │  `  │
 ├─────┼─────┼─────┼─────┼─────┼─────┼─────┐                  ┌─────┼─────┼─────┼─────┼─────┼─────┼─────┤
-│     │  1  │  2  │  3  │  .  │  0  │BRDN │ ◉brillo   scrH◉  │BRUP │  [  │  ]  │  <  │  >  │  |  │  _  │
+│[CMD]│  1  │  2  │  3  │  .  │  0  │BRDN │ ◉brillo   scrH◉  │BRUP │  [  │  ]  │  <  │  >  │  |  │  _  │
 └─────┴─────┴─────┼─────┼─────┼─────┴─────┴─────┐        ┌───┴─────┴─────┼─────┼─────┼─────┴─────┴─────┘
-                  │     │     │     │  ▼  │     │        │     │     │     │     │     │
+                  │ KP= │[ALT]│[CTL]│  ▼  │[SPC]│        │[ENT]│[RSE]│[AGR]│[RCT]│KENT │
                   └─────┴─────┴─────┴─────┴─────┘        └─────┴─────┴─────┴─────┴─────┘
                                     ▲ activa
 ```
 
-Casillas vacías = transparent (heredan de Base). Encoder izq cambia a brillo, encoder der a scroll horizontal.
+Encoder izq cambia a brillo, encoder der a scroll horizontal.
 
-### Raise — operadores programación + navegación
+**Thumbs externos (nuevos, sesión 2026-05-23):**
+- `KP=` (thumb izq exterior): `KC_PEQL` — `=` del numpad, útil para calculadora
+- `KENT` (thumb der exterior): `KC_PENT` — Enter del numpad
+
+Estas dos posiciones eran las únicas realmente libres en el thumb cluster (en Base son `XXXXXXX`). Ahora tienen propósito contextual al numpad activo en Lower.
+
+### Raise — operadores prog + navegación + window mgmt mac + neovim
 
 ```
 ┌─────┬─────┬─────┬─────┬─────┬─────┐                              ┌─────┬─────┬─────┬─────┬─────┬─────┐
-│  =  │ >=  │ <=  │ ??  │ ?.  │ **  │                              │     │     │     │     │     │     │
+│  =  │ >=  │ <=  │ ??  │ ?.  │ **  │                              │MCTL │APXP │SPCL │SPCR │ ZM- │ ZM+ │
 ├─────┼─────┼─────┼─────┼─────┼─────┤                              ├─────┼─────┼─────┼─────┼─────┼─────┤
-│     │  !  │  @  │  #  │  $  │  %  │                              │     │ RPT │     │     │     │     │
+│ JBk │  !  │  @  │  #  │  $  │  %  │                              │SCRA │SCRT │LOCK │FQT  │ RPT │ ZM0 │
 ├─────┼─────┼─────┼─────┼─────┼─────┤                              ├─────┼─────┼─────┼─────┼─────┼─────┤
-│     │  ^  │ +=  │  &  │ &&  │ ||  │                              │  ←  │  ↓  │  ↑  │  →  │ -=  │     │
+│[SFT]│  ^  │ +=  │ -=  │ &&  │ ||  │                              │  ←  │  ↓  │  ↑  │  →  │SPOT │EMJI │
 ├─────┼─────┼─────┼─────┼─────┼─────┼─────┐                  ┌─────┼─────┼─────┼─────┼─────┼─────┼─────┤
-│     │ =>  │ ... │ ==  │ !== │ === │     │ ◉tab     word◉   │     │HOME │PGDN │PGUP │ END │     │     │
+│[CMD]│ =>  │ ... │ ==  │ !== │ === │[MUT]│ ◉tab     word◉   │[PLY]│HOME │PGDN │PGUP │ END │ --- │[E/A]│
 └─────┴─────┴─────┼─────┼─────┼─────┴─────┴─────┐        ┌───┴─────┴─────┼─────┼─────┼─────┴─────┴─────┘
-                  │     │     │     │     │     │        │     │  ▼  │     │     │     │
+                  │ --- │[ALT]│[CTL]│[LWR]│[SPC]│        │[ENT]│  ▼  │[AGR]│[RCT]│ --- │
                   └─────┴─────┴─────┴─────┴─────┘        └─────┴─────┴─────┴─────┴─────┘
                                                                 ▲ activa
 ```
 
-`RPT` = `QK_REP` (repite la última tecla pulsada). Encoder izq cambia a tab nav (`⌘[` / `⌘]`), encoder der a word nav (`⌥←` / `⌥→`).
+**Operadores prog (mano izq):** `=` · `>=` · `<=` · `??` · `?.` · `**` (fila 1); `!` · `@` · `#` · `$` · `%` (fila 2); `^` · `+=` · `-=` · `&&` · `||` (fila 3); `=>` · `...` · `==` · `!==` · `===` (fila 4). Pinky col 0: `JBk` (jump back neovim/IDE) reemplaza el `[TAB]` heredado; `[SFT]` y `[CMD]` se mantienen heredados porque son modifiers útiles mientras editas en Raise (Shift+arrow para selección, Cmd+S/Z/C/V universales).
 
-### Adjust — sistema, macros mac, media, **RGB**
+**Window/Spaces management mac (fila 1 mano der):**
+
+| Label | Keycode | Acción macOS |
+|---|---|---|
+| `MCTL` | `LCTL(KC_UP)` | Mission Control |
+| `APXP` | `LCTL(KC_DOWN)` | App Exposé |
+| `SPCL` / `SPCR` | `LCTL(KC_LEFT)` / `LCTL(KC_RGHT)` | Space izquierda / derecha |
+| `ZM-` / `ZM+` | `LGUI(KC_PMNS)` / `LGUI(KC_PPLS)` | Zoom out / Zoom in (en navegador, screenshare, IDE — verificar en LATAM Mac tras flasheo, si no funciona ajustamos con macro custom) |
+| `ZM0` | `LGUI(KC_0)` | Zoom reset (Cmd+0) — fila 2 col 11, reemplaza el `[BSDL]` heredado |
+| `SPOT` | `LGUI(KC_SPC)` | Spotlight (Cmd+Space, cómodo en home row der) |
+| `EMJI` | `LGUI(LCTL(KC_SPC))` | Emoji & Symbol picker (Cmd+Ctrl+Space) — fila 3 col 11 al lado de SPOT |
+
+> **Tip — cambio de Spaces se siente lento**: macOS anima el cambio de Space ~300 ms y el foco llega después. Si el problema es "cambias de Space y empiezas a tipear en el anterior", **no es del firmware** — es animación del OS. Hay dos formas de mitigarlo, con trade-off:
+>
+> - **Opción A — `Reduce Motion` ON** (search "reduce motion" en System Settings; en versiones recientes está en Accessibility → Motion o Display según release). Acelera dramáticamente el cambio de Space. **Trade-off**: estatiza también las animaciones del Liquid Glass (los widgets siguen translúcidos pero sin la refracción animada que les da el efecto "vivo"). Si te molesta visualmente, usa la Opción B.
+> - **Opción B — Hack del Dock**: `defaults write com.apple.dock expose-animation-duration -float 0.05; killall Dock`. Acelera solo la animación de Mission Control / Spaces sin tocar Liquid Glass. **Trade-off**: en macOS reciente (Sequoia 15+ / Tahoe 26+) `killall Dock` puede no ser suficiente — quizás requiera **logout completo** (`osascript -e 'tell app "System Events" to log out'`) para que WindowServer recoja el cambio. Y aún así, en algunas versiones este setting ya no afecta al Space switching por keyboard shortcut. Si confirmás que no aplica, queda la Opción A.
+
+**Neovim / IDE shortcut:**
+
+| Label | Keycode | Acción |
+|---|---|---|
+| `JBk` | `LCTL(KC_O)` | Jump back en jumplist (neovim nativo, también IDEs con plugin vim). Súper frecuente al navegar código entre archivos. Reemplaza el `[TAB]` heredado en col 0 fila 2 |
+
+**Macros mac sobre cursores (fila 2 mano der, movidas desde Adjust en sesión 2026-05-23):**
+
+| Label | Keycode | Acción macOS |
+|---|---|---|
+| `SCRA` | `⌘⇧4` | Screenshot área |
+| `SCRT` | `⌘⇧5` | Screenshot herramienta (Captura) |
+| `LOCK` | `⌘⌃Q` | Lock pantalla |
+| `FQT` | `⌘⌥Esc` | Force Quit |
+| `RPT` | `QK_REP` | Repite la última tecla pulsada |
+
+> `SCRF` (screenshot completo `⌘⇧3`) **eliminado** en la misma sesión: poco uso. Si lo necesitas, vuelve a agregarlo al enum y a `process_record_user` en `users/gonzafg2/`.
+
+Encoder izq: tab nav (`⌘[` / `⌘]`). Encoder der: word nav (`⌥←` / `⌥→`).
+
+### Adjust — sistema, media, mouse toggle, **RGB**
 
 ```
 ┌─────┬─────┬─────┬─────┬─────┬─────┐                              ┌─────┬─────┬─────┬─────┬─────┬─────┐
-│BOOT │ TOG │ NXT │ HU+ │ SA+ │ VA+ │                              │     │     │     │     │     │     │
+│BOOT │ TOG │ NXT │ HU+ │ SA+ │ VA+ │                              │ --- │ --- │ --- │ --- │ --- │ --- │
 ├─────┼─────┼─────┼─────┼─────┼─────┤                              ├─────┼─────┼─────┼─────┼─────┼─────┤
-│ SP+ │ SP- │ PRV │ HU- │ SA- │ VA- │                              │TGMOU│     │     │     │     │     │
+│ SP+ │ SP- │ PRV │ HU- │ SA- │ VA- │                              │ --- │ --- │ --- │ --- │ --- │ --- │
 ├─────┼─────┼─────┼─────┼─────┼─────┤                              ├─────┼─────┼─────┼─────┼─────┼─────┤
-│     │SCRF │SCRA │SCRT │LOCK │FQT  │                              │     │VOL- │MUTE │VOL+ │     │     │
+│ --- │ --- │ --- │ --- │ --- │ --- │                              │TGMOU│ --- │VOL- │MUTE │VOL+ │ --- │
 ├─────┼─────┼─────┼─────┼─────┼─────┼─────┐                  ┌─────┼─────┼─────┼─────┼─────┼─────┼─────┤
-│     │     │     │     │     │     │     │ ◉track  brillo◉  │     │     │PREV │PLAY │NEXT │     │     │
+│ --- │ --- │ --- │ --- │ --- │ --- │[MUT]│ ◉track  brillo◉  │[PLY]│ --- │ --- │PREV │PLAY │NEXT │ --- │
 └─────┴─────┴─────┼─────┼─────┼─────┴─────┴─────┐        ┌───┴─────┴─────┼─────┼─────┼─────┴─────┴─────┘
-                  │     │     │     │  ▼  │     │        │     │  ▼  │     │     │     │
+                  │ --- │[ALT]│[CTL]│  ▼  │[SPC]│        │[ENT]│  ▼  │[AGR]│[RCT]│ --- │
                   └─────┴─────┴─────┴─────┴─────┘        └─────┴─────┴─────┴─────┴─────┘
                           ▲ hold ambos LWR+RSE | hold ESC
 ```
 
-**Sistema y macros mac:**
-`BOOT` = `QK_BOOT` (entra a bootloader para flashear) · `SCRF/A/T` = screenshots mac (`⌘⇧3`/`4`/`5`)
-`LOCK` = `⌘⌃Q` · `FQT` = Force Quit (`⌘⌥Esc`) · `TGMOU` = toggle capa Mouse persistente
+**Cambios sesión 2026-05-23:**
+- Las 5 macros mac (`SCRF`/`SCRA`/`SCRT`/`LOCK`/`FQT`) ya no viven en Adjust — `SCRF` eliminado, las otras 4 movidas a Raise sobre los cursores
+- Media (VOL/MUTE y PREV/PLAY/NEXT) movido **una casilla a la derecha** (cols 7-9 → 8-10) para descansar en meñique extendido en vez de índice — más cómodo cuando llegas desde el thumb hold
+- `TGMOU` bajado de fila 2 col 6 → fila 3 col 6 (sesión 4) para alinearse horizontalmente con el bloque de media (VOL/MUTE/VOL+) en la misma fila
+
+**Sistema:**
+`BOOT` = `QK_BOOT` (entra a bootloader para flashear) · `TGMOU` = toggle capa Mouse persistente
 
 **Controles RGB (RGB_MATRIX, keycodes `RM_*`):**
 
@@ -138,15 +199,15 @@ Casillas vacías = transparent (heredan de Base). Encoder izq cambia a brillo, e
 | `VA+` / `VA-` | `RM_VALU` / `RM_VALD` | Brillo +/- (tope a 150 por límite USB) |
 | `SP+` / `SP-` | `RM_SPDU` / `RM_SPDD` | Velocidad animación +/- |
 
-**7 efectos en el ciclo** (`NXT` cicla todos):
+**5 efectos en el ciclo** (`NXT` cicla todos):
 
 1. `RGB_MATRIX_SOLID_COLOR` *(always-on de QMK, no se puede deshabilitar; aparece como `RGB?` en el OLED)* — todo el teclado en un solo color fijo del HUE actual
 2. `RGB_MATRIX_GRADIENT_LEFT_RIGHT` *(default al boot)* — gradient estático rojo→violeta de izq a der
-3. `RGB_MATRIX_STARLIGHT` — LEDs random titilan suavemente como estrellas (ambiental)
-4. `RGB_MATRIX_SOLID_MULTISPLASH` — ondas circulares un solo color (reactivo, sin BG idle)
-5. `RGB_MATRIX_SOLID_REACTIVE_MULTICROSS` — al pulsar, fila + columna se iluminan en cruz (reactivo, sin BG idle)
-6. **`MY_WAVE` (custom)** — ondas un solo color + **fondo idle pulsando (respiración)** del HUE actual
-7. **`MY_RAIN` (custom)** — ondas arcoíris + **fondo idle pulsando (respiración)** del HUE actual
+3. `RGB_MATRIX_SOLID_MULTISPLASH` — ondas circulares un solo color (reactivo, sin BG idle)
+4. **`MY_WAVE` (custom)** — ondas un solo color + **fondo idle pulsando (respiración)** del HUE actual
+5. **`MY_RAIN` (custom)** — ondas arcoíris + **fondo idle pulsando (respiración)** del HUE actual
+
+> **Histórico** — sesión 2026-05-23: removidos `RGB_MATRIX_STARLIGHT` (label `Star`) y `RGB_MATRIX_SOLID_REACTIVE_MULTICROSS` (label `Cros`) para liberar 846 B y habilitar `NKRO_ENABLE` (368 B). Ver [decisions-log.md](./claudedocs/decisions-log.md) para el diagnóstico completo del race condition de dead keys LATAM que motivó el cambio.
 
 Los efectos custom están implementados en [`rgb_matrix_user.inc`](./keyboards/sofle/keymaps/gonzafg2/rgb_matrix_user.inc). El BG idle **late tipo corazón** (lub-dub + pausa) usando una lookup table piecewise de 32 frames × ~32ms = ciclo ~1 segundo (~60 BPM). Pico del lub: 88 (~35%); pico del dub: 70 (~28%); reposo: ~15-20 (~6-8%). El brillo total queda modulado por el VAL global.
 
@@ -158,15 +219,15 @@ Los efectos custom están implementados en [`rgb_matrix_user.inc`](./keyboards/s
 
 ```
 ┌─────┬─────┬─────┬─────┬─────┬─────┐                              ┌─────┬─────┬─────┬─────┬─────┬─────┐
-│     │     │     │     │     │     │                              │BTN1 │BTN3 │BTN2 │     │     │EXIT │
+│     │     │     │     │     │     │                              │     │     │     │     │     │EXIT │
 ├─────┼─────┼─────┼─────┼─────┼─────┤                              ├─────┼─────┼─────┼─────┼─────┼─────┤
-│     │     │     │     │     │     │                              │ ←M  │ ↓M  │ ↑M  │ →M  │     │     │
+│     │     │     │     │     │     │                              │BTN1 │BTN3 │BTN2 │ --- │ --- │ --- │
 ├─────┼─────┼─────┼─────┼─────┼─────┤                              ├─────┼─────┼─────┼─────┼─────┼─────┤
-│ SFT │     │     │     │     │     │                              │ ←S  │ ↓S  │ ↑S  │ →S  │     │     │
+│[SFT]│     │     │     │     │     │                              │ ←M  │ ↓M  │ ↑M  │ →M  │ --- │ --- │
 ├─────┼─────┼─────┼─────┼─────┼─────┼─────┐                  ┌─────┼─────┼─────┼─────┼─────┼─────┼─────┤
-│ CMD │     │     │     │     │     │     │  ◉scrV    scrH◉  │     │     │     │     │     │     │EXIT │
+│[CMD]│     │     │     │     │     │[MUT]│  ◉scrV    scrH◉  │[PLY]│ ←S  │ ↓S  │ ↑S  │ →S  │ --- │EXIT │
 └─────┴─────┴─────┼─────┼─────┼─────┴─────┴─────┐        ┌───┴─────┴─────┼─────┼─────┼─────┴─────┴─────┘
-                  │ CTL │ ALT │     │     │ SPC │        │ ENT │     │     │ALTGR│ CTL │
+                  │ --- │[ALT]│[CTL]│[LWR]│[SPC]│        │[ENT]│[RSE]│[AGR]│[RCT]│ --- │
                   └─────┴─────┴─────┴─────┴─────┘        └─────┴─────┴─────┴─────┴─────┘
               ▲ hold encoder push izq (momentario) | tap TGMOU desde Adjust (persistente)
 ```
@@ -174,6 +235,12 @@ Los efectos custom están implementados en [`rgb_matrix_user.inc`](./keyboards/s
 `M` = movimiento del cursor · `S` = scroll · `BTN1/2/3` = clic izq / medio / der · `EXIT` = `TG(_MOUSE)` apaga la capa
 
 Mano izq mantiene Shift y Cmd para combos: Shift+click (selección), Cmd+click (abrir en nueva pestaña), Ctrl+click (menú contextual mac).
+
+**Cascada de filas (sesión 2026-05-23):** botones BTN1/3/2 bajaron de fila 1 → fila 2; movimiento de fila 2 → fila 3; scroll de fila 3 → fila 4. Razón: la fila 1 quedaba muy alta para los dedos descansados, físicamente difícil de alcanzar. Ahora botones quedan en home row, movimiento en fila 3 (alcance natural del meñique-anular-medio-índice), scroll en fila 4.
+
+**Alineación scroll (sesión 4 2026-05-23):** scroll movido de cols 9-12 → cols 8-11 en fila 4 para quedar alineado verticalmente con movimiento (fila 3 cols 6-9 físicas) y botones (fila 2 cols 6-8 físicas). Antes el scroll estaba desfasado un espacio a la derecha respecto a movimiento/botones.
+
+**Precisión del movimiento (sesión 2026-05-23):** activado `MK_KINETIC_SPEED` en `users/gonzafg2/config.h` para movimiento smooth con momentum (más natural tipo trackpad). Parámetros tuneados: `MOUSEKEY_MOVE_DELTA 16` (default 25), `MOUSEKEY_INITIAL_SPEED 50` (default 100), `MOUSEKEY_BASE_SPEED 2000` (default 5000, bajado de 3000 en sesión 4 por feedback de aceleración muy rápida). Resultado: tap individual = ~16 px (preciso), hold acelera suavemente hasta 2000 px/s.
 
 ## Modificadores standard PC — dónde queda cada uno
 
@@ -203,23 +270,35 @@ Mano izq mantiene Shift y Cmd para combos: Shift+click (selección), Cmd+click (
 
 > **⚠️ Hardware conocido**: en la unidad actual los **push de los encoders no registran señal eléctrica** (cold joint diagnosticado, no es bug de firmware). La rotación funciona correctamente. Los keycodes de tap/hold están asignados correctamente y funcionarán una vez resoldados los pines del switch del EC11. Detalle del diagnóstico en [`claudedocs/hardware-notes.md`](./claudedocs/hardware-notes.md).
 
+## Split — comunicación master ↔ slave
+
+El Sofle es un teclado **split** con dos mitades comunicándose por TRRS. La mitad izquierda es la **master** (`MASTER_LEFT` en config); es la que se conecta por USB al Mac. La derecha es la **slave**.
+
+**Cómo procesa pulsaciones:** la slave detecta una tecla apretada físicamente y manda solo "posición (fila, col) apretada" al master por TRRS. El master, que sabe en qué capa estás, traduce esa posición usando `keymaps[][][]` y manda el keycode resultante a USB. La slave **nunca conoce la capa** por default.
+
+**`SPLIT_LAYER_STATE_ENABLE` (activado en sesión 2026-05-23 sesión 3):** sincroniza el `layer_state` (qué capa está activa) del master a la slave por TRRS. Costó **0 B** en este contexto por dividendos de LTO con otras features split presentes. Hoy no tiene efecto visible — habilita futuro:
+1. Mostrar capa actual en el OLED de la slave (hoy solo muestra "Eres / un / Crack" + Luna pet estático)
+2. RGB indicators per-capa en la slave (ej. cambiar color del thumb derecho según capa activa)
+3. Cualquier feedback visual no-USB en la slave que dependa de la capa
+
 ## Caps Word
 
 Doble tap rápido de **Shift** (LSFT) activa Caps Word — mayúsculas temporales hasta que pulses espacio, enter, tab o pase un timeout. Útil para escribir constantes (`MAX_RETRIES`) o acrónimos sin mantener Shift.
 
 Activado vía `DOUBLE_TAP_SHIFT_TURNS_ON_CAPS_WORD` (built-in de QMK, sin overhead de `COMBO_ENABLE`).
 
-## Macros macOS (Adjust)
+## Macros macOS (Raise)
 
-Implementadas con `tap_code16` LATAM-aware en `users/gonzafg2/gonzafg2.c`:
+Implementadas con `tap_code16` LATAM-aware en `users/gonzafg2/gonzafg2.c`. **Movidas de Adjust a Raise en sesión 2026-05-23** (encima de los cursores) para acceso más rápido:
 
 | Tecla | Acción |
 |---|---|
-| `SCRF` | `⌘⇧3` (screenshot completo) |
-| `SCRA` | `⌘⇧4` (área) |
-| `SCRT` | `⌘⇧5` (herramienta) |
+| `SCRA` | `⌘⇧4` (screenshot área) |
+| `SCRT` | `⌘⇧5` (screenshot herramienta) |
 | `LOCK` | `⌘⌃Q` (lock pantalla) |
 | `FQT` | `⌘⌥Esc` (Force Quit) |
+
+`SCRF` (`⌘⇧3` screenshot completo) eliminado — poco uso. Si vuelve a hacer falta, agregarlo al enum `gfg_keycodes` en `gonzafg2.h` y al switch en `gonzafg2.c`.
 
 ## Operadores de programación (Raise)
 
@@ -242,7 +321,7 @@ RGBv2         fila 7     — identificación del PCB
 [gata pet]    filas 9-12 — gata estática (sentada alerta, 32×32)
 CC AA         fila 13    — Ctrl izq/der + Alt/AltGr (ver abajo)
 SS MM         fila 14    — Shift izq/der + Cmd izq/der (ver abajo)
-Lower / Star  fila 15    — capa actual O efecto RGB (ver abajo)
+Lower / Wave  fila 15    — capa actual O efecto RGB (ver abajo)
 ```
 
 **Filas 13-14 - indicadores de mods con distinción L/R** (codificación posicional fija, 2 filas × 5 chars = 8 mods + 2 separadores):
@@ -282,9 +361,7 @@ Cada posición tiene una letra fija que aparece sólo cuando ese mod específico
 | Label | Efecto |
 |---|---|
 | `Grad` | `RGB_MATRIX_GRADIENT_LEFT_RIGHT` |
-| `Star` | `RGB_MATRIX_STARLIGHT` |
 | `Wave` | `RGB_MATRIX_SOLID_MULTISPLASH` (ondas mono, sin BG idle) |
-| `Cros` | `RGB_MATRIX_SOLID_REACTIVE_MULTICROSS` (cruz fila+columna) |
 | `iWav` | `MY_WAVE` custom (ondas mono **+ BG idle pulsando**) |
 | `iRai` | `MY_RAIN` custom (ondas arcoíris **+ BG idle pulsando**) |
 | `RGB?` | `RGB_MATRIX_SOLID_COLOR` (always-on, sin label propio para ahorrar flash) |
@@ -371,18 +448,44 @@ La app Claude Desktop tiene un atajo global asignado a `\` (abre asistente de ca
 - Desactivar el atajo: Claude Desktop → Settings → Shortcuts
 - O cerrar el asistente cuando aparece: las pulsaciones siguientes de `\` ya van al campo activo
 
+### Tipeo rápido y dead keys (NKRO)
+
+Si al escribir muy rápido en LATAM notabas que **´+vocal no producía la tilde** (ej. tipear "también" rápido salía "tambien" o "tambi´en"), era un race condition entre las dos mitades del split y el modo HID **6KRO** de QMK.
+
+**Causa raíz**: la ´ (`KC_LBRC`) está en la mitad derecha; las vocales en la izquierda (master). Al teclear rápido, el evento de la ´ viaja por TRRS al master, y si llega dentro de la misma ventana de polling USB (~1 ms) que la siguiente vocal, ambos se reportan en un único reporte HID 6KRO sin orden claro. macOS no sabe cuál tecla vino primero y la dead key del layout LATAM no combina, dejando como si no hubieras apretado nada.
+
+**Fix aplicado** (sesión 2026-05-23, ver [decisions-log.md](./claudedocs/decisions-log.md)):
+
+- `NKRO_ENABLE = yes` + `FORCE_NKRO` → cambia el formato HID de array de 6 slots compartidos (6KRO) a bitmap con un bit por tecla (NKRO). Los reportes HID en ambos modos son **snapshots de estado** (no eventos ordenados), pero al no compartir slots, NKRO elimina la ambigüedad sobre qué tecla ocupa qué slot del array. Empíricamente esto resolvió el bug — la causa exacta probablemente combina la eliminación de esa ambigüedad con diferencias de timing/batching de reportes entre los dos modos en QMK. Costo: **368 B medidos**.
+- `DEBOUNCE 8` (default QMK = 5) → margen extra anti-chatter. Costo: 0 B (es un define numérico).
+
+El firmware arranca siempre en NKRO sin necesidad de hotkey de toggle. Si por alguna razón necesitas volver a 6KRO en una máquina con BIOS antiguo o KVM problemático, hay que recompilar quitando `FORCE_NKRO`.
+
+**Verificación**: tipea palabras con tildes lo más rápido posible — "también", "tenía", "está", "más rápido", "véelo" — y todas las vocales acentuadas deberían salir consistentes.
+
 ## Build
 
 ### Build local (requiere toolchain AVR)
 
 ```bash
-brew install qmk/qmk/qmk
+brew install qmk/qmk/qmk          # instala qmk + avr-gcc@8 como dependencia
 qmk setup
 qmk config user.overlay_dir="$(pwd)"
 qmk compile -kb sofle/rev1 -km gonzafg2
 ```
 
-El `.hex` queda en `~/qmk_firmware/sofle_rev1_gonzafg2.hex`.
+El `.hex` queda en `~/qmk_firmware/sofle_rev1_gonzafg2.hex` y también en la raíz del userspace.
+
+> **⚠️ Gotcha — `avr-gcc` no está en el PATH por default**
+>
+> Homebrew instala `avr-gcc@8` como **keg-only** (no se simbolinkea a `/opt/homebrew/bin`) porque su tap permite tener múltiples versiones coexistiendo. Resultado: `qmk compile` falla con `sh: avr-gcc: command not found` aunque el paquete esté instalado.
+>
+> **Fix persistente** — agregar a `~/.zshrc`:
+> ```bash
+> export PATH="/opt/homebrew/opt/avr-gcc@8/bin:/opt/homebrew/opt/avr-binutils/bin:$PATH"
+> ```
+>
+> **Por qué fijar a la serie 8.x y no actualizar a versiones mayores**: QMK tiene problemas conocidos con `avr-gcc >= 9` (binarios 10-20% más grandes). Con el firmware al 97% del ATmega32U4, `avr-gcc 12+` muy probablemente no cabe. El CI oficial de QMK usa intencionalmente `avr-gcc 8.x`, y este repo documenta `8.5.0` como baseline en [`claudedocs/feature-weights.md`](./claudedocs/feature-weights.md). `brew upgrade avr-gcc@8` para parches dentro de 8.x es seguro.
 
 ### Build CI (recomendado)
 
@@ -410,16 +513,45 @@ Haz push a `main` → GitHub Actions corre `qmk_userspace_build.yml` + `qmk_user
 
 ## Features deshabilitadas (trade-offs AVR)
 
-El ATmega32U4 tiene 28KB usables. Build actual está al **~99%** (muy cerca del límite — el número exacto cambia con cada feature y aparece en el output de `qmk compile`). Para llegar a este balance se sacrificó:
+El ATmega32U4 tiene 28672 bytes usables (`28KB - bootloader Caterina`). Build actual: **28170 / 28672 bytes (98%, 502 libres)** medidos con `avr-gcc 8.5.0` + LTO. Resultado de 3 sesiones del 2026-05-23:
+1. **NKRO + DEBOUNCE 8** para fix de dead keys LATAM (368 B), quitando STARLIGHT + MULTICROSS para liberar 846 B
+2. **Reorganización keymap Tech Lead** + `MK_KINETIC_SPEED` mouse (+150 B neto)
+3. **`SPLIT_LAYER_STATE_ENABLE`** reactivado (0 B por LTO compartido), `CHORDAL_HOLD` probado y descartado (1236 B, no cabe + ROI marginal)
+
+Para llegar a este balance se sacrificó:
 
 | Feature | Estado | Por qué se quitó |
 |---|---|---|
 | `VIA_ENABLE` | `no` | ~2.5 KB para Luna pet (sesión 2026-05-21) |
 | `WPM_ENABLE` | `no` | ~500 B para meter `RGB_MATRIX_ENABLE` (sesión 2026-05-22). Luna ya no reacciona a velocidad de tipeo, cicla por timer fijo |
-| `SPLIT_LAYER_STATE_ENABLE` | `no` | ~130 B para meter STARLIGHT como 5to efecto RGB. Sin impacto visible (slave no muestra capa por OLED ni RGB indicators) |
+| `SPLIT_LAYER_STATE_ENABLE` | `yes` (reactivado 2026-05-23) | Activado de nuevo, costo medido **0 B** (LTO comparte código con otras features split ya presentes). Habilita futuro mostrar capa en OLED slave o RGB indicators per-layer. |
+| `ENABLE_RGB_MATRIX_STARLIGHT` (`Star`) | quitado 2026-05-23 | Liberar espacio para `NKRO_ENABLE` (368 B). Ver gotcha de tipeo rápido / dead keys arriba |
+| `ENABLE_RGB_MATRIX_SOLID_REACTIVE_MULTICROSS` (`Cros`) | quitado 2026-05-23 | Mismo motivo. Quitar **STARLIGHT + MULTICROSS + 2 cases OLED juntos** liberó **846 B medidos** — mucho más que la suma individual estimada (~320 B), porque LTO produce dividendos no-lineales cuando se eliminan varios efectos a la vez |
 | `SPLIT_TRANSPORT_MIRROR`, `SPLIT_OLED_ENABLE`, `SPLIT_MODS_ENABLE`, `SPLIT_LED_STATE_ENABLE` | `no` | Build excedía 28KB en sesión inicial |
 
-**Para revertir algún sacrificio**: hay que liberar el equivalente quitando otra feature. Las opciones más pesadas que aún siguen activas son `MOUSEKEY_ENABLE` (~700 B) y `RGB_MATRIX_ENABLE` (~3 KB).
+**Features activadas significativas (con peso medido en este build):**
+
+| Feature | Estado | Peso | Notas |
+|---|---|---|---|
+| `RGB_MATRIX_ENABLE` + ws2812 + 5 efectos | `yes` | ~3000 B | El mayor consumidor del firmware |
+| `OLED_ENABLE` + renderers custom | `yes` | ~2200 B | Logo GFG, capa, mods L/R, gata, Luna pet, indicador RGB |
+| `MOUSEKEY_ENABLE` | `yes` | ~700 B | Necesario para la capa `_MOUSE` |
+| `NKRO_ENABLE` + `FORCE_NKRO` | `yes` | **368 B** | Activado 2026-05-23 para resolver race condition de dead keys LATAM en split |
+| `MK_KINETIC_SPEED` | `yes` | ~150 B | Activado 2026-05-23: modo mouse kinetic con momentum, más natural y preciso |
+| `CAPS_WORD_ENABLE` | `yes` | ~250 B | Doble-tap Shift para CAPS WORD |
+| `ENCODER_MAP_ENABLE` | `yes` | ~180 B | Encoder por capa declarativo |
+
+**Para revertir algún sacrificio**: hay que liberar el equivalente quitando otra feature. Las opciones más pesadas activas son `RGB_MATRIX_ENABLE` (~3 KB) y `OLED_ENABLE` (~2.2 KB). Con los 502 B libres actuales puedes:
+
+- ✅ Agregar 1 efecto RGB chico tipo `BREATHING` (~50 B)
+- ✅ `SPLIT_LAYER_STATE_ENABLE` ya está activado (costó 0 B por LTO)
+- ⚠️ `RAINBOW_MOVING_CHEVRON` (~150 B) ajustado pero entra
+- ❌ `CHORDAL_HOLD` (probado 2026-05-23: pesó **1236 B**, no cabe — 3-4× más de lo que reporta la docs de QMK; ver `claudedocs/feature-weights.md` para el detalle)
+- ❌ Reactivar `WPM_ENABLE` + `STARLIGHT` juntos (sumarían >630 B)
+- ❌ Habilitar `VIA_ENABLE` (~2500 B, no cabe sin sacrificar RGB o OLED)
+- ❌ `UNICODE_ENABLE` (~500-1000 B + conflicto con LATAM Input Source en macOS)
+
+Catálogo completo de pesos medidos por feature en [`claudedocs/feature-weights.md`](./claudedocs/feature-weights.md), con descripción detallada de cada componente del firmware activo.
 
 ## Diferencias vs Corne (ZMK)
 

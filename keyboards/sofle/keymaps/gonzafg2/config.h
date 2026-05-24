@@ -19,9 +19,12 @@
 #define RGB_MATRIX_DEFAULT_MODE RGB_MATRIX_GRADIENT_LEFT_RIGHT
 
 #define ENABLE_RGB_MATRIX_GRADIENT_LEFT_RIGHT
-#define ENABLE_RGB_MATRIX_STARLIGHT
 #define ENABLE_RGB_MATRIX_SOLID_MULTISPLASH
-#define ENABLE_RGB_MATRIX_SOLID_REACTIVE_MULTICROSS
+// STARLIGHT y SOLID_REACTIVE_MULTICROSS removidos: liberar 846 B medidos al
+// quitar ambos efectos + 2 cases OLED juntos (vs ~320 B estimacion individual
+// sumada; LTO no-lineal libera mas codigo compartido al sacar varios efectos).
+// Esto hizo espacio para NKRO_ENABLE (368 B medidos). Ver claudedocs/
+// feature-weights.md y decisions-log.md (sesion 2026-05-23 sesion 1).
 // Removidos por espacio para meter el BG pulsando:
 // - CYCLE_LEFT_RIGHT: ambiental, sustituible por la pulsacion del BG idle.
 // - MULTISPLASH: MY_RAIN custom (iRai) lo reemplaza con BG idle pulsando.

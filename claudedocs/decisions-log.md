@@ -241,6 +241,258 @@ Tras los fixes de Copilot y nuevas features pedidas por el usuario, el OLED mast
 
 **Reversible**: sí. Si en el futuro se prefiere recuperar WPM reactivo, volver a `WPM_ENABLE = yes`, restaurar `render_luna()` original y deshabilitar `RGB_MATRIX_ENABLE` (o cambiar a `RGBLIGHT_ENABLE` que es más liviano y permite mantener WPM).
 
+## 2026-05-23 · Activar NKRO + `DEBOUNCE 8` para resolver dead-key intermitente en LATAM
+
+**Decisión**: activar `NKRO_ENABLE = yes` + `FORCE_NKRO` en config, subir `DEBOUNCE` de 5 ms (default) a 8 ms. Para hacer espacio en flash, quitar los efectos RGB `STARLIGHT` y `SOLID_REACTIVE_MULTICROSS` (junto con sus cases en el switch OLED).
+
+**Síntoma reportado**: al escribir rápido en LATAM (macOS), la tecla ´ (KC_LBRC) "no hace nada" y hay que repetirla para que la combinación ´+vocal produzca á/é/í/ó/ú. Intermitente, más frecuente al inicio de uso del Mac o tipeo rápido.
+
+**Diagnóstico**:
+- Verificado que `KC_LBRC` es keycode puro sin `LT()`/`MT()` ni combos → no es interferencia del firmware
+- Verificado que NO había chatter (la tecla siempre registra cuando se prueba aislada)
+- Causa raíz: **race condition entre las dos mitades del split + modo HID 6KRO de QMK**. La ´ está en la mitad derecha (slave), las vocales en la izquierda (master). El evento de ´ viaja por serial (~1-3 ms de lag) y, al escribir rápido, llega al master tan cerca del evento de la vocal que ambos se reportan en la misma ventana de polling USB (1 ms). En 6KRO el reporte HID es un array de 6 slots con orden ambiguo. macOS no puede saber qué tecla vino primero y la dead key del layout LATAM no combina.
+
+**Por qué NKRO lo arregla**: cambia el formato HID de array de 6 slots compartidos (6KRO) a un bitmap con un bit por tecla (NKRO). Los reportes HID en ambos modos son **snapshots de estado** (no eventos ordenados — esto aplica a 6KRO y NKRO por igual), pero NKRO elimina la ambigüedad de slots: en 6KRO los 6 slots se llenan en orden no estrictamente definido por la spec, lo que combinado con eventos solapados puede llevar a que macOS interprete teclas en el orden "incorrecto". Empíricamente activar NKRO resolvió el bug, aunque la causa exacta probablemente involucra también diferencias de timing/batching de reportes entre los dos modos en QMK, no solo el formato HID puro.
+
+**Por qué `DEBOUNCE 8` (no es la causa principal pero ayuda)**: subir de 5 a 8 ms agrega margen anti-chatter sin latencia perceptible al humano (8 ms < 1 frame a 60 fps). Costo en flash = 0 (es un define numérico).
+
+**Costo en flash**: NKRO pesó **368 B medidos** (27652 → 28020). Antes del cambio el firmware estaba a 28498/28672 (174 libres) → no cabía. Se liberaron 846 B quitando STARLIGHT + MULTICROSS + sus cases OLED (medición conjunta; LTO produce dividendos no-lineales al quitar varios efectos juntos). Resultado final: **28020/28672 (652 libres)**.
+
+**Por qué `STARLIGHT` y `MULTICROSS` y no otros**:
+- `STARLIGHT` (label `Star`): efecto ambiental decorativo, no único — el gradient + custom MY_WAVE/MY_RAIN cubren el rol estético
+- `SOLID_REACTIVE_MULTICROSS` (label `Cros`): efecto reactivo, pero el custom MY_RAIN ya provee reactividad con personalidad propia
+- `SOLID_MULTISPLASH` (label `Wave`) **no se quitó** porque su código se comparte por LTO con el runner de MY_WAVE custom — quitarlo paradójicamente sube el binario (medido en sesión anterior)
+
+**Por qué `FORCE_NKRO` y no `NKRO_ENABLE` solo**: `NKRO_ENABLE = yes` deja el binario con soporte para ambos modos pero arranca en 6KRO; requiere keycode `NK_TOGG` para cambiar. `FORCE_NKRO` asegura que arranque siempre en NKRO. El user pidió no incluir hotkey de toggle.
+
+**Reversible**: sí. Si NKRO causara problemas en algún BIOS antiguo o KVM (improbable en macOS):
+1. Quitar `FORCE_NKRO` y `NKRO_ENABLE = yes` → vuelve a 6KRO
+2. Re-activar `ENABLE_RGB_MATRIX_STARLIGHT` y `ENABLE_RGB_MATRIX_SOLID_REACTIVE_MULTICROSS`
+3. Restaurar los 2 cases en el switch OLED (`Star`, `Cros`)
+4. Bajar `DEBOUNCE` a 5 (o quitar el define)
+
+**Validación pendiente**: probar físicamente después de flashear que ´+vocal funciona consistente al escribir rápido. Tipear palabras como "también", "tenía", "está", "más rápido" y verificar que no se pierden vocales.
+
+## 2026-05-23 · Sesión 2: Reorganización keymap (workflow Tech Lead) + mouse kinetic
+
+**Contexto**: tras resolver el bug de dead keys con NKRO (decisión anterior), el user revisó el keymap completo y pidió 10 cambios para acomodar mejor su workflow diario como Tech Lead en macOS (window management, screenshare zoom, mouse preciso, layout más ergonómico).
+
+### Cambios aplicados
+
+**1. Convención de diagramas ASCII reescrita** (keymap.c comentarios + README.md). Los thumb clusters de Lower/Raise/Mouse mostraban contenido inconsistente con el código real (todos los thumbs son `_______` que heredan de Base, pero los diagramas mostraban combinaciones distintas — eran de iteraciones previas que nunca se actualizaron). Nueva convención documentada al inicio de `keymap.c`:
+- `[KEY]` = heredada de Base (slot `_______`)
+- `KEY` (sin corchetes) = asignada en esta capa
+- `---` = bloqueada (`XXXXXXX`)
+- `▼` = thumb que estás holdeando para activar la capa actual
+- `[MUTM]` / `[PLAY]` = encoder push heredado de Base
+
+Abreviaciones de 5 chars por límite visual: `[AGR]`=AltGr, `[RCT]`=RCtl, `[BSD]`=BSDL mod-morph, `[E/A]`=ESC/Adjust LT, `[MUT]`=MUTM, `[PLY]`=PLAY.
+
+**2. Lower thumbs externos**: las dos únicas posiciones realmente libres del thumb cluster (pos 0 izq y pos 9 der, que en Base son `XXXXXXX`) ahora tienen propósito contextual al numpad activo en Lower:
+- Pos 0 izq: `KC_PEQL` (= numpad)
+- Pos 9 der: `KC_PENT` (Enter numpad)
+
+**3. Raise mano derecha reorganizada para workflow Tech Lead**:
+
+Fila 1 — Window/Spaces management mac (6 keycodes, 0 B en flash por ser combos QMK estándar):
+- `MCTL` = `LCTL(KC_UP)` Mission Control
+- `APXP` = `LCTL(KC_DOWN)` App Exposé
+- `SPC-` / `SPC+` = `LCTL(KC_LEFT)` / `LCTL(KC_RGHT)` Space prev/next
+- `ZM-` / `ZM+` = `LGUI(KC_PMNS)` / `LGUI(KC_PPLS)` Zoom out/in (para navegador, screenshare, IDE — verificar en LATAM Mac, si falla crear macro custom)
+
+Fila 2 col 6-9: macros mac `SCRA`/`SCRT`/`LOCK`/`FQT` (movidas desde Adjust — más accesibles cerca de los cursores que se usan a menudo).
+Fila 2 col 10: `QK_REP` (movido desde col 7).
+Fila 3 col 10: `LGUI(KC_SPC)` Spotlight. Razón: el user dijo "tengo lejos CMD+Space"; ahora descansa en home row de la mano derecha.
+Fila 3 col 3 izq: `GFG_MIEQ` (`-=`) reemplaza `S(KC_6)` (`^`). Razón: tener `+=` y `-=` juntos en orden. `^` se elimina de Raise (sigue accesible en Lower como `S(KC_6)`).
+
+**4. Adjust limpiado**:
+- `SCRF` (screenshot completo `⌘⇧3`) eliminado completamente del enum, handler y keymap. Poco uso confirmado.
+- `SCRA`/`SCRT`/`LOCK`/`FQT` movidas a Raise (ver punto 3).
+- Media (`VOL-`/`MUTE`/`VOL+` y `PREV`/`PLAY`/`NEXT`) movida una casilla a la derecha (cols 7-9 → 8-10). Razón ergonómica del user: descansan mejor en el meñique extendido en vez del índice al llegar desde el thumb hold.
+
+**5. Mouse cascada completa**:
+- Botones `BTN1`/`BTN3`/`BTN2`: fila 1 → fila 2
+- Movimiento `MS_LEFT`/`DOWN`/`UP`/`RGHT`: fila 2 → fila 3
+- Scroll `MS_WHLL`/`D`/`U`/`R`: fila 3 → fila 4 (cols 8-11)
+- Fila 1 queda solo con `EXIT` en col 11; `EXIT` también en fila 4 col 13 (sin cambio)
+
+Razón: la fila 1 era físicamente difícil de alcanzar con dedos descansados. Ahora botones en home row (fila 2), movimiento en alcance natural (fila 3), scroll en posición más extendida pero menos usado (fila 4).
+
+**6. Mouse precisión con `MK_KINETIC_SPEED`**: activado en `users/gonzafg2/config.h` con parámetros tuneados:
+```c
+#define MK_KINETIC_SPEED
+#define MOUSEKEY_DELAY              8
+#define MOUSEKEY_INTERVAL           8
+#define MOUSEKEY_MOVE_DELTA         16     // default 25
+#define MOUSEKEY_INITIAL_SPEED      50     // default 100
+#define MOUSEKEY_BASE_SPEED         3000   // default 5000
+#define MOUSEKEY_DECELERATED_SPEED  400
+#define MOUSEKEY_ACCELERATED_SPEED  3000
+```
+Resultado: tap individual = ~16 px (preciso para clicks de precisión), hold acelera suavemente con momentum tipo trackpad hasta 3000 px/s. Modo kinetic preferido sobre accelerated default por feel más natural.
+
+### Medición de pesos
+
+| Cambio | Costo en flash |
+|---|---|
+| `MK_KINETIC_SPEED` + params | +150 B (medido al toggle) |
+| 7 keycodes Tech Lead (LCTL/LGUI combos) | 0 B (son macros QMK estándar) |
+| `GFG_SCRF` eliminado (enum + case) | -30 B aprox |
+| Reorganización keymap (mover keycodes) | 0 B |
+| Diagramas ASCII | 0 B (solo comentarios) |
+| **Total neto** | **+120 B aprox** |
+
+Tamaño: 28020 → 28170 / 28672 (652 → 502 libres, 97% → 98%).
+
+### Validación pendiente al flashear
+
+1. **Zoom in/out** (`LGUI(KC_PPLS)` y `LGUI(KC_PMNS)`) en navegador/screenshare/IDE. Si no funciona en LATAM Mac, crear macro custom con `tap_code16(LGUI(LSFT(KC_0)))` para Cmd+Shift+0 (= Cmd++ en LATAM) y similar para Cmd+-.
+2. **Mouse kinetic feel**: ¿tap individual = movimiento preciso? ¿hold acelera bien?
+3. **Window management mac**: Mission Control, App Exposé, Spaces funcionan
+4. **Spotlight** se abre rápido con la nueva posición home row
+5. **Macros mac en Raise** (SCRA/SCRT/LOCK/FQT) cómodas sobre cursores
+6. **Thumbs externos Lower** (= y Enter numpad) útiles cuando usas el numpad
+
+### Reversible
+
+Sí. Cada cambio es independiente:
+- Quitar `MK_KINETIC_SPEED` + sus params → vuelve a accelerated default
+- Restaurar bloques en `keymap.c` → keymap previo
+- Re-agregar `GFG_SCRF` al enum + case → recupera screenshot completo
+- Re-agregar `STARLIGHT`/`MULTICROSS` requiere quitar algo más (no caben en 502 B libres con todo lo nuevo)
+
+## 2026-05-23 · Sesión 3: Activar `SPLIT_LAYER_STATE_ENABLE`, descartar `CHORDAL_HOLD`
+
+**Contexto**: tras quedar con 502 B libres tras la sesión 2, el user pidió evaluar features de productividad que aporten valor. Se evaluaron `UNICODE_ENABLE`, `CHORDAL_HOLD`, `SPLIT_LAYER_STATE_ENABLE`, `TAPPING_TERM_PER_KEY` y otras.
+
+### `SPLIT_LAYER_STATE_ENABLE`: activado (costo 0 B)
+
+**Decisión**: activar `SPLIT_LAYER_STATE_ENABLE = yes` en `users/gonzafg2/rules.mk`.
+
+**Por qué**: habilita que la mitad slave conozca la capa activa. Sin esto, el slave es ciego a la capa (solo procesa pulsaciones físicas y las manda al master, que las traduce). Activarlo abre tres puertas futuras:
+1. Mostrar capa actual en el OLED slave (hoy muestra solo "Eres / un / Crack" + Luna)
+2. RGB indicators per-layer en el slave (ej. cambiar color del thumb derecho según capa)
+3. Animaciones reactivas a capa en el slave
+
+**Costo medido**: **0 B**. Sorprendente — la medición previa (sesión 2026-05-22) decía ~130 B al quitarlo para meter STARLIGHT. Reactivarlo ahora costó 0 B porque LTO comparte código con algo ya presente en el build actual (probablemente las funciones de split transport ya están instanciadas por otras features de split que sí dependen del state).
+
+**Tamaño**: 28170 → 28170 / 28672 (502 libres sin cambio).
+
+**Reversible**: sí, `SPLIT_LAYER_STATE_ENABLE = no` y vuelve al estado anterior.
+
+### `CHORDAL_HOLD`: probado y descartado
+
+**Decisión**: NO activar `CHORDAL_HOLD`. Probado en sesión, pesó 1236 B (no cabe en 502 B libres, excede por 734 B).
+
+**Plan probado** (revertido):
+- `#define CHORDAL_HOLD` en `users/gonzafg2/config.h`
+- Array `chordal_hold_layout[MATRIX_ROWS][MATRIX_COLS] PROGMEM` en `keymap.c` con `'L'`/`'R'` por posición usando el macro `LAYOUT`
+
+**Costo medido**: **1236 B** (28170 → 29406, 734 B sobre el límite de 28672). Esto es **3-4× más pesado que la docs típica de QMK** (~340 B). Hipótesis: interacción con `HOLD_ON_OTHER_KEY_PRESS` + `PERMISSIVE_HOLD` ya activos, más el tamaño de la matriz del Sofle (5×14 = 70 posiciones × 1 byte cada una = 70 B solo del array, sin contar la lógica). Si la docs reporta ~340 B en keymaps mínimos, el costo escala con el contexto.
+
+**Por qué se descartó (más allá del tamaño)**: en este keymap específico **CHORDAL_HOLD solo aplica a `GFG_ESCAD`** (LT(_ADJUST, KC_ESC) en el pinky derecho). No hay otros LT ni MT (`GFG_LWR`/`GFG_RSE` son `MO()`, no LT). El único caso de uso real sería evitar que ESC active Adjust accidentalmente al tipear rápido "ESC + tecla izq", que es un caso raro. ROI no justifica sacrificar 1.2 KB de otras features.
+
+**Cuándo re-evaluar**: si en el futuro se agregan **home-row mods** (cada tecla de home row es un `MT()` con modificador en hold) o **más LT en thumbs**, CHORDAL_HOLD se vuelve crítico y valdría la pena buscar 1.2 KB sacrificando algo.
+
+**Reversible**: sí, el código quedó comentado en `users/gonzafg2/config.h` con la nota:
+```c
+// CHORDAL_HOLD: descomentar para activar (probado 2026-05-23, pesaba ~1100 B
+// en esta config, demasiado para el espacio disponible).
+// #define CHORDAL_HOLD
+```
+
+### `UNICODE_ENABLE`: descartado sin probar
+
+**Decisión**: NO activar.
+
+**Por qué**:
+1. Tamaño: ~500-1000 B según features, no cabe
+2. Conflicto crítico con LATAM en macOS: requiere "Unicode Hex Input" como Input Source, choca con LATAM. Cambiar input source manualmente rompe el flujo de tipeo en español; cambiarlo desde firmware introduce delay y falla a veces
+3. Mejores alternativas en macOS sin firmware: `Ctrl+Cmd+Space` (emoji picker nativo), Text Replacements en System Settings, Raycast/Alfred snippets, espanso. Todos funcionan en todas las apps sin tocar el teclado
+
+### Estado final tras sesión 3
+
+- Tamaño: 28170 / 28672 (502 libres, **sin cambio** del estado tras sesión 2)
+- Único cambio efectivo: `SPLIT_LAYER_STATE_ENABLE = yes` (gratis, habilita futuro)
+- Medición valiosa documentada: `CHORDAL_HOLD` pesa 1236 B en esta config (vs ~340 B típico de docs)
+
+## 2026-05-23 · Sesión 4: ajustes post-flasheo (feedback del user)
+
+**Contexto**: tras flashear la build de la sesión 3 y probar físicamente, el user reportó 6 ajustes basados en uso real. Esta sesión los aplica.
+
+### 1. Mouse aceleración muy rápida
+
+**Reporte**: "es muy lento al principio lo que está bien, pero al acelerar lo hace muy rápido."
+
+**Cambio**: `MOUSEKEY_BASE_SPEED 3000 → 2000` en `users/gonzafg2/config.h`. Tap individual sigue preciso (~16 px), pero el tope del kinetic ahora es 2000 px/s en vez de 3000. Si aún se siente rápido, bajamos a 1500.
+
+**Costo**: 0 B (cambio numérico).
+
+### 2. `TGMOU` debería bajar para coherencia con VOL/PREV
+
+**Reporte**: "TGMOU sigue en la misma posición, debería haber bajado para tener coherencia con VOL y PREV."
+
+**Cambio**: `TG(_MOUSE)` en Adjust mano der: fila 2 col 6 → **fila 3 col 6**. Queda en la misma fila que VOL/MUTE/VOL+ (cols 8-10), lado izquierdo. Coherente con la lógica del bloque "media controls" inferior.
+
+**Costo**: 0 B (mover keycode).
+
+### 3. Mouse scroll desfasado un espacio a la derecha
+
+**Reporte**: "en la capa mouse, el scroll quedó desfasado un espacio a la derecha. Debe estar en la misma fila de EXIT y estar alineado con el movimiento y los botones."
+
+**Cambio**: scroll `MS_WHLL/D/U/R` en fila 4: cols 9-12 → **cols 8-11**. Físicamente queda alineado vertical con movimiento (fila 3 cols 6-9) y botones (fila 2 cols 6-8). Las cols 9-12 vs cols 8-11 numéricamente confunden por el offset del LAYOUT (2 center keys en fila 4 desplazan el indexing), pero son las MISMAS columnas físicas. EXIT queda en col 13 (sin cambio).
+
+**Costo**: 0 B (mover keycodes).
+
+### 4. `ZM0` reset zoom + rename `SPC-`/`SPC+` → `SPCL`/`SPCR`
+
+**Reporte**: "en raise `[BSD]` podrías poner un `ZM0` para restablecer". También: "`SPC-` y `SPC+` no son de suma o resta sino que son L y R pero se entienden".
+
+**Cambios**:
+- Raise fila 2 col 11 (era `_______` que heredaba `[BSDL]`) → `LGUI(KC_0)`. Label `ZM0`. Trade-off: pierdes BSDL en Raise, pero al soltar RSE recuperas BSDL en Base. Para uso típico de Tech Lead (zoom rápido en screenshare) vale la pena.
+- Labels diagrama: `SPC-`/`SPC+` → `SPCL`/`SPCR` (más claros: Space izq/der).
+
+**Sobre el delay al cambiar Space** ("termino escribiendo en el escritorio anterior"): **no es del firmware**, es la animación nativa de macOS Spaces (~300 ms). Fix recomendado al user: `System Settings → Accessibility → Display → Reduce Motion` ON.
+
+**Costo**: 0 B (combo QMK estándar).
+
+### 5. Emoji picker al lado de `SPOT`
+
+**Reporte**: "al lado derecho de SPOT podrías poner CMD+CTRL+SPACE para lanzar el selector de iconos."
+
+**Cambio**: Raise fila 3 col 11 (era `XXXXXXX`) → `LGUI(LCTL(KC_SPC))`. Label `EMJI`. Abre el emoji & symbol picker nativo de macOS sin necesidad de Ctrl+Cmd+Space manual.
+
+**Costo**: 0 B.
+
+### 6. Raise mano izq col 0 fila 2-4 (`[TAB]`/`[SFT]`/`[CMD]` heredados)
+
+**Reporte**: "analiza si nos sirven de algo en esta capa, sino, veamos con qué más podemos reemplazarlos. Uso neovim, quizás algo con eso de uso frecuente."
+
+**Análisis diferenciado por fila**:
+
+| Pos | Heredado | Decisión | Razón |
+|---|---|---|---|
+| Fila 2 col 0 | `[TAB]` | **Reemplazado** con `LCTL(KC_O)` (label `JBk`) | TAB no es modifier, perderlo en Raise no rompe combos. `Ctrl+O` = jump back en jumplist de neovim, también funciona en IDEs con plugin vim. Súper frecuente al navegar código entre archivos |
+| Fila 3 col 0 | `[SFT]` | **Mantenido heredado** | Shift ES modifier. Útil en Raise: `Shift+←/→` para selección por carácter, `Shift+ENTER` para nueva línea sin enviar, `Shift+TAB` para deindent |
+| Fila 4 col 0 | `[CMD]` | **Mantenido heredado** | Cmd ES modifier. **Crítico** mientras editas en Raise: `Cmd+S` (save), `Cmd+Z` (undo), `Cmd+/` (comment), `Cmd+C/V`. Perderlo te obliga a soltar RSE para guardar/deshacer — flujo roto |
+
+**Costo**: 0 B (combo QMK estándar).
+
+### Tamaño final
+
+28170 → 28170 / 28672 (502 libres, **sin cambio**). Todos los cambios fueron 0 B: combos QMK estándar (LGUI+0, LGUI+LCTL+SPC, LCTL+O), reordenamientos (TGMOU, scroll) y cambios numéricos (BASE_SPEED).
+
+### Validación pendiente (tras re-flashear)
+
+1. **Mouse aceleración** se siente bien al hold (no muy rápido)
+2. **TGMOU** en nueva posición (Adjust fila 3 col 6) responde a TG_MOUSE
+3. **Scroll en Mouse** alineado físicamente con movimiento (no desfasado)
+4. **ZM0** (Raise + col 11 fila 2) hace Cmd+0 reset zoom en navegador/IDE
+5. **EMJI** (Raise + col 11 fila 3) abre el emoji picker
+6. **JBk** (Raise + col 0 fila 2) hace jump back en neovim/IDE
+7. **`Reduce Motion` activado** en macOS — el cambio de Space ya no se siente lento
+8. **SFT y CMD heredados en Raise** siguen funcionando para Shift+arrow y Cmd+S/Z
+
 ## Decisiones pendientes (sin resolver)
 
 Ver [thumb-cluster-iteration.md](./thumb-cluster-iteration.md):

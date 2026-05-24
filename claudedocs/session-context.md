@@ -60,7 +60,7 @@ Firmware final: **26044/28672 bytes (90%, 2628 libres)**.
 3. **RGB_MATRIX activado** (`rules.mk` + `config.h` + `keymap.c`): brillo máx 150, modo default gradient L→R. Keycodes `RM_*` (no `RGB_*`) en `_ADJUST` mano izquierda.
 4. **Sacrificios para caber en AVR**:
    - `WPM_ENABLE = yes → no` (liberó ~500 B)
-   - `SPLIT_LAYER_STATE_ENABLE` removido (~130 B; sin impacto visible)
+   - `SPLIT_LAYER_STATE_ENABLE` removido (~130 B; sin impacto visible). NOTA: reactivado en sesión 2026-05-23 (3) sin costo (0 B medidos en nuevo contexto)
 5. **Iteraciones de Luna**: primero a walk loop fijo (post-WPM), después **Luna ciclando** entre sit→walk→run cada 6s (los 5 sprites originales mantenidos, frijol-y-nieblita stay).
 6. **Set inicial de efectos RGB** (luego iterado): `GRADIENT_LEFT_RIGHT` (default), `STARLIGHT`, `CYCLE_LEFT_RIGHT`, `TYPING_HEATMAP`, `SOLID_REACTIVE_SIMPLE`. Después de varias iteraciones el **set final shipped** quedó: `GRADIENT_LEFT_RIGHT`, `STARLIGHT`, `SOLID_MULTISPLASH`, `SOLID_REACTIVE_MULTICROSS` + custom `MY_WAVE` + `MY_RAIN` con BG idle heartbeat. `SOLID_COLOR` siempre activo (always-on en QMK).
 7. **Verificado físicamente**: gradient rojo→violeta enciende al boot. **Titileo en brillo alto confirmó undervolt** — no subir `RGB_MATRIX_MAXIMUM_BRIGHTNESS` arriba de 150 sin cambiar fuente USB.
@@ -79,6 +79,70 @@ Después del primer build de RGB_MATRIX, varias features adicionales sumaron al 
 
 **Tamaño final del PR**: ~99% (10 bytes libres en el último compile). Para nuevas features se requiere sacrificar algo existente.
 
+## Sesión 2026-05-23 — fix dead-key intermitente en LATAM (NKRO)
+
+**Síntoma**: al escribir rápido en macOS LATAM, la tecla ´ "no hacía nada" y había que repetirla para que ´+vocal combinara en á/é/í/ó/ú. Intermitente, más frecuente al inicio de uso del Mac.
+
+**Diagnóstico** (ver [decisions-log.md](./decisions-log.md)): race condition entre las dos mitades del split + modo HID 6KRO. Los eventos del slave (donde está ´) llegan al USB tan cerca de los del master (vocales) que macOS no puede determinar cuál vino primero, rompiendo el dead key.
+
+**Cambios aplicados**:
+1. `users/gonzafg2/config.h`: + `FORCE_NKRO`, + `DEBOUNCE 8`
+2. `users/gonzafg2/rules.mk`: + `NKRO_ENABLE = yes`
+3. `keyboards/sofle/keymaps/gonzafg2/config.h`: – `ENABLE_RGB_MATRIX_STARLIGHT`, – `ENABLE_RGB_MATRIX_SOLID_REACTIVE_MULTICROSS`
+4. `keyboards/sofle/keymaps/gonzafg2/keymap.c`: – 2 cases del switch OLED (`Star`, `Cros`)
+5. `~/dotfiles/zsh/.zshrc`: + bloque PATH para `avr-gcc@8` (keg-only en Homebrew, hasta hoy nunca había compilado local — todo era CI)
+
+**Medición de pesos** (✅ compilado local con avr-gcc 8.5.0):
+- NKRO_ENABLE: **368 B medidos** (27652 → 28020)
+- STARLIGHT + MULTICROSS + 2 cases OLED (combinado): **846 B liberados** — mucho más que la suma individual estimada (~320 B), confirmando que LTO produce dividendos no-lineales al quitar varios efectos juntos
+- Tamaño final: **28020 / 28672 bytes (97%, 652 libres)**
+
+**Validación pendiente**: probar físicamente tras flashear que ´+vocal funciona consistente al escribir rápido.
+
+## Sesión 2026-05-23 (sesión 2) — reorganización keymap workflow Tech Lead + mouse kinetic
+
+Tras resolver el bug de dead keys, el user revisó el keymap completo y pidió 10 cambios para acomodar su workflow diario como Tech Lead en macOS (window management, screenshare zoom, mouse preciso, layout más ergonómico).
+
+**Cambios aplicados** (detalle completo en [decisions-log.md](./decisions-log.md) entrada "Sesión 2"):
+
+1. **Convención `[KEY]` en diagramas ASCII** — keymap.c (comentarios) + README.md. Notación: `[KEY]` = heredada de Base, `KEY` = asignada en capa, `---` = bloqueada (`XXXXXXX`), `▼` = thumb activo. Thumb clusters de Lower/Raise/Mouse corregidos (estaban desincronizados con código real).
+2. **Lower thumbs externos**: `KC_PEQL` (= numpad) izq + `KC_PENT` (Enter numpad) der — únicas posiciones realmente libres en thumb cluster.
+3. **Raise fila 1 mano der**: 6 keycodes window mgmt mac (Mission Control, App Exposé, Space prev/next, Zoom-, Zoom+).
+4. **Raise fila 2 col 6-9**: SCRA/SCRT/LOCK/FQT movidas desde Adjust (sobre cursores). `QK_REP` movido a col 10.
+5. **Raise fila 3 col 3 izq**: `-=` reemplaza `^` (junto a `+=`). Fila 3 col 10 der: Spotlight (LGUI+SPC).
+6. **Adjust**: eliminado `GFG_SCRF` (enum + handler). Media (VOL/MUTE y PREV/PLAY/NEXT) movida col 7-9 → 8-10.
+7. **Mouse cascada completa**: botones BTN→fila 2, movimiento→fila 3, scroll→fila 4. Más cómodo para dedos descansados.
+8. **Mouse precisión**: `MK_KINETIC_SPEED` activado + params tuneados (`MOVE_DELTA 16`, `INITIAL_SPEED 50`, `BASE_SPEED 3000`).
+
+**Medición**: +150 B neto (de 28020 → 28170 / 28672, 502 libres, 97% → 98%). NKRO+combos 0 B, MK_KINETIC +150 B, GFG_SCRF -30 B.
+
+## Sesión 2026-05-23 (sesión 4) — ajustes post-flasheo
+
+Tras flashear y probar, 6 ajustes basados en feedback de uso real (detalle en [decisions-log.md](./decisions-log.md) entrada "Sesión 4"):
+
+1. **Mouse aceleración**: `MOUSEKEY_BASE_SPEED 3000 → 2000` (sentía muy rápido al hold)
+2. **TGMOU**: Adjust fila 2 col 6 → fila 3 col 6 (coherencia con bloque media VOL/MUTE)
+3. **Mouse scroll**: cols 9-12 → cols 8-11 fila 4 (alineado vertical con movimiento y botones)
+4. **`ZM0` reset zoom**: nuevo `LGUI(KC_0)` en Raise fila 2 col 11 (reemplaza `[BSDL]` heredado). Labels `SPC-/SPC+` renombrados a `SPCL/SPCR` para claridad
+5. **Emoji picker**: nuevo `LGUI(LCTL(KC_SPC))` en Raise fila 3 col 11 al lado de SPOT
+6. **Neovim `JBk`**: nuevo `LCTL(KC_O)` jump back en Raise fila 2 col 0 (reemplaza `[TAB]` heredado). `[SFT]` y `[CMD]` mantenidos heredados — son modifiers críticos en Raise
+
+**Nota sobre Spaces lento**: el delay entre cambiar Space y poder tipear es animación nativa de macOS (~300 ms), no firmware. Recomendado activar `System Settings → Accessibility → Display → Reduce Motion`.
+
+**Tamaño**: 28170 / 28672 (502 libres, sin cambio). Todos los cambios fueron 0 B.
+
+## Sesión 2026-05-23 (sesión 3) — `SPLIT_LAYER_STATE_ENABLE` activado, `CHORDAL_HOLD` descartado
+
+Tras quedar con 502 B libres, evaluamos qué features de productividad valdrían la pena.
+
+**Cambios aplicados** (detalle en [decisions-log.md](./decisions-log.md) entrada "Sesión 3"):
+
+1. **`SPLIT_LAYER_STATE_ENABLE = yes`**: habilita que el slave sepa la capa activa. Costo medido: **0 B** (la medición previa de ~130 B no aplica en el contexto actual; LTO comparte código). Sin uso visible aún, abre puerta a mostrar capa en OLED slave o RGB indicators per-layer.
+2. **`CHORDAL_HOLD` probado y descartado**: pesó **1236 B** (3-4× más que la docs típica de QMK). No cabe + ROI marginal en este keymap (solo aplica a `GFG_ESCAD`, único LT). Si en futuro se agregan home-row mods, re-evaluar.
+3. **`UNICODE_ENABLE` descartado sin probar**: tamaño 500-1000 B + conflicto con LATAM Input Source en macOS. Alternativas no-firmware (Ctrl+Cmd+Space, Text Replacements, Raycast) son mejores.
+
+**Tamaño final**: 28170 / 28672 (502 libres, sin cambio vs sesión 2).
+
 ## Trade-offs aceptados
 
 | Decisión | Por qué | Reversible |
@@ -86,9 +150,10 @@ Después del primer build de RGB_MATRIX, varias features adicionales sumaron al 
 | RGB_MATRIX activo (vs RGBLIGHT) | El usuario lo pidió. Efectos reactivos al tecleo (heatmap, solid reactive) | Sí, cambiando a `RGBLIGHT_ENABLE = yes` (más liviano) |
 | Brillo RGB tope 150/255 | Undervolt confirmado en sesión al subir más allá | Sí, si se cambia a fuente USB con mejor amperaje |
 | WPM OFF + Luna ciclando (no reactiva al WPM) | RGB_MATRIX cuesta ~3KB; WPM era el sacrificio menos disruptivo. Luna mantiene los 5 frames ciclando por timer | Sí, deshabilitando RGB_MATRIX o quitando MOUSEKEY |
-| SPLIT_LAYER_STATE_ENABLE removido | Para meter STARLIGHT como 5to efecto. Slave no necesita saber capa porque no muestra OLED de capa ni RGB indicators per-capa | Sí, si se agregan indicadores RGB de capa en el slave |
+| SPLIT_LAYER_STATE_ENABLE (reactivado 2026-05-23 sesión 3, costo 0 B) | Habilita futuro mostrar capa en OLED slave o RGB indicators per-layer. Sin uso visible aún. | Sí, `= no` y vuelve al estado anterior |
 | SPLIT_* otras features quitadas | Firmware excedía 28KB de ATmega32U4 | Sí, si liberamos espacio |
 | VIA con custom keycodes hex | VIA mainline no conoce los `GFG_*` | Sí, generando vial.json |
+| STARLIGHT + MULTICROSS removidos (2026-05-23) | Liberar 846 B para meter NKRO (368 B) y resolver dead-key intermitente en LATAM. Set RGB final shipped: `Grad`, `Wave`, `iWav`, `iRai` (4 efectos vs 6 previos) | Sí, requiere desactivar NKRO o sacrificar otra cosa |
 
 ## Convenciones de pulgar (importante para próximas iteraciones)
 
