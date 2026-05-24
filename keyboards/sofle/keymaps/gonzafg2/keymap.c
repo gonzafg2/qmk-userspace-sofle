@@ -3,7 +3,7 @@
 
 /* Convención de los diagramas ASCII:
  *   [KEY]   = slot _______ que hereda KEY de la capa Base (no está sobrescrita)
- *   ---     = slot XXXXXXX (bloqueado, no produce nada)
+ *   (vacío) = slot XXXXXXX (bloqueado, no produce nada) — celda en blanco
  *   KEY     = keycode asignado en esta capa
  *   ▼       = thumb que estás holdeando para entrar a esta capa
  *   [MUTM]  = encoder push izq heredado (LT _MOUSE KC_MUTE en Base)
@@ -28,7 +28,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |------+------+------+------+------+------| MUTM  |    | PLAY  |------+------+------+------+------+------|
  * | LGUI |  Z   |  X   |  C   |  V   |  B   |-------|    |-------|  N   |  M   |  ,   |  .   |  -   | ESCAD|
  * `-----------------------------------------/       /     \      \-----------------------------------------'
- *           | ---  | LALT | LCTL| LWR | SPC |       | ENT | RSE | RALT| RCTL | ---  |
+ *           |      | LALT | LCTL| LWR | SPC |       | ENT | RSE | RALT| RCTL |      |
  */
 [_BASE] = LAYOUT(
   KC_ESC,   KC_1,    KC_2,    KC_3,    KC_4,    KC_5,                                       KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_DEL,
@@ -49,7 +49,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |------+------+------+------+------+------| BRDN  |    | BRUP  |------+------+------+------+------+------|
  * |[CMD] |  1   |  2   |  3   |  .   |  0   |-------|    |-------|  [   |  ]   |  <   |  >   |  |   |  _   |
  * `-----------------------------------------/       /     \      \-----------------------------------------'
- *           | KP=  |[ALT]|[CTL]|  ▼  |[SPC]|        |[ENT]|[RSE]|[ALTGR]|[RCTL]| KPENT|
+ *           |      |[ALT]|[CTL]|  ▼  |[SPC]|        |[ENT]|[RSE]|[ALTGR]|[RCTL]|      |
  */
 // Right side: keycodes posicionales para macOS layout Spanish LATAM (mismo enfoque que zmk-config-corne)
 [_LOWER] = LAYOUT(
@@ -57,10 +57,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   _______,  KC_7,    KC_8,    KC_9,    KC_PSLS, KC_PAST,                                    S(KC_8),    S(KC_9),    A(KC_MINS),   KC_EXLM,    S(KC_MINS), _______,
   _______,  KC_4,    KC_5,    KC_6,    KC_PPLS, KC_PMNS,                                    KC_QUOT,    KC_BSLS,    A(KC_RBRC),   KC_MINS,    S(KC_2),    A(KC_BSLS),
   _______,  KC_1,    KC_2,    KC_3,    KC_DOT,  KC_0,    KC_BRID,                KC_BRIU,   S(KC_QUOT), S(KC_BSLS), KC_NUBS,      S(KC_NUBS), KC_GRV,     S(KC_SLSH),
-                     KC_PEQL, _______, _______, _______, _______,                _______,   _______, _______, _______, KC_PENT
+                     XXXXXXX, _______, _______, _______, _______,                _______,   _______, _______, _______, XXXXXXX
 ),
 
-/* Raise (operadores programacion + navegacion + window mgmt mac + zoom + spotlight + neovim)
+/* Raise (operadores programacion + navegacion + window mgmt mac + zoom + spotlight)
  * Heredadas de Base se muestran como [KEY] entre corchetes.
  *
  * Window/Spaces management mac (fila 1 mano der):
@@ -76,22 +76,28 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * ZM0  = reset zoom (LGUI+0), reemplaza [BSDL] heredado en col 11 fila 2.
  * SPOT = Spotlight (LGUI+SPC) en fila 3 col 10.
  * EMJI = emoji picker (LGUI+LCTL+SPC) en fila 3 col 11.
- * JBk  = jump back neovim/IDE (LCTL+O), reemplaza [TAB] heredado en col 0 fila 2.
+ *
+ * Aperturas LATAM (sesion 2026-05-23 sesion 5):
+ *   col 0 fila 2 = KC_EQL  → ¿  (apertura de pregunta, reemplaza JBk eliminado)
+ *   col 1 fila 2 = S(KC_EQL) → ¡ (apertura de exclamacion, reemplaza ! que sigue en Lower)
+ * Hipotesis del keycode segun layout Mac Spanish - Latin American (tecla US `=`
+ * produce ¿/¡ por convencion ISO LATAM). Verificar al flashear; si falla, probar
+ * A(KC_1) para ¡ y A(S(KC_1)) o A(KC_SLSH) para ¿.
  *
  * ,-----------------------------------------.                    ,-----------------------------------------.
  * |  =   |  >=  |  <=  |  ??  |  ?.  |  **  |                    | MCTL | APXP | SPCL | SPCR | ZM-  | ZM+  |
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * | JBk  |  !   |  @   |  #   |  $   |  %   |                    | SCRA | SCRT | LOCK | FQT  | RPT  | ZM0  |
+ * |  ¿   |  ¡   |  @   |  #   |  $   |  %   |                    | SCRA | SCRT | LOCK | FQT  | RPT  | ZM0  |
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
  * |[SFT] |  ^   |  +=  |  -=  |  &&  |  ||  |-------.    ,-------| LEFT | DOWN |  UP  | RGHT | SPOT | EMJI |
  * |------+------+------+------+------+------|[MUTM] |    |[PLAY] |------+------+------+------+------+------|
  * |[CMD] | =>   | ...  |  ==  |  !== |  === |-------|    |-------| HOME | PGDN | PGUP | END  |      |[ESC/A]
  * `-----------------------------------------/       /     \      \-----------------------------------------'
- *           | ---  |[ALT]|[CTL]|[LWR]|[SPC]|        |[ENT]|  ▼  |[ALTGR]|[RCTL]| ---  |
+ *           |      |[ALT]|[CTL]|[LWR]|[SPC]|        |[ENT]|  ▼  |[ALTGR]|[RCTL]|      |
  */
 [_RAISE] = LAYOUT(
   S(KC_0),  GFG_GTEQ,GFG_LTEQ,GFG_NULC,GFG_OPTC,GFG_POW,                                    LCTL(KC_UP), LCTL(KC_DOWN), LCTL(KC_LEFT), LCTL(KC_RGHT), LGUI(KC_PMNS), LGUI(KC_PPLS),
-  LCTL(KC_O), KC_EXLM,    A(KC_Q),   KC_HASH, KC_DLR,  KC_PERC,                              GFG_SCRA, GFG_SCRT, GFG_LOCK, GFG_FQUIT, QK_REP, LGUI(KC_0),
+  KC_EQL,   S(KC_EQL),  A(KC_Q),   KC_HASH, KC_DLR,  KC_PERC,                              GFG_SCRA, GFG_SCRT, GFG_LOCK, GFG_FQUIT, QK_REP, LGUI(KC_0),
   _______,  A(KC_QUOT), GFG_PLEQ,  GFG_MIEQ, GFG_AND, GFG_OR,                                KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, LGUI(KC_SPC), LGUI(LCTL(KC_SPC)),
   _______,  GFG_ARROW,GFG_SPREAD,GFG_EQEQ,GFG_NEQ,GFG_TEQ,_______,                _______,  KC_HOME, KC_PGDN, KC_PGUP, KC_END,  XXXXXXX, _______,
                      _______, _______, _______, _______, _______,                _______,   _______, _______, _______, _______
@@ -113,7 +119,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |------+------+------+------+------+------|[MUTM] |    |[PLAY] |------+------+------+------+------+------|
  * |      |      |      |      |      |      |-------|    |-------|      |      | MPRV | MPLY | MNXT |      |
  * `-----------------------------------------/       /     \      \-----------------------------------------'
- *           | ---  |[ALT]|[CTL]|  ▼  |[SPC]|        |[ENT]|  ▼  |[ALTGR]|[RCTL]| ---  |
+ *           |      |[ALT]|[CTL]|  ▼  |[SPC]|        |[ENT]|  ▼  |[ALTGR]|[RCTL]|      |
  */
 [_ADJUST] = LAYOUT(
   QK_BOOT,  RM_TOGG, RM_NEXT, RM_HUEU, RM_SATU, RM_VALU,                                    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
@@ -143,7 +149,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |------+------+------+------+------+------|[MUTM] |    |[PLAY] |------+------+------+------+------+------|
  * |[CMD] |      |      |      |      |      |-------|    |-------| S_LF | S_DN | S_UP | S_RT |      | EXIT |
  * `-----------------------------------------/       /     \      \-----------------------------------------'
- *           | ---  |[ALT]|[CTL]|[LWR]|[SPC]|        |[ENT]|[RSE]|[ALTGR]|[RCTL]| ---  |
+ *           |      |[ALT]|[CTL]|[LWR]|[SPC]|        |[ENT]|[RSE]|[ALTGR]|[RCTL]|      |
  */
 [_MOUSE] = LAYOUT(
   XXXXXXX,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                                    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, TG(_MOUSE),

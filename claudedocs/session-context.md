@@ -116,6 +116,20 @@ Tras resolver el bug de dead keys, el user revisó el keymap completo y pidió 1
 
 **Medición**: +150 B neto (de 28020 → 28170 / 28672, 502 libres, 97% → 98%). NKRO+combos 0 B, MK_KINETIC +150 B, GFG_SCRF -30 B.
 
+## Sesión 2026-05-23 (sesión 5) — aperturas LATAM ¡/¿ + limpieza thumbs Lower + cosmético
+
+Tras flashear las sesiones 1-4, el user revisó el thumb cluster de Base y abrió un ciclo de pulido (detalle en [decisions-log.md](./decisions-log.md) entrada "Sesión 5"):
+
+1. **Cosmético**: `---` (slots `XXXXXXX`) → celda vacía en diagramas ASCII de keymap.c y README.md. Convención actualizada al inicio del keymap.
+2. **Lower thumbs externos eliminados**: `KC_PEQL` y `KC_PENT` (cols 0 y 13 fila 4 Lower) → `XXXXXXX`. Revierte sesión 2 punto 2 — el usuario reportó bajo uso real (calculadora vía Spotlight, Enter ya en thumb interior).
+3. **Raise col 0 fila 2**: `LCTL(KC_O)` (JBk neovim) → `KC_EQL` (¿ apertura). Usuario no usa Neovim regularmente.
+4. **Raise col 1 fila 2**: `KC_EXLM` (!) → `S(KC_EQL)` (¡ apertura). `!` simple sigue en Lower.
+5. **Hipótesis LATAM Mac de `¿`/`¡`**: tecla US `=` produce `¿` sin shift y `¡` con shift (convención ISO LATAM). Verificar al flashear; si falla, probar `A(KC_1)` para `¡` y `A(S(KC_1))`/`A(KC_SLSH)` para `¿`.
+6. **SFT y CMD en Raise — mantenidos** tras investigación de combos `Cmd+arrow`/`Cmd+Shift+arrow`: navegación y selección por línea/archivo son críticas cuando las flechas viven en Raise.
+7. **Pendientes deferidos**: col 12 fila 4 Raise sigue `XXXXXXX` (candidatos `&`, `!=`, `++`, `<<`, etc.); Adjust ~24 slots libres sin tocar (Hyperkey, macros IDE, sleep display considerados pero no implementados).
+
+**Tamaño**: 28170 / 28672 (502 libres, sin cambio). Todos los cambios zero-cost.
+
 ## Sesión 2026-05-23 (sesión 4) — ajustes post-flasheo
 
 Tras flashear y probar, 6 ajustes basados en feedback de uso real (detalle en [decisions-log.md](./decisions-log.md) entrada "Sesión 4"):

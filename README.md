@@ -57,7 +57,7 @@ En los diagramas de Lower / Raise / Adjust / Mouse se usa esta notación para di
 |---|---|
 | `KEY` (sin corchetes) | Keycode asignado en esta capa (sobrescribe a Base) |
 | `[KEY]` (entre corchetes) | Slot `_______` que **hereda** la tecla `KEY` de Base (no está sobrescrita) |
-| `---` | Slot `XXXXXXX` (bloqueado, no produce nada) |
+| Celda vacía | Slot `XXXXXXX` (bloqueado, no produce nada) — se dibuja en blanco |
 | `▼` | Thumb que estás **holdeando** ahora para activar esta capa |
 | `[MUTM]` / `[PLAY]` | Encoder push heredado de Base (LT mouse / play) |
 
@@ -94,37 +94,42 @@ Abreviaciones por espacio en celdas de 5 chars: `[SFT]`=LSFT, `[CMD]`=LGUI, `[CT
 ├─────┼─────┼─────┼─────┼─────┼─────┼─────┐                  ┌─────┼─────┼─────┼─────┼─────┼─────┼─────┤
 │[CMD]│  1  │  2  │  3  │  .  │  0  │BRDN │ ◉brillo   scrH◉  │BRUP │  [  │  ]  │  <  │  >  │  |  │  _  │
 └─────┴─────┴─────┼─────┼─────┼─────┴─────┴─────┐        ┌───┴─────┴─────┼─────┼─────┼─────┴─────┴─────┘
-                  │ KP= │[ALT]│[CTL]│  ▼  │[SPC]│        │[ENT]│[RSE]│[AGR]│[RCT]│KENT │
+                  │     │[ALT]│[CTL]│  ▼  │[SPC]│        │[ENT]│[RSE]│[AGR]│[RCT]│     │
                   └─────┴─────┴─────┴─────┴─────┘        └─────┴─────┴─────┴─────┴─────┘
                                     ▲ activa
 ```
 
 Encoder izq cambia a brillo, encoder der a scroll horizontal.
 
-**Thumbs externos (nuevos, sesión 2026-05-23):**
-- `KP=` (thumb izq exterior): `KC_PEQL` — `=` del numpad, útil para calculadora
-- `KENT` (thumb der exterior): `KC_PENT` — Enter del numpad
+**Thumbs externos (cols 0 y 13 fila 4):** vacíos (`XXXXXXX`). Eran `KP=` / `KENT` hasta la sesión 2026-05-23 (sesión 5); se quitaron por bajo uso real — la calculadora se invoca con Spotlight y el Enter del numpad ya está cubierto por `[ENT]` heredado del thumb interior.
 
-Estas dos posiciones eran las únicas realmente libres en el thumb cluster (en Base son `XXXXXXX`). Ahora tienen propósito contextual al numpad activo en Lower.
-
-### Raise — operadores prog + navegación + window mgmt mac + neovim
+### Raise — operadores prog + navegación + window mgmt mac
 
 ```
 ┌─────┬─────┬─────┬─────┬─────┬─────┐                              ┌─────┬─────┬─────┬─────┬─────┬─────┐
 │  =  │ >=  │ <=  │ ??  │ ?.  │ **  │                              │MCTL │APXP │SPCL │SPCR │ ZM- │ ZM+ │
 ├─────┼─────┼─────┼─────┼─────┼─────┤                              ├─────┼─────┼─────┼─────┼─────┼─────┤
-│ JBk │  !  │  @  │  #  │  $  │  %  │                              │SCRA │SCRT │LOCK │FQT  │ RPT │ ZM0 │
+│  ¿  │  ¡  │  @  │  #  │  $  │  %  │                              │SCRA │SCRT │LOCK │FQT  │ RPT │ ZM0 │
 ├─────┼─────┼─────┼─────┼─────┼─────┤                              ├─────┼─────┼─────┼─────┼─────┼─────┤
 │[SFT]│  ^  │ +=  │ -=  │ &&  │ ||  │                              │  ←  │  ↓  │  ↑  │  →  │SPOT │EMJI │
 ├─────┼─────┼─────┼─────┼─────┼─────┼─────┐                  ┌─────┼─────┼─────┼─────┼─────┼─────┼─────┤
-│[CMD]│ =>  │ ... │ ==  │ !== │ === │[MUT]│ ◉tab     word◉   │[PLY]│HOME │PGDN │PGUP │ END │ --- │[E/A]│
+│[CMD]│ =>  │ ... │ ==  │ !== │ === │[MUT]│ ◉tab     word◉   │[PLY]│HOME │PGDN │PGUP │ END │     │[E/A]│
 └─────┴─────┴─────┼─────┼─────┼─────┴─────┴─────┐        ┌───┴─────┴─────┼─────┼─────┼─────┴─────┴─────┘
-                  │ --- │[ALT]│[CTL]│[LWR]│[SPC]│        │[ENT]│  ▼  │[AGR]│[RCT]│ --- │
+                  │     │[ALT]│[CTL]│[LWR]│[SPC]│        │[ENT]│  ▼  │[AGR]│[RCT]│     │
                   └─────┴─────┴─────┴─────┴─────┘        └─────┴─────┴─────┴─────┴─────┘
                                                                 ▲ activa
 ```
 
-**Operadores prog (mano izq):** `=` · `>=` · `<=` · `??` · `?.` · `**` (fila 1); `!` · `@` · `#` · `$` · `%` (fila 2); `^` · `+=` · `-=` · `&&` · `||` (fila 3); `=>` · `...` · `==` · `!==` · `===` (fila 4). Pinky col 0: `JBk` (jump back neovim/IDE) reemplaza el `[TAB]` heredado; `[SFT]` y `[CMD]` se mantienen heredados porque son modifiers útiles mientras editas en Raise (Shift+arrow para selección, Cmd+S/Z/C/V universales).
+**Operadores prog (mano izq):** `=` · `>=` · `<=` · `??` · `?.` · `**` (fila 1); `¿` · `¡` · `@` · `#` · `$` · `%` (fila 2); `^` · `+=` · `-=` · `&&` · `||` (fila 3); `=>` · `...` · `==` · `!==` · `===` (fila 4). Pinky col 0 fila 2: `¿` (apertura de pregunta LATAM), reemplaza el `JBk` que vivía ahí — se eliminó por bajo uso del workflow Neovim. Col 1 fila 2: `¡` (apertura de exclamación LATAM) reemplaza el `!` simple que sigue accesible en Lower. `[SFT]` y `[CMD]` se mantienen heredados porque son modifiers útiles mientras editas en Raise (Shift+arrow para selección, Cmd+arrow/Shift+arrow para navegación y selección por línea/archivo, Cmd+S/Z/C/V/F universales).
+
+**Aperturas LATAM Mac (hipótesis del keycode, verificar al flashear):**
+
+| Símbolo | Keycode propuesto | Razón |
+|---|---|---|
+| `¿` | `KC_EQL` | En layout Spanish - Latin American Mac, la tecla US `=` (scancode 0x2E) produce `¿` sin shift por convención ISO LATAM (fila numérica `' ¿` a la derecha del 0) |
+| `¡` | `S(KC_EQL)` | Misma tecla con shift produce `¡` |
+
+Si la hipótesis falla, alternativas a probar: `A(KC_1)` para `¡` (Option+1, layout Spanish ISO), `A(S(KC_1))` o `A(KC_SLSH)` para `¿`.
 
 **Window/Spaces management mac (fila 1 mano der):**
 
@@ -142,12 +147,6 @@ Estas dos posiciones eran las únicas realmente libres en el thumb cluster (en B
 >
 > - **Opción A — `Reduce Motion` ON** (search "reduce motion" en System Settings; en versiones recientes está en Accessibility → Motion o Display según release). Acelera dramáticamente el cambio de Space. **Trade-off**: estatiza también las animaciones del Liquid Glass (los widgets siguen translúcidos pero sin la refracción animada que les da el efecto "vivo"). Si te molesta visualmente, usa la Opción B.
 > - **Opción B — Hack del Dock**: `defaults write com.apple.dock expose-animation-duration -float 0.05; killall Dock`. Acelera solo la animación de Mission Control / Spaces sin tocar Liquid Glass. **Trade-off**: en macOS reciente (Sequoia 15+ / Tahoe 26+) `killall Dock` puede no ser suficiente — quizás requiera **logout completo** (`osascript -e 'tell app "System Events" to log out'`) para que WindowServer recoja el cambio. Y aún así, en algunas versiones este setting ya no afecta al Space switching por keyboard shortcut. Si confirmás que no aplica, queda la Opción A.
-
-**Neovim / IDE shortcut:**
-
-| Label | Keycode | Acción |
-|---|---|---|
-| `JBk` | `LCTL(KC_O)` | Jump back en jumplist (neovim nativo, también IDEs con plugin vim). Súper frecuente al navegar código entre archivos. Reemplaza el `[TAB]` heredado en col 0 fila 2 |
 
 **Macros mac sobre cursores (fila 2 mano der, movidas desde Adjust en sesión 2026-05-23):**
 
@@ -167,15 +166,15 @@ Encoder izq: tab nav (`⌘[` / `⌘]`). Encoder der: word nav (`⌥←` / `⌥�
 
 ```
 ┌─────┬─────┬─────┬─────┬─────┬─────┐                              ┌─────┬─────┬─────┬─────┬─────┬─────┐
-│BOOT │ TOG │ NXT │ HU+ │ SA+ │ VA+ │                              │ --- │ --- │ --- │ --- │ --- │ --- │
+│BOOT │ TOG │ NXT │ HU+ │ SA+ │ VA+ │                              │     │     │     │     │     │     │
 ├─────┼─────┼─────┼─────┼─────┼─────┤                              ├─────┼─────┼─────┼─────┼─────┼─────┤
-│ SP+ │ SP- │ PRV │ HU- │ SA- │ VA- │                              │ --- │ --- │ --- │ --- │ --- │ --- │
+│ SP+ │ SP- │ PRV │ HU- │ SA- │ VA- │                              │     │     │     │     │     │     │
 ├─────┼─────┼─────┼─────┼─────┼─────┤                              ├─────┼─────┼─────┼─────┼─────┼─────┤
-│ --- │ --- │ --- │ --- │ --- │ --- │                              │TGMOU│ --- │VOL- │MUTE │VOL+ │ --- │
+│     │     │     │     │     │     │                              │TGMOU│     │VOL- │MUTE │VOL+ │     │
 ├─────┼─────┼─────┼─────┼─────┼─────┼─────┐                  ┌─────┼─────┼─────┼─────┼─────┼─────┼─────┤
-│ --- │ --- │ --- │ --- │ --- │ --- │[MUT]│ ◉track  brillo◉  │[PLY]│ --- │ --- │PREV │PLAY │NEXT │ --- │
+│     │     │     │     │     │     │[MUT]│ ◉track  brillo◉  │[PLY]│     │     │PREV │PLAY │NEXT │     │
 └─────┴─────┴─────┼─────┼─────┼─────┴─────┴─────┐        ┌───┴─────┴─────┼─────┼─────┼─────┴─────┴─────┘
-                  │ --- │[ALT]│[CTL]│  ▼  │[SPC]│        │[ENT]│  ▼  │[AGR]│[RCT]│ --- │
+                  │     │[ALT]│[CTL]│  ▼  │[SPC]│        │[ENT]│  ▼  │[AGR]│[RCT]│     │
                   └─────┴─────┴─────┴─────┴─────┘        └─────┴─────┴─────┴─────┴─────┘
                           ▲ hold ambos LWR+RSE | hold ESC
 ```
@@ -221,13 +220,13 @@ Los efectos custom están implementados en [`rgb_matrix_user.inc`](./keyboards/s
 ┌─────┬─────┬─────┬─────┬─────┬─────┐                              ┌─────┬─────┬─────┬─────┬─────┬─────┐
 │     │     │     │     │     │     │                              │     │     │     │     │     │EXIT │
 ├─────┼─────┼─────┼─────┼─────┼─────┤                              ├─────┼─────┼─────┼─────┼─────┼─────┤
-│     │     │     │     │     │     │                              │BTN1 │BTN3 │BTN2 │ --- │ --- │ --- │
+│     │     │     │     │     │     │                              │BTN1 │BTN3 │BTN2 │     │     │     │
 ├─────┼─────┼─────┼─────┼─────┼─────┤                              ├─────┼─────┼─────┼─────┼─────┼─────┤
-│[SFT]│     │     │     │     │     │                              │ ←M  │ ↓M  │ ↑M  │ →M  │ --- │ --- │
+│[SFT]│     │     │     │     │     │                              │ ←M  │ ↓M  │ ↑M  │ →M  │     │     │
 ├─────┼─────┼─────┼─────┼─────┼─────┼─────┐                  ┌─────┼─────┼─────┼─────┼─────┼─────┼─────┤
-│[CMD]│     │     │     │     │     │[MUT]│  ◉scrV    scrH◉  │[PLY]│ ←S  │ ↓S  │ ↑S  │ →S  │ --- │EXIT │
+│[CMD]│     │     │     │     │     │[MUT]│  ◉scrV    scrH◉  │[PLY]│ ←S  │ ↓S  │ ↑S  │ →S  │     │EXIT │
 └─────┴─────┴─────┼─────┼─────┼─────┴─────┴─────┐        ┌───┴─────┴─────┼─────┼─────┼─────┴─────┴─────┘
-                  │ --- │[ALT]│[CTL]│[LWR]│[SPC]│        │[ENT]│[RSE]│[AGR]│[RCT]│ --- │
+                  │     │[ALT]│[CTL]│[LWR]│[SPC]│        │[ENT]│[RSE]│[AGR]│[RCT]│     │
                   └─────┴─────┴─────┴─────┴─────┘        └─────┴─────┴─────┴─────┴─────┘
               ▲ hold encoder push izq (momentario) | tap TGMOU desde Adjust (persistente)
 ```
