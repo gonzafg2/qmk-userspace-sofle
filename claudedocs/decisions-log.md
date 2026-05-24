@@ -279,10 +279,10 @@ Tras los fixes de Copilot y nuevas features pedidas por el usuario, el OLED mast
 
 ### Cambios aplicados
 
-**1. Convención de diagramas ASCII reescrita** (keymap.c comentarios + README.md). Los thumb clusters de Lower/Raise/Mouse mostraban contenido inconsistente con el código real (todos los thumbs son `_______` que heredan de Base, pero los diagramas mostraban combinaciones distintas — eran de iteraciones previas que nunca se actualizaron). Nueva convención documentada al inicio de `keymap.c`:
+**1. Convención de diagramas ASCII reescrita** (keymap.c comentarios + README.md). Los thumb clusters de Lower/Raise/Mouse mostraban contenido inconsistente con el código real (todos los thumbs son `_______` que heredan de Base, pero los diagramas mostraban combinaciones distintas — eran de iteraciones previas que nunca se actualizaron). Convención introducida en esta sesión 2 (la marca `---` para slots bloqueados se reemplazó por celda vacía en sesión 5, ver más abajo):
 - `[KEY]` = heredada de Base (slot `_______`)
 - `KEY` (sin corchetes) = asignada en esta capa
-- `---` = bloqueada (`XXXXXXX`)
+- `---` = bloqueada (`XXXXXXX`) *(sesión 2; reemplazado por celda vacía en sesión 5)*
 - `▼` = thumb que estás holdeando para activar la capa actual
 - `[MUTM]` / `[PLAY]` = encoder push heredado de Base
 
@@ -493,12 +493,55 @@ Sí. Cada cambio es independiente:
 7. **`Reduce Motion` activado** en macOS — el cambio de Space ya no se siente lento
 8. **SFT y CMD heredados en Raise** siguen funcionando para Shift+arrow y Cmd+S/Z
 
+## 2026-05-23 · Sesión 5: Aperturas LATAM ¡/¿, eliminación JBk + KP=/KENT, cosmético `---`
+
+**Contexto**: el usuario revisó el thumb cluster de Base ("estas keys vacías") y abrió un ciclo de pulido del keymap. Pidió 8 cambios; algunos se decidieron en sesión y otros quedaron para próxima iteración.
+
+### Cambios aplicados
+
+**1. Cosmético — `---` → celda vacía en diagramas ASCII** (keymap.c + README.md). La convención previa marcaba slots `XXXXXXX` con `---` para visualizar el bloqueo. Cambio: ahora se dejan en blanco. El código C sigue usando `XXXXXXX` (no cambia, es solo el render visual de los comentarios). Convención al inicio de `keymap.c` actualizada.
+
+**2. Lower thumbs externos eliminados** — `KC_PEQL` (col 0 fila 4 Lower) y `KC_PENT` (col 13 fila 4 Lower) reemplazados por `XXXXXXX`. Razón: el `=` del numpad se invoca con Spotlight + Calculator; el Enter del numpad ya está cubierto por `[ENT]` heredado del thumb interior. Esto revierte el punto 2 de sesión 2 (2026-05-23).
+
+**3. `!` (col 1 fila 2 Raise) → `¡` (apertura de exclamación)**. Keycode: `S(KC_EQL)` — hipótesis basada en convención ISO LATAM (la tecla US `=` produce `¿`/`¡` en layout Spanish - Latin American Mac). `!` simple sigue accesible en Lower (col 9 fila 2). Verificar al flashear.
+
+**4. JBk (`LCTL(KC_O)` col 0 fila 2 Raise) eliminado** — reemplazado por `¿` (apertura de pregunta). Keycode: `KC_EQL` (misma hipótesis ISO LATAM, sin shift). Razón: el usuario no usa Neovim regularmente; el atajo no aportaba al workflow real. Esto revierte el punto 8 de la tabla "Pinky col 0 mantenido vs reemplazado" de sesión 2.
+
+**5. SFT y CMD heredados en Raise — mantenidos (sin cambio)**. El usuario consideró reemplazarlos por símbolos, pero tras investigar shortcuts `Cmd+arrow` / `Cmd+Shift+arrow` en macOS (navegación + selección por línea/archivo) confirmamos que son críticos porque las flechas viven en Raise — perderlos rompería navegación amplia + selección sin soltar el thumb hold. Documentado en sesión 2 (decisions-log:477) ya, pero re-validado con investigación específica de combos Cmd+arrow.
+
+**6. Slots libres pendientes (Raise)**:
+- col 12 fila 4 (bajo SPOT/EMJI): `XXXXXXX` (vacío). Candidatos discutidos: `&`, símbolos programación (`!=`, `++`, `<<`, etc.), tab management. Se difiere a próxima sesión.
+
+**7. Adjust — sin cambios funcionales**, solo cosmético `---` → vacío en diagramas. El usuario priorizó pulir lo existente antes que llenar Adjust. Sigue con ~24 slots libres documentados.
+
+**8. Sin capa nueva**. Solo 502 B libres en flash, y Adjust ya tiene capacidad. Si en el futuro hace falta (window manager, F13-F24, etc.), se evalúa contra el balance de flash.
+
+### Tamaño final
+
+28170 → 28170 / 28672 (502 libres, **sin cambio**). Todos los cambios fueron zero-cost:
+- LCTL(KC_O) ↔ KC_EQL: ambos son combos QMK estándar, mismo peso
+- KC_PEQL/KC_PENT → XXXXXXX: ahorro despreciable
+- Cambios cosméticos en comentarios: 0 B (no se compilan)
+
+### Validación pendiente (tras re-flashear)
+
+1. **`¿` y `¡` en Raise** — col 0 y col 1 fila 2 — producen efectivamente los caracteres LATAM esperados. Si la hipótesis `KC_EQL`/`S(KC_EQL)` falla, probar:
+   - `A(KC_1)` para `¡` (Option+1, layout Spanish ISO)
+   - `A(S(KC_1))` o `A(KC_SLSH)` para `¿`
+2. **Lower thumbs externos** — col 0 y col 13 fila 4 — no producen nada (`XXXXXXX` activo).
+3. **SFT y CMD en Raise** — `Cmd+arrow` / `Cmd+Shift+arrow` / `Shift+arrow` funcionan sin soltar RSE.
+4. Estado previo (puntos 1-5 de sesión 4) siguen funcionando.
+
 ## Decisiones pendientes (sin resolver)
 
 Ver [thumb-cluster-iteration.md](./thumb-cluster-iteration.md):
 - ¿Mantener doble Enter o consolidar a uno solo?
 - ¿Reemplazar `LWR` y `RSE` solos por TAB/BSPC dedicados?
 - ¿Otra alternativa que el usuario proponga?
+
+De sesión 5:
+- ¿Qué llenar en col 12 fila 4 Raise (bajo SPOT/EMJI)? Candidatos: `&`, símbolos programación (`!=`, `++`, `<<`, `:=`), tab management (`LGUI(LSFT(KC_T))` reabrir tab cerrado).
+- ¿Aprovechar los ~24 slots libres de Adjust? Ideas mencionadas pero no implementadas: `KC_HYPR`, macros IDE (GoTo Line, Find in Files, GoTo Symbol), sleep display Mac (`LCTL(LSFT(KC_PWR))`).
 
 Pendiente verificar en físico (esta sesión):
 - Posición real del Luna pet en el OLED (¿queda en parte inferior como esperado o en otra zona por la rotación 270°?)

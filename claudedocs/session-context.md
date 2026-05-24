@@ -105,7 +105,7 @@ Tras resolver el bug de dead keys, el user revisó el keymap completo y pidió 1
 
 **Cambios aplicados** (detalle completo en [decisions-log.md](./decisions-log.md) entrada "Sesión 2"):
 
-1. **Convención `[KEY]` en diagramas ASCII** — keymap.c (comentarios) + README.md. Notación: `[KEY]` = heredada de Base, `KEY` = asignada en capa, `---` = bloqueada (`XXXXXXX`), `▼` = thumb activo. Thumb clusters de Lower/Raise/Mouse corregidos (estaban desincronizados con código real).
+1. **Convención `[KEY]` en diagramas ASCII** — keymap.c (comentarios) + README.md. Notación introducida en sesión 2: `[KEY]` = heredada de Base, `KEY` = asignada en capa, `---` = bloqueada (`XXXXXXX`), `▼` = thumb activo. Thumb clusters de Lower/Raise/Mouse corregidos (estaban desincronizados con código real). **Nota**: la marca `---` para slots bloqueados se reemplazó por celda vacía en sesión 5 (ver más abajo).
 2. **Lower thumbs externos**: `KC_PEQL` (= numpad) izq + `KC_PENT` (Enter numpad) der — únicas posiciones realmente libres en thumb cluster.
 3. **Raise fila 1 mano der**: 6 keycodes window mgmt mac (Mission Control, App Exposé, Space prev/next, Zoom-, Zoom+).
 4. **Raise fila 2 col 6-9**: SCRA/SCRT/LOCK/FQT movidas desde Adjust (sobre cursores). `QK_REP` movido a col 10.
@@ -115,6 +115,20 @@ Tras resolver el bug de dead keys, el user revisó el keymap completo y pidió 1
 8. **Mouse precisión**: `MK_KINETIC_SPEED` activado + params tuneados (`MOVE_DELTA 16`, `INITIAL_SPEED 50`, `BASE_SPEED 3000`).
 
 **Medición**: +150 B neto (de 28020 → 28170 / 28672, 502 libres, 97% → 98%). NKRO+combos 0 B, MK_KINETIC +150 B, GFG_SCRF -30 B.
+
+## Sesión 2026-05-23 (sesión 5) — aperturas LATAM ¡/¿ + limpieza thumbs Lower + cosmético
+
+Tras flashear las sesiones 1-4, el user revisó el thumb cluster de Base y abrió un ciclo de pulido (detalle en [decisions-log.md](./decisions-log.md) entrada "Sesión 5"):
+
+1. **Cosmético**: `---` (slots `XXXXXXX`) → celda vacía en diagramas ASCII de keymap.c y README.md. Convención actualizada al inicio del keymap.
+2. **Lower thumbs externos eliminados**: `KC_PEQL` y `KC_PENT` (cols 0 y 13 fila 4 Lower) → `XXXXXXX`. Revierte sesión 2 punto 2 — el usuario reportó bajo uso real (calculadora vía Spotlight, Enter ya en thumb interior).
+3. **Raise col 0 fila 2**: `LCTL(KC_O)` (JBk neovim) → `KC_EQL` (¿ apertura). Usuario no usa Neovim regularmente.
+4. **Raise col 1 fila 2**: `KC_EXLM` (!) → `S(KC_EQL)` (¡ apertura). `!` simple sigue en Lower.
+5. **Hipótesis LATAM Mac de `¿`/`¡`**: tecla US `=` produce `¿` sin shift y `¡` con shift (convención ISO LATAM). Verificar al flashear; si falla, probar `A(KC_1)` para `¡` y `A(S(KC_1))`/`A(KC_SLSH)` para `¿`.
+6. **SFT y CMD en Raise — mantenidos** tras investigación de combos `Cmd+arrow`/`Cmd+Shift+arrow`: navegación y selección por línea/archivo son críticas cuando las flechas viven en Raise.
+7. **Pendientes deferidos**: col 12 fila 4 Raise sigue `XXXXXXX` (candidatos `&`, `!=`, `++`, `<<`, etc.); Adjust ~24 slots libres sin tocar (Hyperkey, macros IDE, sleep display considerados pero no implementados).
+
+**Tamaño**: 28170 / 28672 (502 libres, sin cambio). Todos los cambios zero-cost.
 
 ## Sesión 2026-05-23 (sesión 4) — ajustes post-flasheo
 
