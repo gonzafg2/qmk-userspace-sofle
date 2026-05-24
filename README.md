@@ -57,7 +57,7 @@ En los diagramas de Lower / Raise / Adjust / Mouse se usa esta notación para di
 |---|---|
 | `KEY` (sin corchetes) | Keycode asignado en esta capa (sobrescribe a Base) |
 | `[KEY]` (entre corchetes) | Slot `_______` que **hereda** la tecla `KEY` de Base (no está sobrescrita) |
-| Celda vacía | Slot `XXXXXXX` (bloqueado, no produce nada) — se dibuja en blanco |
+| Celda vacía | Slot que **no produce nada** en esta capa — se dibuja en blanco. Cubre dos casos equivalentes desde el punto de vista del usuario: `XXXXXXX` explícito en esta capa, o `_______` que hereda `XXXXXXX` desde Base (caso típico: thumbs externos en Raise/Adjust/Mouse) |
 | `▼` | Thumb que estás **holdeando** ahora para activar esta capa |
 | `[MUTM]` / `[PLAY]` | Encoder push heredado de Base (LT mouse / play) |
 

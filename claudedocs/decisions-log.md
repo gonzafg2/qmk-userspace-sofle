@@ -279,10 +279,10 @@ Tras los fixes de Copilot y nuevas features pedidas por el usuario, el OLED mast
 
 ### Cambios aplicados
 
-**1. Convención de diagramas ASCII reescrita** (keymap.c comentarios + README.md). Los thumb clusters de Lower/Raise/Mouse mostraban contenido inconsistente con el código real (todos los thumbs son `_______` que heredan de Base, pero los diagramas mostraban combinaciones distintas — eran de iteraciones previas que nunca se actualizaron). Nueva convención documentada al inicio de `keymap.c`:
+**1. Convención de diagramas ASCII reescrita** (keymap.c comentarios + README.md). Los thumb clusters de Lower/Raise/Mouse mostraban contenido inconsistente con el código real (todos los thumbs son `_______` que heredan de Base, pero los diagramas mostraban combinaciones distintas — eran de iteraciones previas que nunca se actualizaron). Convención introducida en esta sesión 2 (la marca `---` para slots bloqueados se reemplazó por celda vacía en sesión 5, ver más abajo):
 - `[KEY]` = heredada de Base (slot `_______`)
 - `KEY` (sin corchetes) = asignada en esta capa
-- `---` = bloqueada (`XXXXXXX`)
+- `---` = bloqueada (`XXXXXXX`) *(sesión 2; reemplazado por celda vacía en sesión 5)*
 - `▼` = thumb que estás holdeando para activar la capa actual
 - `[MUTM]` / `[PLAY]` = encoder push heredado de Base
 

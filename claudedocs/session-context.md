@@ -105,7 +105,7 @@ Tras resolver el bug de dead keys, el user revisó el keymap completo y pidió 1
 
 **Cambios aplicados** (detalle completo en [decisions-log.md](./decisions-log.md) entrada "Sesión 2"):
 
-1. **Convención `[KEY]` en diagramas ASCII** — keymap.c (comentarios) + README.md. Notación: `[KEY]` = heredada de Base, `KEY` = asignada en capa, `---` = bloqueada (`XXXXXXX`), `▼` = thumb activo. Thumb clusters de Lower/Raise/Mouse corregidos (estaban desincronizados con código real).
+1. **Convención `[KEY]` en diagramas ASCII** — keymap.c (comentarios) + README.md. Notación introducida en sesión 2: `[KEY]` = heredada de Base, `KEY` = asignada en capa, `---` = bloqueada (`XXXXXXX`), `▼` = thumb activo. Thumb clusters de Lower/Raise/Mouse corregidos (estaban desincronizados con código real). **Nota**: la marca `---` para slots bloqueados se reemplazó por celda vacía en sesión 5 (ver más abajo).
 2. **Lower thumbs externos**: `KC_PEQL` (= numpad) izq + `KC_PENT` (Enter numpad) der — únicas posiciones realmente libres en thumb cluster.
 3. **Raise fila 1 mano der**: 6 keycodes window mgmt mac (Mission Control, App Exposé, Space prev/next, Zoom-, Zoom+).
 4. **Raise fila 2 col 6-9**: SCRA/SCRT/LOCK/FQT movidas desde Adjust (sobre cursores). `QK_REP` movido a col 10.

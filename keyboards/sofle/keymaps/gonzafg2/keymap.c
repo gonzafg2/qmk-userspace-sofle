@@ -3,7 +3,11 @@
 
 /* Convención de los diagramas ASCII:
  *   [KEY]   = slot _______ que hereda KEY de la capa Base (no está sobrescrita)
- *   (vacío) = slot XXXXXXX (bloqueado, no produce nada) — celda en blanco
+ *   (vacío) = slot que NO produce nada en esta capa — celda en blanco.
+ *             Incluye dos casos: (a) `XXXXXXX` explícito en esta capa, o
+ *             (b) `_______` que hereda `XXXXXXX` desde Base (común en los
+ *             thumbs externos de Raise/Adjust/Mouse). Funcionalmente
+ *             equivalentes desde el punto de vista del usuario.
  *   KEY     = keycode asignado en esta capa
  *   ▼       = thumb que estás holdeando para entrar a esta capa
  *   [MUTM]  = encoder push izq heredado (LT _MOUSE KC_MUTE en Base)
